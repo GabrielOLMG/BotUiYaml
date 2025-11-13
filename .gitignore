@@ -1,0 +1,4 @@
+/projects_examples
+
+__pycache__/
+*.pyc

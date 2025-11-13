@@ -1,0 +1,1 @@
+- Criar opção no find para esperar até esta carregado, so podera funcionar com imagem
