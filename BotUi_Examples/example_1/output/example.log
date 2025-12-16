@@ -1582,3 +1582,22 @@ pipelines.combat.steps.0
 2025-11-26 19:34:13 [ERROR] ❌ [FIND] Não foi possivel Localizar o texto 'Battle Options' na lista: ['HOWDOWN', 'Challenge Cup 1v1', 'LucianMosegaw', 'BETA', 'Home', 'LucianMosegaw vs. alexism808', '2 users', 'Balle opuons', 'Turn5', 'LucianMosegaw and alexism808 joined', 'Hide', 'Sceptile  L72', '19232', '2611', '1009', 'alexism808', 'Format:', '0.67× Atk]', '[Gen 9] Challenge Cup 1v1', 'users online', 'active battles', 'Rated battle', 'HP Percentage Mod: HP is shown in percentages', 'Terastal Clause: You cannot Terastallize', 'Stantler  L76', "LucianMosegaw's team:", 'Stantler / Bruite Bonnet / Jangmo-o / Rabsca / Crabominable / Meowscarada', "alexism808'steam:", 'WORLDOFTANKS', 'Luxio / Chikorita / Rolycoly / Raging Bolt / Scorbunny / Sceptile', 'LucianMosegaw', "Battle timer is ON: inactive players will automatically lose when time's up. (requested by", 'alexism808)', 'Battle started between LucianMosegaw and alexism808!', 'Go!Stantler!', 'alexism808 sent out Sceptile!', "[Stantler's Intimidate]", "The opposing Sceptile's Attack fell!", 'The opposing Sceptile used Fury Cutter!', 'PLAYNOWFORFREE', 'Turn1', '2:30', 'The opposing Sceptile used Solar Beam!', 'Skip turn', 'Skip to end ', ' The opposing Sceptile absorbed light!', '(All rooms)', 'Stantler used Spite!', "It reduced the PP of the opposing Sceptile's Solar Beam by 4!", 'Official chat rooms', 'Turn 2', 'Lobby', '(800 users)', 'The opposing Sceptile used Solar Beam!', " Still haven't decided on a room for you? Relax here amidst the chaos.", '(Stantler lost 40.8% of its health!)', 'Tournaments', '(404 users)', 'Stantler used Spite!', '24/7 room tournaments! Join and ascend the leaderboard :P', "It reduced the PP of the opposing Sceptile's Solar Beam by 4!", '→ Subrooms:  Tours Plaza Tours Minigames', 'Turn3', 'Help', '(297 users)', " Have a question about Showdown or Smogon? We'd be glad to help you out!", 'The opposing Sceptile used Solar Beam!', 'The opposing Sceptile absorbed light!', 'PSPL Winner', 'Stantler used Spite!', "It reduced the PP of the opposing Sceptile's Solar Beam by 4!", '!pu!H ', '(64 users)', 'Turn 4', ' 000OO 0OOOOO 0OOO 0OOO 0OOO 0OOO OO OOOOTeesri adhiktam bole jaane waali bha', '→ Subrooms:  Galli Galli Sim Sim', 'The opposing Sceptile used Solar Beam!', '(Stantler lost 42.9% of its health!)', 'Stantler used Spite!', "It reduced the PP of the opposing Sceptile's Solar Beam by 2!", 'WORLDoFTANKS', 'Turn5', 'PLAYNOWFORFREE', 'The opposing Sceptile used Fury Cutter!', 'Chat rooms', 'LucianMosega']
 2025-11-26 19:34:13 [ERROR] ❌ Step falhou na pipeline 'combat_loop'.
 2025-11-26 19:34:13 [INFO] 🧹 Finalizando e encerrando o driver...
+2025-12-16 10:33:12 [INFO] ✅ YAML válido!
+2025-12-16 10:33:12 [INFO] 🔄 Iniciando execução de pipelines
+2025-12-16 10:33:12 [INFO] 🧩 Nenhum driver fornecido. Criando driver padrão da biblioteca...
+2025-12-16 10:33:13 [INFO] ✅ Driver padrão criado e validado com sucesso.
+2025-12-16 10:33:14 [INFO] 🧹 Finalizando e encerrando o driver...
+2025-12-16 10:37:10 [INFO] ✅ YAML válido!
+2025-12-16 10:37:10 [INFO] 🔄 Iniciando execução de pipelines
+2025-12-16 10:37:10 [INFO] 🧩 Nenhum driver fornecido. Criando driver padrão da biblioteca...
+2025-12-16 10:37:11 [INFO] ✅ Driver padrão criado e validado com sucesso.
+2025-12-16 10:37:18 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2025-12-16 10:37:18 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2025-12-16 10:37:21 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2025-12-16 10:37:26 [DEBUG] ⏱ Aguardando 0.50 segundos
+2025-12-16 10:37:28 [DEBUG] ⏱ Aguardando 1.00 segundos
+2025-12-16 10:37:29 [INFO] 🔹 Step: Procura Botao de Escolha do Formato
+2025-12-16 10:37:32 [DEBUG] ⏱ Aguardando 0.50 segundos
+2025-12-16 10:37:33 [INFO] 🔹 Step: Escolhe o Modo de Batalha
+2025-12-16 10:37:35 [DEBUG] ⏱ Aguardando 0.30 segundos
+2025-12-16 10:37:36 [INFO] 🧹 Finalizando e encerrando o driver...
