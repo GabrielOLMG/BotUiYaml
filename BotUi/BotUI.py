@@ -57,6 +57,7 @@ class BotUI:
         if self.global_yaml_path:
             yaml_data = open_yaml(self.global_yaml_path)["config"]
             return self.init_config(yaml_data)
+        return True, None
 
 
     def init_actions(self, step_info):
@@ -305,9 +306,9 @@ class BotUI:
 
 
         self.init_actions(step_info)
-        action_bool, action_error_log = self.actions.run_action()
+        action_bool, action_error_log = self.actions.run_action() # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
 
-        if not action_bool:
+        if action_error_log:
             self.finish(action_error_log)
             return False
         return True

@@ -10,8 +10,16 @@ text_model = None
 def get_text_detect_model():
     global text_model
     if not text_model:
-        # text_model = RapidOCR(det_limit_side_len=500)
-        text_model = RapidOCR()
+        text_model = RapidOCR(
+            det_limit_side_len=960,  # mais parecido com o Spaces
+            box_thresh=0.6,
+            unclip_ratio=1.6,
+            text_score=0.5,
+            use_dilation=True,       # MUITO IMPORTANTE p/ colar caixas pequenas
+            #rec_img_shape=[3, 48, 320]
+        )
+        #text_model = RapidOCR(det_limit_side_len=500)
+        # text_model = RapidOCR()
 
     return text_model
 

@@ -1,0 +1,125 @@
+config:
+  variables:
+    USERNAME: LucianMosegaw
+    PASSWORD: gabriel999
+
+
+pipelines:
+  teste:
+    url: https://play.pokemonshowdown.com
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: Consent
+        in_text: False
+        click: True
+        optional: True
+        helper: Procura Botao de Escolha do Nome
+  
+  login:
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: Choose name
+        in_text: False
+        click: True
+        helper: Procura Botao de Escolha do Nome
+      - action: WRITE
+        text: $USERNAME
+      - action: KEYS_SELECTIONS
+        keys:
+          - Enter
+        wait: 0.5
+      - action: WRITE
+        text: $PASSWORD
+      - action: KEYS_SELECTIONS
+        keys:
+          - Enter
+        wait: 1
+        
+  combat_format:
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: "Format:"
+        y_coord: 10
+        in_text: False
+        click: True
+        helper: Procura Botao de Escolha do Formato
+        wait: 0.5
+      - action: FIND
+        object_type: TEXT
+        text: Randomized Metas
+        in_text: False
+        click: True
+        helper: Escolhe o Modo de Batalha
+        wait: 0.3
+      - action: FIND
+        object_type: TEXT
+        text: Challenge Cup 1v1
+        in_text: False
+        click: True
+        helper: Escolhe o Modo de Batalha
+      - action: FIND
+        object_type: TEXT
+        text: "Battle!"
+        in_text: False
+        click: True
+        helper: Inicia Batalha     
+        wait: 5
+      - action: FIND
+        object_type: TEXT
+        text: "Connecting"
+        helper: Esperando Conectar    
+        if_find: retry
+        optional: True
+        wait: 1
+      - action: FIND
+        object_type: TEXT
+        text: "Searching..."
+        helper: Esperando Achar Alguem    
+        if_find: retry
+        optional: True
+        wait: 3
+
+  combat_loop:
+    steps:
+      - action: DO_WHILE
+        while_condition: # TODO : WHILE SO TER FIND? pode ser? Como negar? until_find(?)
+          - action: FIND
+            object_type: TEXT
+            text: "Battle Options" # Mudar Para Algo que Permanecesse enquant oo jogo esta ativo
+            helper: Verifica While condition
+            in_text: False
+        do:
+          - action: FIND
+            object_type: TEXT
+            text: "Choose"
+            y_coord: 25
+            click: True
+            helper: Tentado Escolher Pokemon
+            optional: True
+          - action: FIND 
+            object_type: TEXT
+            text: "Attack"
+            in_text: False
+            y_coord: 25
+            click: True
+            optional: True
+            helper: Tenatndo Usa Primeiro Ataque # Atravez do primeiro ataque eu consigo localizar todos os ataques!
+  
+      # Loop Até Algum momento acontecer(jogo manualmente até alguem vence rou perder até e contrar algo especifico de vitoria ou deerrota para usar aqui)
+
+      
+
+# Ler o chat e ver qual meu time ( $USERNAME's team: (proxima linha é a lista do meu time)-> mais dificl!)(posso comecar com Choose Lead abaixo, para escollher qlq um)
+# Aparece ususario oppoennte sent out ___ para pegar o nome do pokemon adv
+# Na parte de atacks tem algo escrito "Attack". Eu posso selecionar no comeo o primeiro abaixo dele
+
+
+
+# FUTURE ACTIONS
+
+# DO -> varias actions seguidas e no final tem um where, ou algo do genero, que ira parar o DO, se nao parar, volta a repetir!
+# FIND -> alguma forma de se encontrar algo, seja imagem ou texto, ele deve voltar repetir o find, até encontrar ou nao encontrar, serve para os 2. passo mais simples do anterior!
+  # FIND TEXT 'Searching...'' if_find(ou until_find ou os dois): [retry(volta a tentar encontrar), finalzia o codigo, passa para a proxima acao, e etc]

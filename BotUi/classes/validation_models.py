@@ -24,7 +24,8 @@ class Step(BaseModel):
         "FIND_TEXT_BY_COLOR",
         "STOP_IF",
         "FOR_EACH", # README
-        "FIND" # README
+        "FIND", # README
+        "DO_WHILE"
     ]
 
     '''
@@ -56,6 +57,9 @@ class Step(BaseModel):
     in_text: Optional[bool] = True # Localiza texto igual ou contido. Se True, ele faz "text" in VALOR_ACHADOS caso contrario "text" == VALOR_ACHADOS 
     optional: Optional[bool] = False # Se é obrigatorio encontrar o objeto ou não, se True, ele avança para a proxima acao sem dar erro!
     debug: Optional[bool] = False
+    until_find:  Optional[Literal["retry"]] = None
+    if_find:  Optional[Literal["retry"]] = None
+
 
     # KEYS_SELECTIONS ACTION
     keys: Optional[List[str]] = None
@@ -63,6 +67,9 @@ class Step(BaseModel):
     # WRITE ACTION
     file_path: Optional[str] = None
 
+    # DO_WHILE ACTIONS # TODO!
+    while_condition: Optional[List[Dict]] = None
+    do: Optional[List[Dict]] = None
 
     # GLOBAL ACTIONS
     wait: Optional[float] = None
@@ -96,6 +103,15 @@ class Step(BaseModel):
         if not self.keys:
             raise ValueError(f"{initial_error_text} The 'keys' field is required.")
 
+    def validate_do_while(self):
+        initial_error_text = "[ACTION DO_WHILE]"
+
+        if not self.do:
+            raise ValueError(f"{initial_error_text} The 'do' field is required.")
+        if not self.while_condition:
+            raise ValueError(f"{initial_error_text} The 'while_condition' field is required.")
+
+
 
     @model_validator(mode="after")
     def validate_fields(self):
@@ -106,6 +122,9 @@ class Step(BaseModel):
 
         if action == "KEYS_SELECTIONS":
             self.validate_keys_selections()
+        
+        if action == "DO_WHILE":
+            self.validate_do_while()
 
         if action == "UPLOAD_FILE":
             if not self.file_path:

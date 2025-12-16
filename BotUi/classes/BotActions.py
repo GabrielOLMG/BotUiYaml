@@ -29,6 +29,9 @@ class BotActions:
         self.scroll_distance = 500
         self.scroll_direction_default = "DOWN"
         
+        # retry
+        self.find_retry_attempts = 0
+        self.find_retry_max_attempts = 50
 
         # Screenshots
         self.screenshots_path = screenshots_path
@@ -44,7 +47,8 @@ class BotActions:
                 "RUN_SCRIPT": self.run_script,
                 "FIND_TEXT_BY_COLOR": self.find_text_by_color,
                 "STOP_IF": self.stop_if,
-                "UPLOAD_FILE": self.upload_file
+                "UPLOAD_FILE": self.upload_file,
+                "DO_WHILE": self.do_while
             }
 
     def run_action(self):
@@ -57,7 +61,7 @@ class BotActions:
         self._take_screenshot()
         try:
             result = function()
-            if not isinstance(result, bool) and not result[0]:
+            if not isinstance(result, bool) and result[1]:
                 return False, result[1] 
             
             if self.step_info.get("refresh", False):
@@ -68,7 +72,7 @@ class BotActions:
                 self.logger.debug("⏱ Aguardando %.2f segundos", wait_time)
                 time.sleep(wait_time)
             
-            if self.step_info.get("save_url", None):
+            if self.step_info.get("save_url", None): # TODO: Como posso melhorar essa opcao?
                 self.data_store[self.step_info.get("save_url")] = self.driver.current_url
             
         except Exception as e:
@@ -96,23 +100,62 @@ class BotActions:
     # ----------------------
     # Actions
     # ----------------------~
+    def do_while(self):
+        do_actions = self.step_info["do"]
+        while_condition_actions = self.step_info["while_condition"]
+        allowed_while_actions = ["FIND"]
+        keep_going = True
+
+        while keep_going:
+            for i, do_action in enumerate(do_actions): # As Acoes Nao podem dar Erro
+                print(f"fazendo action_{i}")
+                actions = BotActions(
+                    driver=self.driver,
+                    data_store=self.data_store,
+                    logger=self.logger,
+                    step_info=do_action,
+                    screenshots_path=self.screenshots_path
+                )
+                print(f"iniciando acao do Action_{i}")
+
+                action_bool, action_error_log = actions.run_action()
+                if not action_bool: 
+                    return action_bool, action_error_log
+
+            for while_action in while_condition_actions: # O while por hora pode dar erro, so se 
+                if while_action["action"] not in allowed_while_actions:
+                    return False, f"Atualmente o while pode apenas conter as acoes: {allowed_while_actions}"
+                actions = BotActions(
+                    driver=self.driver,
+                    data_store=self.data_store,
+                    logger=self.logger,
+                    step_info=while_action,
+                    screenshots_path=self.screenshots_path
+                )
+                while_bool, while_error_log = actions.run_action()
+                if while_error_log: 
+                    return while_bool, while_error_log 
+                
+                if not while_bool: # TODO: Melhorar logica, pq por hora so funciina com FIND!
+                    keep_going = False
+                    break
+                # TODO: Como que vou finalizar o while? nao posso permitir que finalize com erros
+                # if not while_bool: 
+                #     keep_going= False
+                #     break
+        return True
 
     def find(self):
         """
         Localiza um objeto na tela (imagem ou texto), com suporte a scroll e clique.
         Retorna True em sucesso, ou (False, mensagem) em falha.
         """
+        # TODO: PRECISA RETORNAR TRUE SE ACHOU E FALSE SE NAO ACHOU!! A VERIFICACAO PRECISA SER EM RELACAO AO ERROR_TEXT!
+        self._take_screenshot()
 
         # --- 1️⃣ Captura configurações principais ---
         step = self.step_info
         object_type = step.get("object_type")
-        scroll_enabled = step.get("scroll", False)
-        scroll_direction = step.get("scroll_direction", self.scroll_direction_default)
-        offset_x = step.get("x_coord", 0)
-        offset_y = step.get("y_coord", 0)
-        debug_mode = step.get("debug", False)
-        optional = step.get("optional", False)
-        click_enabled = step.get("click", False)
 
         # --- 2️⃣ Escolhe função de busca ---
         find_fn_map = {
@@ -132,52 +175,13 @@ class BotActions:
             return False, f"[FIND] Tipo de objeto inválido: {object_type}"
 
         # --- 3️⃣ Tenta localizar o objeto ---
-        status, error_text, coord = find_fn_map[object_type]()
+        status, error_text, object_coord = find_fn_map[object_type]()
 
-        # --- 4️⃣ Caso falhe, tenta scrollar e repetir ---
+        # --- 4️⃣ Check se achou e aplica devida regra ---
         if not status:
-            if scroll_enabled and self.scroll_attempt < self.scroll_max_attempts:
-                self.logger.debug(
-                    f"🔄 Scrolling to locate the object "
-                    f"({self.scroll_attempt}/{self.scroll_max_attempts})..."
-                )
-                self.scroll_attempt += 1
-
-                scroll_status, scroll_error, scroll_coord = find_image_center(
-                    screenshot_path=self.screenshot_check_page,
-                    template_path=step["scroll_image_path"]
-                )
-
-                if not scroll_status:
-                    return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
-                drag_vertical(
-                    driver=self.driver,
-                    coord=scroll_coord,
-                    direction=scroll_direction,
-                    delta_y=self.scroll_distance
-                )
-                self._take_screenshot()
-                return self.find()  # chamada recursiva
-            else:
-                if not optional:
-                    return False, f"[FIND] {error_text}"
-                else:
-                    return True
-
-        # --- 5️⃣ Aplica offset (x, y) ---
-        if offset_x or offset_y:
-            coord = (coord[0] + offset_x, coord[1] + offset_y)
-
-        # --- 6️⃣ Modo debug ---
-        if debug_mode:
-            self.debug(coord, self.screenshot_check_page)
-
-        # --- 7️⃣ Clique final ---
-        if click_enabled and coord:
-            click_coord(self.driver, coord)
-
-        # --- 8️⃣ Retorno final ---
-        return True
+            return self._not_find_consequence(step, error_text)
+        else:
+            return self._find_consequence(step, object_coord)
 
     def write(self):
         if "text" in self.step_info:
@@ -258,6 +262,86 @@ class BotActions:
         upload_file(self.driver, self.step_info["file_path"])
 
         return True
+    
+    # ----------------------
+    # Find Actions Secondary Functions
+    # ----------------------
+
+    def _scroll_to_find(self, step, scroll_direction):
+        # --- Aplica Log ---
+        self.logger.debug(
+            f"🔄 Scrolling to locate the object "
+            f"({self.scroll_attempt}/{self.scroll_max_attempts})..."
+        )
+        # --- Atualiza A Tentativa ---
+        self.scroll_attempt += 1
+
+        # --- Localiza Scroll Na Pagina ---
+        scroll_status, scroll_error, scroll_coord = find_image_center(
+            screenshot_path=self.screenshot_check_page,
+            template_path=step["scroll_image_path"]
+        )
+        if not scroll_status:
+            return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
+        
+        # --- Aplica o Scroll ---
+        drag_vertical(
+            driver=self.driver,
+            coord=scroll_coord,
+            direction=scroll_direction,
+            delta_y=self.scroll_distance
+        )
+
+        return self.find()
+    
+    def _not_find_consequence(self, step, error_text): # TODO: Mudar o nome. Melhorar parametros
+        scroll_enabled = step.get("scroll", False)
+        scroll_direction = step.get("scroll_direction", self.scroll_direction_default)
+        until_find = step.get("until_find", None)
+        optional = step.get("optional", False)
+
+
+        # Funcao que aplica logica se nao encontrar nada com FIND
+        if scroll_enabled and self.scroll_attempt < self.scroll_max_attempts:
+            return self._scroll_to_find(step, scroll_direction) 
+        else:
+            if until_find: 
+                if until_find=="retry" and self.find_retry_attempts <= self.find_retry_max_attempts:
+                    self.find_retry_attempts-=1
+                    return self.find() 
+            if not optional:
+                return False, f"[FIND] {error_text}"
+            else:
+                return False
+    
+    def _find_consequence(self, step, object_coord):
+        offset_x = step.get("x_coord", 0)
+        offset_y = step.get("y_coord", 0)
+        debug_mode = step.get("debug", False)
+        click_enabled = step.get("click", False)
+        if_find = step.get("if_find", None)
+
+
+        # --- 5️⃣ Aplica offset (x, y) ---
+        if offset_x or offset_y:
+            object_coord = (object_coord[0] + offset_x, object_coord[1] + offset_y)
+
+        # --- 6️⃣ Modo debug ---
+        if debug_mode:
+            self.debug(object_coord, self.screenshot_check_page)
+
+        # --- 7️⃣ Clique final ---
+        if click_enabled and object_coord:
+            click_coord(self.driver, object_coord)
+
+        # --- 8️⃣  Acoes de Encontrar---
+        if if_find:
+            if if_find=="retry":
+                return self.find()
+        
+        return True
+
+
     # ----------------------
     # Helper genéricos
     # ----------------------

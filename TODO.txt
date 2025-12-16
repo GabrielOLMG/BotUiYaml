@@ -1,0 +1,3 @@
+ler memlhor:
+
+https://huggingface.co/spaces/RapidAI/RapidOCR
