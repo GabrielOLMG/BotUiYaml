@@ -3,7 +3,7 @@ set -e
 
 echo ""
 echo "======================================"
-echo "🤖 BotUI — Verificação de Ambiente"
+echo "🤖 BotUI — Verificação de Ambiente (Playwright)"
 echo "======================================"
 echo ""
 
@@ -41,7 +41,7 @@ else
 fi
 
 echo ""
-echo "🚀 Tudo pronto para rodar o BotUI!"
+echo "🚀 Ambiente pronto para rodar o BotUI (Playwright)"
 echo "--------------------------------------"
 echo ""
 

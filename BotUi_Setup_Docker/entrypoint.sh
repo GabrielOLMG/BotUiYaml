@@ -12,8 +12,23 @@ echo "====================================="
 echo ""
 echo "📦 Ambiente pronto!"
 echo "➡️  Python: $(python3 --version 2>/dev/null || echo '❌ não encontrado')"
-echo "➡️  Chromium: $(chromium --version 2>/dev/null || echo '❌ não encontrado')"
-echo "➡️  ChromeDriver: $(chromedriver --version 2>/dev/null || echo '❌ não encontrado')"
+
+# -------------------------------------
+# 🧪 Teste rápido do Playwright
+# -------------------------------------
+echo -n "➡️  Playwright: "
+python3 - <<'EOF'
+try:
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        browser.close()
+    print("✅ OK")
+except Exception as e:
+    print("❌ ERRO")
+    raise
+EOF
+
 echo ""
 echo "====================================="
 

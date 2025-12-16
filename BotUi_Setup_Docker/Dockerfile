@@ -8,10 +8,18 @@ FROM python:3.10-slim
 # Evita prompts interativos
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instala dependências do sistema, Chromium e Tesseract
+# Define onde o Playwright vai instalar os browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# ================================
+# 🔧 Dependências do Sistema
+# ================================
+
+# Dependências exigidas pelo Playwright + Tesseract
 RUN apt-get update -y && apt-get install -y \
-    chromium \
-    chromium-driver \
+    wget \
+    gnupg \
+    ca-certificates \
     python3-tk \
     python3-dev \
     libnss3 \
@@ -31,6 +39,16 @@ RUN apt-get update -y && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-por \
     && rm -rf /var/lib/apt/lists/*
+
+# ================================
+# 🧠 Playwright
+# ================================
+
+# Instala Playwright
+RUN pip install --no-cache-dir playwright
+
+# Instala Chromium do Playwright
+RUN playwright install chromium
 
 # ============================
 # 📦 Configuração da Aplicação
