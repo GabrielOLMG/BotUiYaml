@@ -120,15 +120,27 @@ def drag_vertical(driver, coord=None, direction="DOWN", delta_y=100, delta_x=0):
 
 def click_coord(driver, coords):
     x, y = coords
-    # x = center_x + extra_x
-    # y = center_y + extra_y
 
-    actions = ActionChains(driver)
-    actions.move_by_offset(x, y).click().perform()
-    actions.move_by_offset(-x, -y).perform() 
+    driver.execute_cdp_cmd("Input.dispatchMouseEvent", {
+        "type": "mousePressed",
+        "x": x,
+        "y": y,
+        "button": "left",
+        "clickCount": 1
+    })
 
-def upload_file(driver, file_path):
-    pass
+    driver.execute_cdp_cmd("Input.dispatchMouseEvent", {
+        "type": "mouseReleased",
+        "x": x,
+        "y": y,
+        "button": "left",
+        "clickCount": 1
+    })
+
+def upload_file(page, file_path):
+    print("NOT WORKING!")
+    raise RuntimeError("Upload File is not working, wait!")
+
 
 
 from selenium.webdriver.common.by import By
