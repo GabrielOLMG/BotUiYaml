@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from playwright.sync_api import sync_playwright
 
 def get_page( viewport=(1920, 1080)):
     pw = sync_playwright().start()
 
     browser = pw.chromium.launch(
-        headless=False,   # 👈 IMPORTANTE
+        headless=False,
         args=[
             "--no-sandbox",
             "--disable-setuid-sandbox",
@@ -66,7 +68,6 @@ def click_coord(page, object_coord, delay_ms=100):
     page.wait_for_timeout(delay_ms)
     page.mouse.click(x, y)
 
-from pathlib import Path
 
 def upload_file(page, file_path, coord):
     """
@@ -83,3 +84,25 @@ def upload_file(page, file_path, coord):
 
     file_chooser = fc_info.value
     file_chooser.set_files(file_path)
+
+
+def drag_vertical(page, coord=None, direction="DOWN", delta_y=100, delta_x=0):
+    if coord is not None:
+        x, y = coord
+        page.mouse.move(x, y)
+
+    if direction == "UP":
+        delta_y *= -1
+
+    page.mouse.wheel(delta_x, delta_y)
+
+
+def get_screenshot(page, output_path):
+    if not output_path.lower().endswith(".png"):
+        output_path += ".png"
+
+    page.screenshot(
+        path=output_path,
+        #full_page=True
+    )
+    return output_path

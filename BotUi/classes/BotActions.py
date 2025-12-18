@@ -1,7 +1,8 @@
 import os
+import time
 import subprocess
 
-from ..functions.selenium_functions import *
+from ..functions.playwright_functions import *
 from ..functions.key_map import *
 from ..functions.utils import *
 from ..functions.image_functions import *
@@ -186,7 +187,6 @@ class BotActions:
             return self._find_consequence(step, object_coord)
 
     def write(self):
-        from ..functions.playwright_functions import write_input
         if "text" in self.step_info:
             text = self.step_info["text"]
             write_input(self.page, text)
@@ -261,7 +261,6 @@ class BotActions:
         return True
 
     def upload_file(self):
-        from ..functions.playwright_functions import upload_file
         coord = self.step_info.get("coord")
         if isinstance(coord, str):
             coord = coord.strip("[]")
@@ -284,7 +283,8 @@ class BotActions:
         )
         # --- Atualiza A Tentativa ---
         self.scroll_attempt += 1
-
+        
+        # TODO: REMOVER E GARANTIR QUE FUNCIONA!
         """
         # --- Localiza Scroll Na Pagina ---
         scroll_status, scroll_error, scroll_coord = find_image_center(
@@ -352,7 +352,6 @@ class BotActions:
 
         # --- 7️⃣ Clique final ---
         if click_enabled and object_coord:
-            from ..functions.playwright_functions import click_coord
             click_coord(self.page, object_coord)
 
         # --- 8️⃣  Acoes de Encontrar---

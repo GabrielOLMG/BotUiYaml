@@ -1,15 +1,13 @@
-import time
-import logging
-import cv2
-import sys
-import json
 import re
 import ast
+import time
+import json
+import logging
+
 
 from copy import deepcopy
 from pydantic import ValidationError
 
-from .functions.selenium_functions import *
 from .functions.key_map import *
 from .functions.utils import *
 from .functions.image_functions import *
@@ -17,12 +15,6 @@ from .functions.tests import test_driver
 
 from .classes.validation_models import *
 from .classes.BotActions import BotActions
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webdriver import WebDriver
-
 
 class BotUI:
     """
