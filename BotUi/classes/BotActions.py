@@ -15,8 +15,8 @@ class BotActions:
     Mantém driver, data_store e funções comuns.
     """
 
-    def __init__(self, driver, step_info, logger, screenshots_path, data_store=None):
-        self.driver = driver
+    def __init__(self, page, step_info, logger, screenshots_path, data_store=None):
+        self.page = page
         self.data_store = data_store if data_store is not None else {}
 
 
@@ -65,7 +65,8 @@ class BotActions:
                 return False, result[1] 
             
             if self.step_info.get("refresh", False):
-                self.driver.refresh()
+                self.page.reload()
+
 
             wait_time = self.step_info.get("wait")
             if wait_time:
@@ -73,7 +74,7 @@ class BotActions:
                 time.sleep(wait_time)
             
             if self.step_info.get("save_url", None): # TODO: Como posso melhorar essa opcao?
-                self.data_store[self.step_info.get("save_url")] = self.driver.current_url
+                self.data_store[self.step_info.get("save_url")] = self.page.url
             
         except Exception as e:
             return False, f"Erro ao executar step '{self.step_info}': {e}" 
@@ -93,7 +94,7 @@ class BotActions:
 
     def _take_screenshot(self, screenshot_name="screenshot_check_page.png"):
         full_screenshot_path = os.path.join(self.screenshots_path, screenshot_name)
-        self.screenshot_check_page = get_screenshot(self.driver, full_screenshot_path) 
+        self.screenshot_check_page = get_screenshot(self.page, full_screenshot_path) 
 
         return self.screenshot_check_page
 
@@ -110,7 +111,7 @@ class BotActions:
             for i, do_action in enumerate(do_actions): # As Acoes Nao podem dar Erro
                 print(f"fazendo action_{i}")
                 actions = BotActions(
-                    driver=self.driver,
+                    page=self.page,
                     data_store=self.data_store,
                     logger=self.logger,
                     step_info=do_action,
@@ -126,7 +127,7 @@ class BotActions:
                 if while_action["action"] not in allowed_while_actions:
                     return False, f"Atualmente o while pode apenas conter as acoes: {allowed_while_actions}"
                 actions = BotActions(
-                    driver=self.driver,
+                    driver=self.page,
                     data_store=self.data_store,
                     logger=self.logger,
                     step_info=while_action,
@@ -176,6 +177,7 @@ class BotActions:
 
         # --- 3️⃣ Tenta localizar o objeto ---
         status, error_text, object_coord = find_fn_map[object_type]()
+        
 
         # --- 4️⃣ Check se achou e aplica devida regra ---
         if not status:
@@ -184,20 +186,21 @@ class BotActions:
             return self._find_consequence(step, object_coord)
 
     def write(self):
+        from ..functions.playwright_functions import write_input
         if "text" in self.step_info:
             text = self.step_info["text"]
-            write_input(self.driver, text)
+            write_input(self.page, text)
             return True
         elif "file_path" in self.step_info:
             path = self.step_info["file_path"]
             text = open_file(path)
-            write_input(self.driver, text)
+            write_input(self.page, text)
             return True
         else:
             return False, "Flag Para Write Não Existe!"
 
     def keys_selections(self):
-        send_key_sequence(self.driver, self.step_info["keys"])
+        send_key_sequence(self.page, self.step_info["keys"])
         return True
 
     def run_script(self):
@@ -258,8 +261,14 @@ class BotActions:
         return True
 
     def upload_file(self):
-        print("#NOT WORKING!!!!!!!")
-        upload_file(self.driver, self.step_info["file_path"])
+        from ..functions.playwright_functions import upload_file
+        coord = self.step_info.get("coord")
+        if isinstance(coord, str):
+            coord = coord.strip("[]")
+            x, y = coord.split(",")
+            coord = [float(x), float(y)]
+        upload_file(self.page, self.step_info["file_path"], coord)
+        return True
 
         return True
     
@@ -276,6 +285,7 @@ class BotActions:
         # --- Atualiza A Tentativa ---
         self.scroll_attempt += 1
 
+        """
         # --- Localiza Scroll Na Pagina ---
         scroll_status, scroll_error, scroll_coord = find_image_center(
             screenshot_path=self.screenshot_check_page,
@@ -283,10 +293,11 @@ class BotActions:
         )
         if not scroll_status:
             return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
-        
+        """
+        scroll_coord = [500, 500]
         # --- Aplica o Scroll ---
         drag_vertical(
-            driver=self.driver,
+            page=self.page,
             coord=scroll_coord,
             direction=scroll_direction,
             delta_y=self.scroll_distance
@@ -320,11 +331,20 @@ class BotActions:
         debug_mode = step.get("debug", False)
         click_enabled = step.get("click", False)
         if_find = step.get("if_find", None)
+        save_as = self.step_info.get("save_as")
 
+        
 
         # --- 5️⃣ Aplica offset (x, y) ---
         if offset_x or offset_y:
             object_coord = (object_coord[0] + offset_x, object_coord[1] + offset_y)
+
+        # --- 5️⃣ Save coord---
+        if save_as:
+            self.data_store[save_as] = [
+                float(object_coord[0]),
+                float(object_coord[1]),
+            ]
 
         # --- 6️⃣ Modo debug ---
         if debug_mode:
@@ -332,7 +352,8 @@ class BotActions:
 
         # --- 7️⃣ Clique final ---
         if click_enabled and object_coord:
-            click_coord(self.driver, object_coord)
+            from ..functions.playwright_functions import click_coord
+            click_coord(self.page, object_coord)
 
         # --- 8️⃣  Acoes de Encontrar---
         if if_find:

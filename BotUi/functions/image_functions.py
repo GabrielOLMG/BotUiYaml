@@ -97,7 +97,6 @@ def extract_base_text_info(image_path):
             "center": center
         })
 
-
     return final_results
 
 def encontrar_texto_central(image_path, text, threshold=0.8, contain_=True, first=True, debug=False): # TODO: E se nao quiser o primeiro? 

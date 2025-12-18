@@ -40,11 +40,12 @@ class BotUI:
             global_yaml_path: str | None = None,  # TODO: Melhorar o nome!
             log_file: str | None = None,
             log_level=logging.INFO,
-            driver=None # Possibilidade de Enviar externamente o driver
     ):
         # Configuração
         self.yaml_conf = open_yaml(yaml_path)
-        self.driver = driver
+        self.page = None
+        self.pw = None
+        self.browser = None 
         self.data_store = {}
         self.actions = None  
         self.screenshots_path = screenshots_path
@@ -59,10 +60,9 @@ class BotUI:
             return self.init_config(yaml_data)
         return True, None
 
-
     def init_actions(self, step_info):
         self.actions = BotActions(
-            driver=self.driver,
+            page=self.page,
             data_store=self.data_store,
             logger=self.logger,
             step_info=step_info,
@@ -74,7 +74,6 @@ class BotUI:
             if "$" in variable_value:
                 self.data_store[variable_name] = resolve_variables(variable_value, self.data_store)
                 self.expand_conf() # caso um $ chame outro $ que chama outro $
-        
 
     def init_config(self, config):
         variables = config["variables"]
@@ -93,38 +92,6 @@ class BotUI:
 
 
         return True, None
-
-
-    def _init_driver(self):
-        """
-        Obtém o driver Selenium.
-        - Se nenhum driver foi passado pelo usuário, cria o padrão da biblioteca.
-        - Se o usuário passou um driver, valida se ele está funcional.
-        """
-        if not self.driver:
-            self.logger.info("🧩 Nenhum driver fornecido. Criando driver padrão da biblioteca...")
-            try:
-                self.driver = get_driver()
-
-                if not test_driver(self.driver):
-                    self.logger.error("❌ Driver padrão criado, mas falhou no teste de funcionalidade.")
-                    return False
-                self.logger.info("✅ Driver padrão criado e validado com sucesso.")
-            except Exception as e:
-                self.logger.exception(f"❌ Falha ao criar driver padrão: {e}")
-                return False
-        else:
-            self.logger.info("🔌 Driver fornecido externamente. Validando funcionalidade...")
-            try:
-                if not test_driver(self.driver):
-                    self.logger.error("❌ Driver fornecido não está funcional. Verifique configuração.")
-                    return False
-                self.logger.info("✅ Driver externo validado e funcional.")
-            except Exception as e:
-                self.logger.exception(f"❌ Erro ao validar driver fornecido: {e}")
-                return False
-
-        return True
 
     def _expand_action(self, step):
         loop_var = step.get("loop_var")
@@ -169,7 +136,6 @@ class BotUI:
                     expanded_steps.append(step_obj)
 
         return expanded_steps
-
 
     def expand_for_each(self, steps: list):
         expanded_steps = []
@@ -251,7 +217,7 @@ class BotUI:
             status = False
         finally:
             self.logger.info("🧹 Finalizando e encerrando o driver...")
-            finish_driver(self.driver)
+            self._finish_page()
 
         return status
 
@@ -272,7 +238,7 @@ class BotUI:
 
         steps = self.expand_for_each(pipeline_infos["steps"])
 
-        if not self.driver:
+        if not self.pw:
             if not self._init_driver():
                 return False
 
@@ -284,7 +250,7 @@ class BotUI:
                 self.logger.error("❌ Erro ao iniciar Pipeline '%s' na URL: %s", pipeline_name, url)
 
                 return False
-        elif not self.driver:
+        elif not self.pw:
             self.logger.error("⚠️ Pipeline '%s' não define URL e nenhum driver foi inicializado.", pipeline_name)
             return False
 
@@ -306,6 +272,7 @@ class BotUI:
 
 
         self.init_actions(step_info)
+        self.actions._take_screenshot()
         action_bool, action_error_log = self.actions.run_action() # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
 
         if action_error_log:
@@ -316,17 +283,26 @@ class BotUI:
     # -----------------------
     # Funções auxiliares
     # -----------------------
+    def _init_driver(self):
+        from .functions.playwright_functions import get_page
+        self.pw, self.browser, self.page = get_page()
+        return True
 
     def _go_to_url(self, url: str, wait_time: float = 5.0) -> bool:
+
         try:
-            self.driver.get(url)
+            self.page.goto(url, wait_until="networkidle")
             time.sleep(wait_time)
             return True
         except Exception as e:
             return False
 
+    def _finish_page(self):
+        from .functions.playwright_functions import finish_page
+        finish_page(self.pw, self.browser)
 
     def finish(self, reason):
+        from .functions.playwright_functions import finish_page
         self.logger.error(f"❌ {reason}")
-        finish_driver(self.driver)
+        finish_page(self.pw, self.browser)
 

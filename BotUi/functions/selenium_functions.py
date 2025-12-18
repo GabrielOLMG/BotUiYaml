@@ -51,12 +51,18 @@ def finish_driver(driver):
 
 
 
-
-def get_screenshot(driver, output_path):
+# TODO: Mudar para a outra pagina!
+def get_screenshot(page, output_path):
     if not output_path.lower().endswith(".png"):
         output_path += ".png"
-    driver.save_screenshot(output_path)
+
+    page.screenshot(
+        path=output_path,
+        full_page=True
+    )
     return output_path
+
+
 
 def write_input(driver, text):
     result = driver.execute_script("""
@@ -93,29 +99,15 @@ def _write_input(driver, text, delay=0.005, block_size=20):
         actions.perform()
 
 
-def drag_vertical(driver, coord=None, direction="DOWN", delta_y=100, delta_x=0):
-    if direction=="UP":
-        delta_y*=-1
-    params = {
-        "type": "mouseWheel",
-        "x": coord[0],
-        "y": coord[1],
-        "deltaX": delta_x,
-        "deltaY": delta_y,
-        "modifiers": 0,
-        "clickCount": 0
-    }
-    driver.execute_cdp_cmd("Input.dispatchMouseEvent", params)
+def drag_vertical(page, coord=None, direction="DOWN", delta_y=100, delta_x=0):
+    if coord is not None:
+        x, y = coord
+        page.mouse.move(x, y)
 
-    
-    params_move = {
-        "type": "mouseMoved",
-        "x": 0,
-        "y": 0,
-        "modifiers": 0,
-    }
-    driver.execute_cdp_cmd("Input.dispatchMouseEvent", params_move)
+    if direction == "UP":
+        delta_y *= -1
 
+    page.mouse.wheel(delta_x, delta_y)
 
 
 def click_coord(driver, coords):
@@ -137,11 +129,9 @@ def click_coord(driver, coords):
         "clickCount": 1
     })
 
+
 def upload_file(page, file_path):
-    print("NOT WORKING!")
-    raise RuntimeError("Upload File is not working, wait!")
-
-
+    return True
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

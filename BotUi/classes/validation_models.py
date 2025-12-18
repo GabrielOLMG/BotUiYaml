@@ -25,7 +25,8 @@ class Step(BaseModel):
         "STOP_IF",
         "FOR_EACH", # README
         "FIND", # README
-        "DO_WHILE"
+        "DO_WHILE",
+        "UPLOAD_FILE"
     ]
 
     '''
@@ -78,7 +79,7 @@ class Step(BaseModel):
     save_url: Optional[str] = None # Ira salvar a url atual da pagina, que podera ser usado para fins do usuario
 
 
-
+    coord: Optional[str] = None # Tornar obrigatorio para o upload?
     down: Optional[bool] = None
     save_as: Optional[str] = None
     color: Optional[str] = None

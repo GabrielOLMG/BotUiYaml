@@ -2,20 +2,15 @@
 # 🐳 Dockerfile — BotUI Environment (No GUI)
 # ================================
 
-# Imagem base com Python 3.10
 FROM python:3.10-slim
 
-# Evita prompts interativos
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Define onde o Playwright vai instalar os browsers
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # ================================
 # 🔧 Dependências do Sistema
 # ================================
 
-# Dependências exigidas pelo Playwright + Tesseract
 RUN apt-get update -y && apt-get install -y \
     wget \
     gnupg \
@@ -38,41 +33,40 @@ RUN apt-get update -y && apt-get install -y \
     jq \
     tesseract-ocr \
     tesseract-ocr-por \
+    \
+    # 🔥 Xvfb + Flutter CanvasKit (NOVO)
+    xvfb \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libdrm2 \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libcairo2 \
+    \
     && rm -rf /var/lib/apt/lists/*
 
 # ================================
 # 🧠 Playwright
 # ================================
 
-# Instala Playwright
 RUN pip install --no-cache-dir playwright
-
-# Instala Chromium do Playwright
 RUN playwright install chromium
 
 # ============================
 # 📦 Configuração da Aplicação
 # ============================
 
-# Define o diretório de trabalho dentro do container
 WORKDIR /app
-
-# Copia o código principal da aplicação
 COPY ../ /app
-
-# Instala a biblioteca local em modo editável
 RUN pip install --no-cache-dir -e .
 
 # ============================
 # ⚙️ Entrypoint e Execução
 # ============================
 
-# Copia o entrypoint da pasta de setup
 COPY BotUi_Setup_Docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Define o entrypoint principal
 ENTRYPOINT ["/entrypoint.sh"]
-
-# Comando padrão (mantém o container interativo)
 CMD ["bash"]
