@@ -13,6 +13,7 @@ setup(
         "pytesseract",
         "rapidocr-onnxruntime",
         "webdriver-manager",
+        "ruamel.yaml"
     ],
     python_requires=">=3.10",
 )

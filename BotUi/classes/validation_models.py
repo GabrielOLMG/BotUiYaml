@@ -2,6 +2,71 @@ import os
 from typing import Optional, List, Dict, Literal, Any
 from pydantic import BaseModel, model_validator, field_validator, RootModel
 
+from typing import Type
+
+GLOBAL_FIELDS = {
+    "helper": str,
+    "wait": float,
+}
+
+ACTION_SCHEMA = {
+    "FIND": {
+        "required": {
+            "object_type": str,
+        },
+        "optional": {
+            "text": str,
+            "image_path": str,
+            "scroll": bool,
+            "scroll_image_path": str,
+            "click": bool,
+            "y_coord": int,
+            "x_coord": int,
+            "until_find": str,
+            "save_as": str,
+            **GLOBAL_FIELDS
+        },
+    },
+    "KEYS_SELECTIONS": {
+        "required": {
+            "keys": list,
+        },
+    },
+    "WRITE": {
+        "required_one_of": {
+            "text": str,
+            "file_path": str
+        },
+    },
+    "RUN_SCRIPT": {
+        "required": {
+            "script_path": str,
+        },
+        "optional": {
+            **GLOBAL_FIELDS
+        }
+    },
+    "UPLOAD_FILE": {
+        "required": {
+            "file_path": str,
+            "coord": (list, str),  # aceita os dois por agora
+        },
+        "optional": {
+            **GLOBAL_FIELDS
+        }
+    },
+    "STOP_IF": {
+        "required": {
+            "condition": str,
+        },
+    },
+    "FIND_TEXT_BY_COLOR": {
+        "required": {
+            "color": str,
+        },
+    },
+}
+
 
 # ============================================================
 # CONFIGURAÇÃO GLOBAL OPCIONAL
@@ -17,170 +82,72 @@ class GlobalConfig(BaseModel):
 # ============================================================
 
 class Step(BaseModel):
-    action: Literal[
-        "WRITE", # README
-        "KEYS_SELECTIONS", # README
-        "RUN_SCRIPT",
-        "FIND_TEXT_BY_COLOR",
-        "STOP_IF",
-        "FOR_EACH", # README
-        "FIND", # README
-        "DO_WHILE",
-        "UPLOAD_FILE"
-    ]
+    action: str
 
-    '''
-        FIND: Tem como objetivo localziar Imagem Ou Texto
-        object_type: [img, text]
-        if text:
-            text
-        if img:
-            image_path
-        click: Default False
-        scrol_to_find: Default False
-        if scrol_to_find:
-            scroll_image_path
-        direction: [UP, DOWN, AUTO(?)]
-        x_coord
-        y_coord
-        '''
-
-    # FIND ACTION
-    object_type: Optional[Literal["IMG", "TEXT"]] = None
-    text: Optional[str] = None
-    image_path: Optional[str] = None
-    click: Optional[bool] = False
-    scroll: Optional[bool] = False
-    scroll_image_path: Optional[str] = None
-    scroll_direction: Optional[Literal["DOWN", "UP"]] = "DOWN" # TODO: Pensar em Algo como "auto"   
-    x_coord: Optional[int] = 0
-    y_coord: Optional[int] = 0
-    in_text: Optional[bool] = True # Localiza texto igual ou contido. Se True, ele faz "text" in VALOR_ACHADOS caso contrario "text" == VALOR_ACHADOS 
-    optional: Optional[bool] = False # Se é obrigatorio encontrar o objeto ou não, se True, ele avança para a proxima acao sem dar erro!
-    debug: Optional[bool] = False
-    until_find:  Optional[Literal["retry"]] = None
-    if_find:  Optional[Literal["retry"]] = None
-
-
-    # KEYS_SELECTIONS ACTION
-    keys: Optional[List[str]] = None
-
-    # WRITE ACTION
-    file_path: Optional[str] = None
-
-    # DO_WHILE ACTIONS # TODO!
-    while_condition: Optional[List[Dict]] = None
-    do: Optional[List[Dict]] = None
-
-    # GLOBAL ACTIONS
-    wait: Optional[float] = None
-    helper: Optional[str] = None
-    refresh: Optional[bool] = False
-    save_url: Optional[str] = None # Ira salvar a url atual da pagina, que podera ser usado para fins do usuario
-
-
-    coord: Optional[str] = None # Tornar obrigatorio para o upload?
-    down: Optional[bool] = None
-    save_as: Optional[str] = None
-    color: Optional[str] = None
-    script_path: Optional[str] = None
-    condition: Optional[str] = None
-
-    #global_allowed = ["wait", "helper", "refresh", "save_url"]
-
-    def validate_find_action(self):
-        allowed_field = ["object_type", "text", "image_path", "click",
-                        "scroll", "scroll_image_path", "scroll_direction", # Transformar em um dicionario 
-                        "x_coord", "y_coord",  # Transformar em um dicionario 
-                        "in_text", "optional", "debug", "until_find", "if_find",
-                        # Global
-                        "wait", "helper", "refresh", "save_url"
-                        ] 
-        initial_error_text = "[ACTION FIND]"
-        
-        if not self.object_type:
-            raise ValueError(f"{initial_error_text} The 'object_type' field is required.")
-        if self.object_type == "IMG" and not self.image_path:
-            raise ValueError(f"{initial_error_text} The 'object_type' as 'IMG' required 'image_path' field.")
-        if self.object_type == "TEXT" and not self.text:
-            raise ValueError(f"{initial_error_text} The 'object_type' as 'TEXT' required 'text' field")
-        if self.scroll and not self.scroll_image_path:
-            raise ValueError(f"{initial_error_text} To define the 'scroll' field, the 'scroll_image_path' field must be defined.")
-        
-    def validate_keys_selections(self):
-        initial_error_text = "[ACTION KEYS_SELECTIONS]"
-
-        if not self.keys:
-            raise ValueError(f"{initial_error_text} The 'keys' field is required.")
-
-    def validate_do_while(self):
-        initial_error_text = "[ACTION DO_WHILE]"
-
-        if not self.do:
-            raise ValueError(f"{initial_error_text} The 'do' field is required.")
-        if not self.while_condition:
-            raise ValueError(f"{initial_error_text} The 'while_condition' field is required.")
-
-    def validate_upload_file(self):
-        initial_error_text = "[ACTION UPLOAD_FILE]"
-        allowed_field = ["file_path", "coord"]
-
-        if not self.file_path:
-                raise ValueError(f" {initial_error_text} The 'file_path' field is required.")
-
-    def validate_write(self):
-        initial_error_text = "[ACTION WRITE]"
-        allowed_field = ["text", "file_path"]
-
-
-        if not self.text and not self.file_path:
-            raise ValueError(f"{initial_error_text} The 'file_path' field or 'text' is required .")
-        if self.text and self.file_path:
-            raise ValueError(f"{initial_error_text} WRITE não pode ter text e file_path ao mesmo tempo")
-
-    def validate_run_script(self):
-        allowed_field = ["script_path"]
-
-        if not self.script_path:
-                raise ValueError("RUN_SCRIPT requer script_path")
-
+    model_config = {
+        "extra": "allow"  # permite campos dinâmicos
+    }
 
     @model_validator(mode="after")
-    def validate_fields(self):
+    def validate_by_schema(self):
         action = self.action
 
-        if action == "FIND":
-            self.validate_find_action()
+        if action not in ACTION_SCHEMA:
+            raise ValueError(f"Action inválida: {action}")
 
-        if action == "KEYS_SELECTIONS":
-            self.validate_keys_selections()
-        
-        if action == "DO_WHILE":
-            self.validate_do_while()
+        schema = ACTION_SCHEMA[action]
 
-        if action == "UPLOAD_FILE":
-            self.validate_upload_file()
+        required = schema.get("required", {})
+        optional = schema.get("optional", {})
+        one_of = schema.get("required_one_of", {})
 
-        if action == "WRITE":
-            self.validate_write()
+        allowed_fields = {"action"} | set(required) | set(optional) | set(one_of)
 
+        # 🔒 Bloqueia campos não permitidos
+        extra_fields = set(self.model_extra or {}) - allowed_fields
+        if extra_fields:
+            raise ValueError(
+                f"[{action}] campos não permitidos: {extra_fields}"
+            )
 
-        if action == "RUN_SCRIPT":
-            self.validate_run_script()
+        # ✅ required (todos)
+        for field, expected in required.items():
+            value = getattr(self, field, None)
+            if value is None:
+                raise ValueError(f"[{action}] campo obrigatório '{field}' ausente")
+            if not isinstance(value, expected):
+                raise ValueError(
+                    f"[{action}] '{field}' deve ser {expected}, recebido {type(value)}"
+                )
 
-        if action == "FIND_TEXT_BY_COLOR":
-            if not self.color:
-                raise ValueError("FIND_TEXT_BY_COLOR requer color")
-            # if self.color not in COLOR_DEFINITION: # TODO: VOLTAR A APLICAR!
-            #     raise ValueError(f"FIND_TEXT_BY_COLOR color '{self.color}' not found")
+        # ✅ one_of (pelo menos um)
+        if one_of:
+            present = []
+            for field, expected in one_of.items():
+                value = getattr(self, field, None)
+                if value is not None:
+                    if not isinstance(value, expected):
+                        raise ValueError(
+                            f"[{action}] '{field}' deve ser {expected}, recebido {type(value)}"
+                        )
+                    present.append(field)
 
-        if action == "STOP_IF" and not self.condition:
-            raise ValueError("STOP_IF requer condition")
+            if not present:
+                raise ValueError(
+                    f"[{action}] requer um dos campos: {list(one_of.keys())}"
+                )
 
-        if self.wait is not None and self.wait < 0:
-            raise ValueError("wait deve ser >= 0")
+        # ✅ optional (tipo)
+        for field, expected in optional.items():
+            value = getattr(self, field, None)
+            if value is not None and not isinstance(value, expected):
+                raise ValueError(
+                    f"[{action}] '{field}' deve ser {expected}, recebido {type(value)}"
+                )
 
         return self
+
+
 
 
 class Pipeline(BaseModel):

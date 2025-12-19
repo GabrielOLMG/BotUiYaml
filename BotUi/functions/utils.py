@@ -1,8 +1,11 @@
-import yaml
+from ruamel.yaml import YAML
 
 def open_yaml(path):
+    yaml = YAML(typ="safe")
+    yaml.allow_duplicate_keys = True
+
     with open(path, "r") as f:
-        data = yaml.safe_load(f)
+        data = yaml.load(f)
     return data
 
 def open_file(path):
