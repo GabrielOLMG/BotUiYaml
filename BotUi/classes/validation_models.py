@@ -86,7 +86,16 @@ class Step(BaseModel):
     script_path: Optional[str] = None
     condition: Optional[str] = None
 
+    #global_allowed = ["wait", "helper", "refresh", "save_url"]
+
     def validate_find_action(self):
+        allowed_field = ["object_type", "text", "image_path", "click",
+                        "scroll", "scroll_image_path", "scroll_direction", # Transformar em um dicionario 
+                        "x_coord", "y_coord",  # Transformar em um dicionario 
+                        "in_text", "optional", "debug", "until_find", "if_find",
+                        # Global
+                        "wait", "helper", "refresh", "save_url"
+                        ] 
         initial_error_text = "[ACTION FIND]"
         
         if not self.object_type:
@@ -112,6 +121,28 @@ class Step(BaseModel):
         if not self.while_condition:
             raise ValueError(f"{initial_error_text} The 'while_condition' field is required.")
 
+    def validate_upload_file(self):
+        initial_error_text = "[ACTION UPLOAD_FILE]"
+        allowed_field = ["file_path", "coord"]
+
+        if not self.file_path:
+                raise ValueError(f" {initial_error_text} The 'file_path' field is required.")
+
+    def validate_write(self):
+        initial_error_text = "[ACTION WRITE]"
+        allowed_field = ["text", "file_path"]
+
+
+        if not self.text and not self.file_path:
+            raise ValueError(f"{initial_error_text} The 'file_path' field or 'text' is required .")
+        if self.text and self.file_path:
+            raise ValueError(f"{initial_error_text} WRITE não pode ter text e file_path ao mesmo tempo")
+
+    def validate_run_script(self):
+        allowed_field = ["script_path"]
+
+        if not self.script_path:
+                raise ValueError("RUN_SCRIPT requer script_path")
 
 
     @model_validator(mode="after")
@@ -128,22 +159,14 @@ class Step(BaseModel):
             self.validate_do_while()
 
         if action == "UPLOAD_FILE":
-            if not self.file_path:
-                raise ValueError("UPLOAD_FILE requer file_path")
+            self.validate_upload_file()
 
         if action == "WRITE":
-            if not self.text and not self.file_path:
-                raise ValueError("WRITE requer text ou file_path")
-            if self.text and self.file_path:
-                raise ValueError("WRITE não pode ter text e file_path ao mesmo tempo")
-            # if self.file_path and not os.path.exists(self.file_path):
-            #     raise ValueError(f"WRITE file {self.file_path} does not exist")
+            self.validate_write()
+
 
         if action == "RUN_SCRIPT":
-            if not self.script_path:
-                raise ValueError("RUN_SCRIPT requer script_path")
-            # if not os.path.exists(self.script_path):
-            #     raise ValueError(f"RUN_SCRIPT file {self.script_path} does not exist")
+            self.validate_run_script()
 
         if action == "FIND_TEXT_BY_COLOR":
             if not self.color:
