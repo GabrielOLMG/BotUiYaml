@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from .functions.key_map import *
 from .functions.utils import *
 from .functions.image_functions import *
+from .functions.playwright_functions import *
 
 from .classes.BotValidation import *
 from .classes.BotActions import BotActions
@@ -276,7 +277,6 @@ class BotUI:
     # Funções auxiliares
     # -----------------------
     def _init_driver(self):
-        from .functions.playwright_functions import get_page
         self.pw, self.browser, self.page = get_page()
         return True
 
@@ -289,11 +289,9 @@ class BotUI:
             return False
 
     def _finish_page(self):
-        from .functions.playwright_functions import finish_page
         finish_page(self.pw, self.browser)
 
     def finish(self, reason):
-        from .functions.playwright_functions import finish_page
         self.logger.error(f"❌ {reason}")
         finish_page(self.pw, self.browser)
 
