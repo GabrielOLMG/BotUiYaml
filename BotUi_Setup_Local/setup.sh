@@ -3,7 +3,7 @@ set -e
 
 echo ""
 echo "============================================="
-echo "🤖 BotUI — Configuração Local (Sem Docker)"
+echo "🤖 BotUI — Configuração Local (Playwright)"
 echo "============================================="
 echo ""
 
@@ -11,32 +11,32 @@ echo ""
 # 1️⃣ Detecta ambiente
 # ---------------------------------------------
 if grep -qi microsoft /proc/version; then
-    echo "💻 Ambiente detectado: WSL (Windows Subsystem for Linux)"
+    echo "💻 Ambiente detectado: WSL"
 else
     echo "💻 Ambiente detectado: Linux nativo"
 fi
 
 # ---------------------------------------------
-# 2️⃣ Atualiza lista de pacotes (sem upgrade)
+# 2️⃣ Atualiza lista de pacotes
 # ---------------------------------------------
 echo ""
 echo "📦 Atualizando lista de pacotes..."
 sudo apt-get update -y
 
 # ---------------------------------------------
-# 3️⃣ Instala dependências principais
+# 3️⃣ Dependências do sistema (IGUAL ao Docker)
 # ---------------------------------------------
 echo ""
-echo "🔧 Instalando dependências principais..."
+echo "🔧 Instalando dependências do sistema..."
 
-# Pacotes compatíveis com Ubuntu e Debian modernos (inclui fallback t64)
 sudo apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-tk \
     python3-dev \
-    chromium || sudo apt-get install -y chromium-browser || true \
-    chromium-driver || sudo apt-get install -y chromium-chromedriver || true \
+    wget \
+    gnupg \
+    ca-certificates \
     libnss3 \
     libx11-6 \
     libxrender1 \
@@ -52,23 +52,40 @@ sudo apt-get install -y --no-install-recommends \
     xdg-utils \
     jq \
     tesseract-ocr \
-    tesseract-ocr-por
+    tesseract-ocr-por \
+    xvfb \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libdrm2 \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libcairo2
 
 # ---------------------------------------------
-# 4️⃣ Instala dependências Python
+# 4️⃣ Python + Playwright
 # ---------------------------------------------
 echo ""
 echo "🐍 Instalando dependências Python..."
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-pip install --upgrade pip
+python3 -m pip install --upgrade pip
 pip install -e "$PROJECT_ROOT"
+pip install playwright
+
+# ---------------------------------------------
+# 5️⃣ Instala Chromium do Playwright
+# ---------------------------------------------
+echo ""
+echo "🌐 Instalando Chromium (Playwright)..."
+playwright install chromium
 
 # ---------------------------------------------
 # ✅ Finalização
 # ---------------------------------------------
 echo ""
 echo "============================================="
-echo "✅ Instalação local concluída com sucesso!"
+echo "✅ Setup local concluído com sucesso!"
 echo "============================================="

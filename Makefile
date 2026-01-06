@@ -70,7 +70,8 @@ script_local:
 	@echo "====================================="
 	@echo "🧩 Executando script localmente: $(SCRIPT)"
 	@echo "====================================="
-	python3 -u $(SCRIPT)
+	./run_local.sh python3 $(SCRIPT)
+
 
 
 # ==========================================
