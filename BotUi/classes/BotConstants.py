@@ -29,6 +29,7 @@ ACTION_SCHEMA = {
             "image_path": str,
             "scroll": bool,
             "scroll_image_path": str,
+            "scroll_direction": str,
             "click": bool,
             "y_coord": int,
             "x_coord": int,
@@ -83,6 +84,7 @@ ACTION_SCHEMA = {
             "color": str,
         },
         "optional": {
+            "save_as": str,
             **GLOBAL_FIELDS
         }
     },
