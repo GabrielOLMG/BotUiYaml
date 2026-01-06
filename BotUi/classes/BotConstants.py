@@ -92,6 +92,14 @@ ACTION_SCHEMA = {
             "do": list
 
         },
+    },
+    "FOR_EACH": {
+        "required": {
+            "loop_var": str,
+            "items": list,
+            "steps": list
+
+        },
     }
 }
 

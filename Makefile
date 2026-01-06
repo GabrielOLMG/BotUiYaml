@@ -6,7 +6,7 @@
 IMAGE_NAME = botui
 
 # Caminho padrão do script Python
-SCRIPT ?= run.py # projects_examples/run.py
+SCRIPT ?= projects_examples/run.py
 
 # Caminho da pasta de setup (onde está o Dockerfile e entrypoint)
 SETUP_DIR = BotUi_Setup_Docker
