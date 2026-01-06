@@ -1,3 +1,6 @@
+import re
+import subprocess
+
 from ruamel.yaml import YAML
 
 def open_yaml(path):
@@ -14,7 +17,6 @@ def open_file(path):
         content = f.read()
     return content
 
-import re
 
 def resolve_variables(value, data_store):
     """
@@ -45,9 +47,31 @@ def evaluate_condition(condition_str: str) -> bool:
             "len": len,
             "bool": bool,
         }
-        result = eval(condition_str, {"__builtins__": allowed_builtins}, {})
-        return bool(result)
+        result = bool(eval(condition_str, {"__builtins__": allowed_builtins}, {}))
+        return True, None, result
     except Exception as e:
-        print(f"❌ Erro ao avaliar condição '{condition_str}': {e}")
-        return False
+        return False, f"Erro ao avaliar condição '{condition_str}': {e}", None
 
+def run_script(script_path, flags):
+    try:
+        # Monta a lista de argumentos
+        cmd = ["bash", script_path]
+        if flags:
+            # Divide em múltiplos argumentos se houver espaços
+            if isinstance(flags, str):
+                cmd.extend(flags.split())
+            elif isinstance(flags, list):
+                cmd.extend(flags)
+
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+        output = result.stdout.strip()
+        return True, None, output
+
+    except subprocess.CalledProcessError as e:
+        return False, f"Script {script_path} failed:\n{e.stderr}", None

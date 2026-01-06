@@ -1,12 +1,11 @@
 import os
 import time
-import subprocess
 
 from ..functions.playwright_functions import *
 from ..functions.key_map import *
 from ..functions.utils import *
 from ..functions.image_functions import *
-
+from .BotConstants import *
 
 
 
@@ -24,15 +23,9 @@ class BotActions:
         self.step_info = step_info
         self.logger = logger
 
-        # Scroll Confg
+        # Counts
         self.scroll_attempt = 0
-        self.scroll_max_attempts = 50
-        self.scroll_distance = 500
-        self.scroll_direction_default = "DOWN"
-        
-        # retry
         self.find_retry_attempts = 0
-        self.find_retry_max_attempts = 50
 
         # Screenshots
         self.screenshots_path = screenshots_path
@@ -100,8 +93,9 @@ class BotActions:
         return self.screenshot_check_page
 
     # ----------------------
-    # Actions
-    # ----------------------~
+    # Main Actions
+    # ----------------------
+    # TODO: Garantir Que Esta 100%!
     def do_while(self):
         do_actions = self.step_info["do"]
         while_condition_actions = self.step_info["while_condition"]
@@ -152,14 +146,15 @@ class BotActions:
         Localiza um objeto na tela (imagem ou texto), com suporte a scroll e clique.
         Retorna True em sucesso, ou (False, mensagem) em falha.
         """
-        # TODO: PRECISA RETORNAR TRUE SE ACHOU E FALSE SE NAO ACHOU!! A VERIFICACAO PRECISA SER EM RELACAO AO ERROR_TEXT!
-        self._take_screenshot()
 
-        # --- 1️⃣ Captura configurações principais ---
+        # --- (1) Captura configurações principais ---
         step = self.step_info
         object_type = step.get("object_type")
 
-        # --- 2️⃣ Escolhe função de busca ---
+        # --- (2) Screenshot ---
+        self._take_screenshot()
+
+        # --- (3) Escolhe função de busca ---
         find_fn_map = {
             "IMG": lambda: find_image_center(
                 screenshot_path=self.screenshot_check_page,
@@ -176,110 +171,103 @@ class BotActions:
         if object_type not in find_fn_map:
             return False, f"[FIND] Tipo de objeto inválido: {object_type}"
 
-        # --- 3️⃣ Tenta localizar o objeto ---
-        status, error_text, object_coord = find_fn_map[object_type]()
+        # --- (4) Tenta localizar o objeto ---
+        executed, error, output = find_fn_map[object_type]()
         
 
-        # --- 4️⃣ Check se achou e aplica devida regra ---
-        if not status:
-            return self._not_find_consequence(step, error_text)
+        # --- (5) Check se achou e aplica devida regra ---
+        if not output:
+            return self._not_find_consequence(step, error)
         else:
-            return self._find_consequence(step, object_coord)
+            return self._find_consequence(step, object_coord=output)
 
     def write(self):
-        if "text" in self.step_info:
-            text = self.step_info["text"]
-            write_input(self.page, text)
-            return True
-        elif "file_path" in self.step_info:
-            path = self.step_info["file_path"]
-            text = open_file(path)
-            write_input(self.page, text)
-            return True
-        else:
-            return False, "Flag Para Write Não Existe!"
+        allowed_fields = {"text", "file_path"}
+        present_fields = allowed_fields & self.step_info.keys()
+
+        if not present_fields:
+            return False, "WRITE requer 'text' ou 'file_path'"
+
+        if len(present_fields) > 1:
+            return False, f"WRITE não pode ter {' e '.join(list(allowed_fields))} ao mesmo tempo"
+
+        field = present_fields.pop()
+        value = self.step_info[field]
+
+        executed, error = write_input(self.page, value)
+        return executed, error
 
     def keys_selections(self):
-        send_key_sequence(self.page, self.step_info["keys"])
-        return True
+        executed, error = send_key_sequence(self.page, self.step_info["keys"])
+        return executed, error
 
     def run_script(self):
-        # TODO: Init Melhorar
-        script_path = self.step_info.get("script_path")
-        script_path = resolve_variables(script_path, self.data_store)
-        script_flags = self.step_info.get("flags", None)
-        script_flags = resolve_variables(script_flags, self.data_store)
-        # TODO: Fim Melhorar
-
-        save_as = self.step_info.get("save_as")
-
-        if not script_path:
-            return False, "RUN_SCRIPT requires 'script_path'"
-        if not os.path.exists(script_path):
+        script_path, flags = self._resolve_script_inputs()
+        
+        if not self._check_path(script_path):
             return False, f"RUN_SCRIPT file {script_path} does not exist"
 
-        try:
-            # Monta a lista de argumentos
-            cmd = ["bash", script_path]
-            if script_flags:
-                # Divide em múltiplos argumentos se houver espaços
-                if isinstance(script_flags, str):
-                    cmd.extend(script_flags.split())
-                elif isinstance(script_flags, list):
-                    cmd.extend(script_flags)
+        executed, error, output = run_script(script_path, flags)
 
-            result = subprocess.run(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                check=True
-            )
-            output = result.stdout.strip()
+        self._save_output(output, error)
 
-        except subprocess.CalledProcessError as e:
-            return False, f"Script {script_path} failed:\n{e.stderr}"
-
-        if save_as:
-            self.data_store[save_as] = output
-        return True
+        return executed, error
 
     def find_text_by_color(self):
         color = self.step_info.get("color")
-        save_as = self.step_info.get("save_as")
 
-        text_detected = extract_text_from_image(self.screenshot_check_page, color)
+        executed, error, output = extract_text_from_image(self.screenshot_check_page, color)
 
-        if save_as:
-            self.data_store[save_as] = text_detected
-        return True
+        self._save_output(output, error)
+        return executed, error
 
     def stop_if(self):
-        result = evaluate_condition(self.step_info["condition"])
-        if result:
-            return False, f"Condition To Stop True: {self.step_info['condition']}=={result}"
-        return True
+        executed, error, output = evaluate_condition(self.step_info["condition"])
+        if not error and output:
+            return False, f"Condition To Stop True: {self.step_info['condition']}=={output}"
+        
+        return executed, error
 
     def upload_file(self):
-        coord = self.step_info.get("coord")
-        if isinstance(coord, str):
-            coord = coord.strip("[]")
-            x, y = coord.split(",")
-            coord = [float(x), float(y)]
-        upload_file(self.page, self.step_info["file_path"], coord)
-        return True
+        raw_coord = self.step_info.get("coord")
+        file_path = self.step_info["file_path"]
 
-        return True
-    
+        coord = self._parse_coord(raw_coord)
+        if coord is None:
+            return False, "UPLOAD error reading upload coordination"
+
+        if not self._check_path(file_path):
+            return False, f"UPLOAD file {file_path} does not exist"
+
+        executed, error = upload_file(self.page, file_path, coord)
+        scroll_until_edge(self.page, direction="UP")
+        self._take_screenshot()
+        return executed, error
+
+    # ----------------------
+    # RunScript Actions Secondary Functions
+    # ----------------------
+    def _resolve_script_inputs(self):
+        path = resolve_variables(
+            self.step_info.get("script_path"),
+            self.data_store
+        )
+
+        flags = resolve_variables(
+            self.step_info.get("flags"),
+            self.data_store
+        )
+
+        return path, flags
+
     # ----------------------
     # Find Actions Secondary Functions
     # ----------------------
-
-    def _scroll_to_find(self, step, scroll_direction):
+    def _scroll_to_find(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
         # --- Aplica Log ---
         self.logger.debug(
             f"🔄 Scrolling to locate the object "
-            f"({self.scroll_attempt}/{self.scroll_max_attempts})..."
+            f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
         )
         # --- Atualiza A Tentativa ---
         self.scroll_attempt += 1
@@ -300,30 +288,42 @@ class BotActions:
             page=self.page,
             coord=scroll_coord,
             direction=scroll_direction,
-            delta_y=self.scroll_distance
+            delta_y=ScrollConstants.DISTANCE
         )
 
         return self.find()
     
-    def _not_find_consequence(self, step, error_text): # TODO: Mudar o nome. Melhorar parametros
+    def _not_find_consequence(self, step, error_text):
         scroll_enabled = step.get("scroll", False)
-        scroll_direction = step.get("scroll_direction", self.scroll_direction_default)
+        scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
         until_find = step.get("until_find", None)
         optional = step.get("optional", False)
 
+        # TODO : Remover esse chek, por hora vai ter que ser assim pq n acho uma solucao que funciione
+        if scroll_enabled and until_find:
+            raise ValueError(
+                "[FIND] não é permitido usar 'scroll' e 'until_find' ao mesmo tempo"
+            )
 
-        # Funcao que aplica logica se nao encontrar nada com FIND
-        if scroll_enabled and self.scroll_attempt < self.scroll_max_attempts:
+
+        # Continua dando scroll?
+        if scroll_enabled and self.scroll_attempt < ScrollConstants.MAX_ATTEMPTS:
             return self._scroll_to_find(step, scroll_direction) 
+        
+
+        # TODO: Fazer um check se chegou no final da pagina ou topo da pagina!
+        if until_find: 
+            if until_find=="retry" and self.find_retry_attempts <= RetryConstants.FIND_RETRY_MAX_ATTEMPTS:
+                self.find_retry_attempts+=1
+                return self.find() 
+            
+
+
+    
+        if not optional:
+            return False, f"[FIND] {error_text}"
         else:
-            if until_find: 
-                if until_find=="retry" and self.find_retry_attempts <= self.find_retry_max_attempts:
-                    self.find_retry_attempts-=1
-                    return self.find() 
-            if not optional:
-                return False, f"[FIND] {error_text}"
-            else:
-                return False
+            return False, None # Nao Encontrou o objeto!
     
     def _find_consequence(self, step, object_coord):
         offset_x = step.get("x_coord", 0)
@@ -331,36 +331,28 @@ class BotActions:
         debug_mode = step.get("debug", False)
         click_enabled = step.get("click", False)
         if_find = step.get("if_find", None)
-        save_as = self.step_info.get("save_as")
 
-        
-
-        # --- 5️⃣ Aplica offset (x, y) ---
+        # --- (1) Aplica offset (x, y) ---
         if offset_x or offset_y:
             object_coord = (object_coord[0] + offset_x, object_coord[1] + offset_y)
 
-        # --- 5️⃣ Save coord---
-        if save_as:
-            self.data_store[save_as] = [
-                float(object_coord[0]),
-                float(object_coord[1]),
-            ]
+        # --- (2) Save coord---
+        self._save_output([float(object_coord[0]), float(object_coord[1])], error=False)
 
-        # --- 6️⃣ Modo debug ---
+        # --- (3) Modo debug ---
         if debug_mode:
             self.debug(object_coord, self.screenshot_check_page)
 
-        # --- 7️⃣ Clique final ---
+        # --- (4) Clique final ---
         if click_enabled and object_coord:
             click_coord(self.page, object_coord)
 
-        # --- 8️⃣  Acoes de Encontrar---
+        # --- (5)  Acoes de Encontrar---
         if if_find:
             if if_find=="retry":
                 return self.find()
         
-        return True
-
+        return True, None
 
     # ----------------------
     # Helper genéricos
@@ -370,3 +362,32 @@ class BotActions:
 
     def get_data_store(self, key, default=None):
         return self.data_store.get(key, default)
+    
+    def _save_output(self, output, error):
+        save_as = self.step_info.get("save_as")
+        if save_as and not error:
+            self.data_store[save_as] = output
+
+    def _check_path(self, path: str) -> bool:
+        return os.path.exists(path)
+
+    def _parse_coord(self, coord):
+        if coord is None:
+            return None
+
+        if isinstance(coord, str):
+            try:
+                coord = coord.strip("[]")
+                x, y = coord.split(",")
+                coord = [float(x), float(y)]
+            except Exception:
+                return None
+
+        if (
+            isinstance(coord, (list, tuple))
+            and len(coord) == 2
+            and all(isinstance(v, (int, float)) for v in coord)
+        ):
+            return coord
+
+        return None

@@ -1601,3 +1601,171 @@ pipelines.combat.steps.0
 2025-12-16 10:37:33 [INFO] 🔹 Step: Escolhe o Modo de Batalha
 2025-12-16 10:37:35 [DEBUG] ⏱ Aguardando 0.30 segundos
 2025-12-16 10:37:36 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:25:48 [ERROR] ❌ Erros de validação do YAML:
+10 validation errors for PipelineConfig
+pipelines.teste.steps.0
+  Value error, [FIND] campos não permitidos: {'in_text', 'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...tao de Escolha do Nome'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.login.steps.0
+  Value error, [FIND] campos não permitidos: {'in_text'} [type=value_error, input_value={'action': 'FIND', 'objec...tao de Escolha do Nome'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.login.steps.4
+  Value error, [KEYS_SELECTIONS] 'wait' deve ser <class 'float'>, recebido <class 'int'> [type=value_error, input_value={'action': 'KEYS_SELECTIO...': ['Enter'], 'wait': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.0
+  Value error, [FIND] campos não permitidos: {'in_text'} [type=value_error, input_value={'action': 'FIND', 'objec...o Formato', 'wait': 0.5}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.1
+  Value error, [FIND] campos não permitidos: {'in_text'} [type=value_error, input_value={'action': 'FIND', 'objec...e Batalha', 'wait': 0.3}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.2
+  Value error, [FIND] campos não permitidos: {'in_text'} [type=value_error, input_value={'action': 'FIND', 'objec...olhe o Modo de Batalha'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.3
+  Value error, [FIND] campos não permitidos: {'in_text'} [type=value_error, input_value={'action': 'FIND', 'objec...cia Batalha', 'wait': 5}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.4
+  Value error, [FIND] campos não permitidos: {'if_find', 'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...ional': True, 'wait': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.5
+  Value error, [FIND] campos não permitidos: {'if_find', 'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...ional': True, 'wait': 3}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_loop.steps.0
+  Value error, Action inválida: DO_WHILE [type=value_error, input_value={'action': 'DO_WHILE', 'w... Usa Primeiro Ataque'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+2026-01-06 13:26:31 [ERROR] ❌ Erros de validação do YAML:
+6 validation errors for PipelineConfig
+pipelines.teste.steps.0
+  Value error, [FIND] campos não permitidos: {'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...tao de Escolha do Nome'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.login.steps.4
+  Value error, [KEYS_SELECTIONS] 'wait' deve ser <class 'float'>, recebido <class 'int'> [type=value_error, input_value={'action': 'KEYS_SELECTIO...': ['Enter'], 'wait': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.3
+  Value error, [FIND] 'wait' deve ser <class 'float'>, recebido <class 'int'> [type=value_error, input_value={'action': 'FIND', 'objec...cia Batalha', 'wait': 5}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.4
+  Value error, [FIND] campos não permitidos: {'if_find', 'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...ional': True, 'wait': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.5
+  Value error, [FIND] campos não permitidos: {'if_find', 'optional'} [type=value_error, input_value={'action': 'FIND', 'objec...ional': True, 'wait': 3}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_loop.steps.0
+  Value error, Action inválida: DO_WHILE [type=value_error, input_value={'action': 'DO_WHILE', 'w... Usa Primeiro Ataque'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+2026-01-06 13:27:40 [ERROR] ❌ Erros de validação do YAML:
+3 validation errors for PipelineConfig
+pipelines.combat_format.steps.4
+  Value error, [FIND] campos não permitidos: {'if_find'} [type=value_error, input_value={'action': 'FIND', 'objec...nal': True, 'wait': 1.0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_format.steps.5
+  Value error, [FIND] campos não permitidos: {'if_find'} [type=value_error, input_value={'action': 'FIND', 'objec...nal': True, 'wait': 3.0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+pipelines.combat_loop.steps.0
+  Value error, Action inválida: DO_WHILE [type=value_error, input_value={'action': 'DO_WHILE', 'w... Usa Primeiro Ataque'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+2026-01-06 13:29:13 [INFO] ✅ YAML válido!
+2026-01-06 13:29:13 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:29:26 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:29:26 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:29:30 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:29:34 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 0.5}': 'Page' object has no attribute 'execute'
+2026-01-06 13:29:34 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:29:34 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:30:34 [ERROR] ❌ Erros de validação do YAML:
+1 validation error for PipelineConfig
+pipelines.login.steps.4
+  Value error, [FIND] campos não permitidos: {'debug'} [type=value_error, input_value={'action': 'FIND', 'objec...bug': True, 'wait': 1.0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+2026-01-06 13:31:15 [INFO] ✅ YAML válido!
+2026-01-06 13:31:15 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:31:23 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:31:23 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:31:26 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:31:33 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:31:34 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 1.0}': 'Page' object has no attribute 'execute'
+2026-01-06 13:31:34 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:31:34 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:32:21 [ERROR] ❌ Erros de validação do YAML:
+1 validation error for PipelineConfig
+pipelines.login.steps.2
+  Value error, [FIND] campos não permitidos: {'x_cood'} [type=value_error, input_value={'action': 'FIND', 'objec...bug': True, 'wait': 1.0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+2026-01-06 13:32:35 [INFO] ✅ YAML válido!
+2026-01-06 13:32:35 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:32:43 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:32:43 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:32:46 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:32:54 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:32:56 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 1.0}': 'Page' object has no attribute 'execute'
+2026-01-06 13:32:56 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:32:56 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:33:11 [INFO] ✅ YAML válido!
+2026-01-06 13:33:11 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:33:19 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:33:19 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:33:23 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:33:30 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:33:32 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 1.0}': 'Page' object has no attribute 'execute'
+2026-01-06 13:33:32 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:33:32 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:33:45 [INFO] ✅ YAML válido!
+2026-01-06 13:33:45 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:33:53 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:33:53 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:33:56 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:34:03 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:34:06 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 1.0}': 'Page' object has no attribute 'execute'
+2026-01-06 13:34:06 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:34:06 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:34:24 [INFO] ✅ YAML válido!
+2026-01-06 13:34:24 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:34:31 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:34:31 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:34:35 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:34:44 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:34:46 [ERROR] ❌ Erro ao executar step '{'action': 'KEYS_SELECTIONS', 'keys': ['Enter'], 'wait': 1.0}': 'Page' object has no attribute 'execute'
+2026-01-06 13:34:46 [ERROR] ❌ Step falhou na pipeline 'login'.
+2026-01-06 13:34:46 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:35:12 [INFO] ✅ YAML válido!
+2026-01-06 13:35:12 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:35:20 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:35:20 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:35:23 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:35:30 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:35:35 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:35:36 [INFO] 🔹 Step: Procura Botao de Escolha do Formato
+2026-01-06 13:35:39 [DEBUG] ⏱ Aguardando 0.50 segundos
+2026-01-06 13:35:40 [INFO] 🔹 Step: Escolhe o Modo de Batalha
+2026-01-06 13:35:42 [DEBUG] ⏱ Aguardando 0.30 segundos
+2026-01-06 13:35:43 [INFO] 🔹 Step: Escolhe o Modo de Batalha
+2026-01-06 13:35:47 [INFO] 🔹 Step: Inicia Batalha
+2026-01-06 13:35:50 [DEBUG] ⏱ Aguardando 5.00 segundos
+2026-01-06 13:35:55 [INFO] 🔹 Step: Esperando Conectar
+2026-01-06 13:35:58 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:35:59 [INFO] 🔹 Step: Esperando Achar Alguem
+2026-01-06 13:36:02 [DEBUG] ⏱ Aguardando 3.00 segundos
+2026-01-06 13:36:11 [ERROR] ❌ Erro ao executar step '{'action': 'DO_WHILE', 'while_condition': [{'action': 'FIND', 'object_type': 'TEXT', 'text': 'Battle Options', 'helper': 'Verifica While condition', 'in_text': False}], 'do': [{'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose', 'y_coord': 25, 'click': True, 'helper': 'Tentado Escolher Pokemon', 'optional': True}, {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Attack', 'in_text': False, 'y_coord': 25, 'click': True, 'optional': True, 'helper': 'Tenatndo Usa Primeiro Ataque'}]}': BotActions.__init__() got an unexpected keyword argument 'driver'
+2026-01-06 13:36:11 [ERROR] ❌ Step falhou na pipeline 'combat_loop'.
+2026-01-06 13:36:11 [INFO] 🧹 Finalizando e encerrando o driver...
+2026-01-06 13:39:58 [INFO] ✅ YAML válido!
+2026-01-06 13:39:58 [INFO] 🔄 Iniciando execução de pipelines
+2026-01-06 13:40:07 [INFO] 🚀 Pipeline 'teste' iniciada na URL: https://play.pokemonshowdown.com
+2026-01-06 13:40:07 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:40:11 [INFO] 🔹 Step: Procura Botao de Escolha do Nome
+2026-01-06 13:40:17 [DEBUG] ⏱ Aguardando 0.50 segundos
+2026-01-06 13:40:18 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:40:20 [INFO] 🔹 Step: Procura Botao de Escolha do Formato
+2026-01-06 13:40:23 [DEBUG] ⏱ Aguardando 0.50 segundos
+2026-01-06 13:40:24 [INFO] 🔹 Step: Escolhe o Modo de Batalha
+2026-01-06 13:40:27 [DEBUG] ⏱ Aguardando 0.30 segundos
+2026-01-06 13:40:28 [INFO] 🔹 Step: Escolhe o Modo de Batalha
+2026-01-06 13:40:32 [INFO] 🔹 Step: Inicia Batalha
+2026-01-06 13:40:35 [DEBUG] ⏱ Aguardando 5.00 segundos
+2026-01-06 13:40:40 [INFO] 🔹 Step: Esperando Conectar
+2026-01-06 13:40:43 [DEBUG] ⏱ Aguardando 1.00 segundos
+2026-01-06 13:40:44 [INFO] 🔹 Step: Esperando Achar Alguem
+2026-01-06 13:40:47 [DEBUG] ⏱ Aguardando 3.00 segundos
+2026-01-06 13:40:57 [ERROR] ❌ Erro ao executar step '{'action': 'DO_WHILE', 'while_condition': [{'action': 'FIND', 'object_type': 'TEXT', 'text': 'Battle Options', 'helper': 'Verifica While condition', 'in_text': False}], 'do': [{'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose', 'y_coord': 25, 'click': True, 'helper': 'Tentado Escolher Pokemon', 'optional': True}, {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Attack', 'in_text': False, 'y_coord': 25, 'click': True, 'optional': True, 'helper': 'Tenatndo Usa Primeiro Ataque'}]}': BotActions.__init__() got an unexpected keyword argument 'driver'
+2026-01-06 13:40:58 [ERROR] ❌ Step falhou na pipeline 'combat_loop'.
+2026-01-06 13:40:58 [INFO] 🧹 Finalizando e encerrando o driver...

@@ -11,9 +11,8 @@ from pydantic import ValidationError
 from .functions.key_map import *
 from .functions.utils import *
 from .functions.image_functions import *
-from .functions.tests import test_driver
 
-from .classes.validation_models import *
+from .classes.BotValidation import *
 from .classes.BotActions import BotActions
 
 class BotUI:
@@ -264,8 +263,9 @@ class BotUI:
 
 
         self.init_actions(step_info)
-        self.actions._take_screenshot()
-        action_bool, action_error_log = self.actions.run_action() # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
+        # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
+        # o action bool deve ser algo como "finalizou a acao"
+        action_bool, action_error_log = self.actions.run_action() 
 
         if action_error_log:
             self.finish(action_error_log)
@@ -281,7 +281,6 @@ class BotUI:
         return True
 
     def _go_to_url(self, url: str, wait_time: float = 5.0) -> bool:
-
         try:
             self.page.goto(url, wait_until="networkidle")
             time.sleep(wait_time)

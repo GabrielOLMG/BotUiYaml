@@ -36,6 +36,8 @@ def find_image_center(screenshot_path: str, template_path: str, threshold=0.9, t
     """
     Localiza o template na tela e retorna o centro (x, y) em pixels.
     Agora suporta matching colorido (melhor para imagens com cores específicas).
+    return: 
+        Foi executado?, Erro?, Coord
     """
     # 1. Carrega em colorido (BGR padrão OpenCV)
     screen_color = cv2.imread(screenshot_path)
@@ -146,14 +148,14 @@ def extract_text_from_image(image_file, color):
     # Isolate the red text
     isolated_text_image = process_color_text_detection(image_file, color)
     if isolated_text_image is None:
-        return "Extraction failed."
+        return False, "Extraction failed.", None
         
     try:
         # Use a page segmentation mode (PSM) that works well for a single line of text
         text = pytesseract.image_to_string(isolated_text_image)
-        return text.strip()
+        return True, None, text.strip()
     except pytesseract.TesseractNotFoundError:
-        return "Tesseract was not found. Please check your installation and path settings."
+        return False, "Tesseract was not found. Please check your installation and path settings.", None
 
 def process_color_text_detection(image_path, color):
     image = cv2.imread(image_path)

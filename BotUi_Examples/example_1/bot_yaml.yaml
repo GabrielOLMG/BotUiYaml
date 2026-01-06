@@ -35,7 +35,7 @@ pipelines:
       - action: KEYS_SELECTIONS
         keys:
           - Enter
-        wait: 1
+        wait: 1.0
         
   combat_format:
     steps:
@@ -66,21 +66,21 @@ pipelines:
         in_text: False
         click: True
         helper: Inicia Batalha     
-        wait: 5
+        wait: 5.0
       - action: FIND
         object_type: TEXT
         text: "Connecting"
         helper: Esperando Conectar    
         if_find: retry
         optional: True
-        wait: 1
+        wait: 1.0
       - action: FIND
         object_type: TEXT
         text: "Searching..."
         helper: Esperando Achar Alguem    
         if_find: retry
         optional: True
-        wait: 3
+        wait: 3.0
 
   combat_loop:
     steps:
