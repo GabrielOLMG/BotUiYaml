@@ -14,35 +14,70 @@ echo "➡️  Python: $(python3 --version 2>/dev/null || echo '❌ não encontra
 # 🖥️ DISPLAY / XVFB
 # --------------------------------------------------
 echo ""
-echo "🖥️ Verificando DISPLAY..."
+echo "🖥️ Preparando ambiente gráfico..."
+
+XVFB_PID=""
+CREATED_XVFB=0
 
 if [ -z "$DISPLAY" ]; then
-    echo "➡️  DISPLAY não definido, iniciando Xvfb em :99"
     export DISPLAY=:99
 
-    Xvfb :99 -screen 0 1920x1080x24 -ac +extension RANDR &
-    XVFB_PID=$!
+    # limpeza preventiva (segura)
+    rm -f /tmp/.X99-lock
+    rm -f /tmp/.X11-unix/X99 2>/dev/null || true
 
-    # garante shutdown limpo
-    trap "echo '🧹 Encerrando Xvfb'; kill $XVFB_PID" EXIT
+    echo "➡️  Iniciando Xvfb em $DISPLAY"
+    Xvfb $DISPLAY -screen 0 1920x1080x24 -ac +extension RANDR &
+    XVFB_PID=$!
+    CREATED_XVFB=1
 
     # espera subir
     for i in {1..10}; do
-        if xdpyinfo -display :99 >/dev/null 2>&1; then
-            echo "✅ Xvfb ativo"
+        if xdpyinfo -display $DISPLAY >/dev/null 2>&1; then
+            echo "✅ Xvfb ativo ($DISPLAY)"
             break
         fi
         sleep 0.3
     done
 
-    if ! xdpyinfo -display :99 >/dev/null 2>&1; then
+    if ! xdpyinfo -display $DISPLAY >/dev/null 2>&1; then
         echo "❌ Xvfb não iniciou corretamente"
         exit 1
     fi
 else
-    echo "✅ DISPLAY já ativo ($DISPLAY)"
+    echo "✅ DISPLAY já definido ($DISPLAY)"
 fi
 
+# --------------------------------------------------
+# 🧹 CLEANUP GARANTIDO
+# --------------------------------------------------
+cleanup() {
+    if [ "$CREATED_XVFB" -eq 1 ]; then
+        echo ""
+        echo "🧹 Encerrando Xvfb ($DISPLAY)"
+        kill $XVFB_PID 2>/dev/null || true
+        rm -f /tmp/.X99-lock
+        rm -f /tmp/.X11-unix/X99 2>/dev/null || true
+    fi
+}
+
+trap cleanup EXIT INT TERM
+
+# --------------------------------------------------
+# 🧪 Smoke test Playwright
+# --------------------------------------------------
+echo ""
+echo "🧪 Testando Playwright..."
+
+python3 - <<'EOF'
+from playwright.sync_api import sync_playwright
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=False)
+    page = browser.new_page()
+    page.goto("about:blank")
+    browser.close()
+print("✅ Playwright OK")
+EOF
 
 # --------------------------------------------------
 # 🚀 Execução principal
