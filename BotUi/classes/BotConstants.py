@@ -14,7 +14,7 @@ class RetryConstants:
 
 GLOBAL_FIELDS = {
     "helper": str,
-    "wait": float,
+    "wait": (int, float),
     "debug": bool
 }
 
