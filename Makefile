@@ -50,11 +50,6 @@ run:
 		$(IMAGE_NAME) \
 		python3 $(SCRIPT)
 
-
-
-
-
-
 ## 🧩 Executa um script Python à sua escolha
 script_docker:
 	@echo "====================================="
@@ -70,7 +65,7 @@ script_local:
 	@echo "====================================="
 	@echo "🧩 Executando script localmente: $(SCRIPT)"
 	@echo "====================================="
-	./run_local.sh python3 $(SCRIPT)
+	./BotUi_Setup_Local/entrypoint.sh python3 $(SCRIPT)
 
 
 
