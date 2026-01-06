@@ -96,7 +96,7 @@ ACTION_SCHEMA = {
     "FOR_EACH": {
         "required": {
             "loop_var": str,
-            "items": list,
+            "items": str,
             "steps": list
 
         },
