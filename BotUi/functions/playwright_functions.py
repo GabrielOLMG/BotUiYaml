@@ -30,7 +30,7 @@ def finish_page(pw, browser):
     finally:
         pw.stop()
 
-def write_input_fast(page, text):
+def write_input(page, text):
     try:
         page.bring_to_front()
 
