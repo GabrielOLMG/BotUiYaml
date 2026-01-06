@@ -193,7 +193,8 @@ class BotActions:
 
         field = present_fields.pop()
         value = self.step_info[field]
-
+        if field == "file_path":
+            value = open_file(value)
         executed, error = write_input(self.page, value)
         return executed, error
 
