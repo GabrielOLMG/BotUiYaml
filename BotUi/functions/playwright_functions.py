@@ -30,23 +30,30 @@ def finish_page(pw, browser):
     finally:
         pw.stop()
 
-def write_input(page, text, delay_ms=None):
-    """
-    Escreve texto no elemento atualmente focado.
-    Compatível com Flutter Web (canvas).
-    """
-    try: 
-        # Garante que a página tem foco
+def write_input_fast(page, text):
+    try:
         page.bring_to_front()
 
-        # Digitação real (evento de teclado)
-        if delay_ms:
-            page.keyboard.type(text, delay=delay_ms)
+        # injeta texto no clipboard
+        page.evaluate(
+            """
+            async (text) => {
+                await navigator.clipboard.writeText(text);
+            }
+            """,
+            text,
+        )
+
+        # cola (Ctrl+V ou Cmd+V)
+        if page.evaluate("navigator.platform").startswith("Mac"):
+            page.keyboard.press("Meta+V")
         else:
-            page.keyboard.type(text)
+            page.keyboard.press("Control+V")
+
         return True, None
     except Exception as e:
         return False, e
+
 
 def click_coord(page, object_coord, delay_ms=100):
     """
