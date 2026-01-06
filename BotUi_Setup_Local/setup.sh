@@ -1,9 +1,12 @@
 #!/bin/bash
 set -e
 
+ENV_NAME="botui"
+PYTHON_VERSION="3.10"
+
 echo ""
 echo "============================================="
-echo "🤖 BotUI — Configuração Local (Playwright)"
+echo "🤖 BotUI — Configuração Local (Conda + Playwright)"
 echo "============================================="
 echo ""
 
@@ -17,21 +20,46 @@ else
 fi
 
 # ---------------------------------------------
-# 2️⃣ Atualiza lista de pacotes
+# 2️⃣ Verifica Conda
 # ---------------------------------------------
-echo ""
-echo "📦 Atualizando lista de pacotes..."
-sudo apt-get update -y
+if ! command -v conda >/dev/null 2>&1; then
+    echo "❌ Conda não encontrado."
+    echo "➡️  Instale Miniconda ou Anaconda antes de continuar."
+    echo "   https://docs.conda.io/en/latest/miniconda.html"
+    exit 1
+fi
+
+echo "✅ Conda encontrado"
 
 # ---------------------------------------------
-# 3️⃣ Dependências do sistema (IGUAL ao Docker)
+# 3️⃣ Cria ambiente Conda (se não existir)
+# ---------------------------------------------
+if conda env list | grep -q "^$ENV_NAME "; then
+    echo "✅ Ambiente Conda '$ENV_NAME' já existe"
+else
+    echo "🐍 Criando ambiente Conda '$ENV_NAME' (Python $PYTHON_VERSION)..."
+    conda create -n "$ENV_NAME" python="$PYTHON_VERSION" -y
+fi
+
+# ---------------------------------------------
+# 4️⃣ Ativa ambiente
+# ---------------------------------------------
+echo "🔑 Ativando ambiente Conda '$ENV_NAME'"
+
+# shellcheck disable=SC1091
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate "$ENV_NAME"
+
+echo "➡️  Python ativo: $(python --version)"
+
+# ---------------------------------------------
+# 5️⃣ Dependências do sistema (IGUAL ao Docker)
 # ---------------------------------------------
 echo ""
 echo "🔧 Instalando dependências do sistema..."
 
+sudo apt-get update -y
 sudo apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
     python3-tk \
     python3-dev \
     wget \
@@ -63,24 +91,26 @@ sudo apt-get install -y --no-install-recommends \
     libcairo2
 
 # ---------------------------------------------
-# 4️⃣ Python + Playwright
+# 6️⃣ Python deps + projeto
 # ---------------------------------------------
 echo ""
 echo "🐍 Instalando dependências Python..."
 
+python -m pip install --upgrade pip
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-python3 -m pip install --upgrade pip
 pip install -e "$PROJECT_ROOT"
 pip install playwright
 
 # ---------------------------------------------
-# 5️⃣ Instala Chromium do Playwright
+# 7️⃣ Chromium do Playwright
 # ---------------------------------------------
 echo ""
 echo "🌐 Instalando Chromium (Playwright)..."
 playwright install chromium
+
 
 # ---------------------------------------------
 # ✅ Finalização
@@ -88,4 +118,6 @@ playwright install chromium
 echo ""
 echo "============================================="
 echo "✅ Setup local concluído com sucesso!"
+echo "➡️  Para usar:"
+echo "   conda activate botui"
 echo "============================================="
