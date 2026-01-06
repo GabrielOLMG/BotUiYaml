@@ -241,7 +241,6 @@ class BotActions:
             return False, f"UPLOAD file {file_path} does not exist"
 
         executed, error = upload_file(self.page, file_path, coord)
-        scroll_until_edge(self.page, direction="UP")
         self._take_screenshot()
         return executed, error
 
