@@ -157,12 +157,12 @@ Example:
     - {"name":"Sarah", "password": "321"}
   steps:  
     - action: WRITE
-      text: {users.name}
+      text: "{users.name}"
     - action: KEYS_SELECTIONS
       keys:
         - TAB
     - action: WRITE
-      text: {users.password}
+      text: "{users.password}"
 ```
 
 ### ACTION: RUN_SCRIPT
