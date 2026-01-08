@@ -38,25 +38,58 @@
   - FIND_TEXT_BY_COLOR
 
 ### ACTION: FIND
-Used to locate text or image on the page.
+**Used to locate text or image on the page.**
 Required fields:
-action: FIND
 object_type: TEXT | IMG
-Conditional fields:
-If object_type: TEXT → must include text
-If object_type: IMG → must include image_path
-Optional behavior fields:
-click: true | false
-scroll: true | false
-scroll_image_path
-x_coord, y_coord
-in_text: true | false
-optional: true | false
-until_find: retry
-if_find: retry
-save_as
-Use scroll: true when the element may not be visible initially.
 
+Conditional fields:
+- If object_type: TEXT → must include text
+- If object_type: IMG → must include image_path
+
+Optional behavior fields:
+  - click
+    - Options: true | false
+    - Select True if the goal is to click on the found object.
+  - scroll
+    - Options: true | false
+    - Select True if you want the page to scroll to find the object.
+  - scroll_image_path
+    - Type: String
+    - Image path for the scroll, in case you want it to scroll from a specific object and not the central object.
+  - x_coord, y_coord
+    - The value to be added (if positive) or subtracted (if negative) from the object's coordinates when it is found. 
+    - It can be used to shift the principal focus.
+  - in_text
+    - Options: true | false
+    - If True is selected, then the text to be searched for may be contained within another text; for example, "project" is contained within "projects". If False is selected, then it will search for the text exactly as written.
+  - optional 
+    - Options: true | false
+    - If marked as True, then if the object is not found, the bot will not throw an error; in other words, it's an optional "found" statement.
+  - until_find
+    - Options: retry
+      - retry: If is selected, then the find action will try again to find the object, until the bot itself reaches the maximum number of attempts.
+  - if_find
+    - Options: retry
+    - If "retry" is selected, then the find action will try again to find the object. This is very useful when you are trying to advance to the next action when a particular object goes out of view.
+  - save_as
+    - It will save the coordinates of the found object, which can be used at some other time.
+
+Notes:
+- It is strictly forbidden to use `until_find` as a retry and `scroll` as true at the same time.
+
+Example:
+```yaml
+- action: FIND
+  object_type: TEXT
+  text: Login
+  click: true
+  until_find: retry
+- action: FIND
+  object_type: IMG
+  image_path: "button_login.png"
+  click: true
+  scroll: true
+```
 
 ### ACTION: WRITE - DONE
 **Writes text into the currently focused input.**
