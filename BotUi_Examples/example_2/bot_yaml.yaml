@@ -1,0 +1,27 @@
+pipelines:
+  access_avatar_email:
+    url: https://www.avatar.com
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: JOIN OUR EMAIL LIST
+        scroll: true
+        helper: "Localizar o texto JOIN OUR EMAIL LIST sem clicar"
+
+      - action: FIND
+        object_type: TEXT
+        text: SIGN-UP
+        click: true
+        scroll: true
+        helper: "Localizar e clicar em SIGN-UP"
+
+      - action: WRITE
+        text: gabrielolmg@gmail.com
+        helper: "Escrever o email no campo ativo"
+
+      - action: FIND
+        object_type: TEXT
+        text: Sign Me Up
+        click: true
+        debug: True
+        helper: "Clicar em Sign Me Up"
