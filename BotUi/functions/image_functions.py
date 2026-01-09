@@ -124,22 +124,76 @@ def encontrar_texto_central(image_path, text, threshold=0.8, contain_=True, firs
 
     return False, f"Não foi possivel Localizar o texto '{text}' na lista: {text_flat}", None
 
-def marcar_x_na_imagem(imagem_path, coordenada, output_path, tamanho=20, cor=(0, 0, 255), espessura=2): 
-    # Lê a imagem
+# def marcar_x_na_imagem(imagem_path, coordenada, output_path, tamanho=20, cor=(0, 0, 255), espessura=2): 
+#     # Lê a imagem
+#     img = cv2.imread(imagem_path)
+#     if img is None:
+#         raise FileNotFoundError(f"Imagem não encontrada: {imagem_path}")
+
+#     x, y = coordenada
+#     x = int(round(x))
+#     y = int(round(y))
+#     # Desenha o "X"
+#     cv2.line(img, (x - tamanho, y - tamanho), (x + tamanho, y + tamanho), cor, espessura)
+#     cv2.line(img, (x - tamanho, y + tamanho), (x + tamanho, y - tamanho), cor, espessura)
+
+#     # Salva a imagem
+#     cv2.imwrite(output_path, img)
+#     return output_path, img
+
+
+def marcar_x_na_imagem(
+    imagem_path,
+    coordenada,
+    output_path,
+    tamanho=30,
+    espessura=2
+):
     img = cv2.imread(imagem_path)
     if img is None:
         raise FileNotFoundError(f"Imagem não encontrada: {imagem_path}")
 
-    x, y = coordenada
-    x = int(round(x))
-    y = int(round(y))
-    # Desenha o "X"
-    cv2.line(img, (x - tamanho, y - tamanho), (x + tamanho, y + tamanho), cor, espessura)
-    cv2.line(img, (x - tamanho, y + tamanho), (x + tamanho, y - tamanho), cor, espessura)
+    x, y = map(int, coordenada)
 
-    # Salva a imagem
+    cor_marker = (0, 0, 255)
+    cor_circulo = (0, 255, 255)
+
+    # Marker
+    cv2.drawMarker(
+        img,
+        (x, y),
+        cor_marker,
+        markerType=cv2.MARKER_CROSS,
+        markerSize=tamanho,
+        thickness=espessura
+    )
+
+    # Círculo
+    cv2.circle(img, (x, y), tamanho, cor_circulo, espessura)
+
+    # Texto com coordenadas
+    texto = f"({x}, {y})"
+    (w, h), _ = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+
+    cv2.rectangle(
+        img,
+        (x + 10, y - h - 10),
+        (x + 10 + w, y),
+        (0, 0, 0),
+        -1
+    )
+    cv2.putText(
+        img,
+        texto,
+        (x + 10, y - 5),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        (255, 255, 255),
+        1
+    )
+
     cv2.imwrite(output_path, img)
-    return output_path
+    return output_path, img
 
 def extract_text_from_image(image_file, color):
     """

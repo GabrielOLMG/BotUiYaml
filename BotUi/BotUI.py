@@ -1,17 +1,23 @@
 import re
 import ast
+import cv2
 import time
 import json
 import logging
+import numpy as np
 
 
+from PIL import Image
+from io import BytesIO
 from copy import deepcopy
 from pydantic import ValidationError
 
-from .functions.key_map import *
+
 from .functions.utils import *
+from .functions.key_map import *
 from .functions.image_functions import *
 from .functions.playwright_functions import *
+
 
 from .classes.BotValidation import *
 from .classes.BotActions import BotActions
@@ -41,6 +47,7 @@ class BotUI:
         self.data_store = {}
         self.actions = None  
         self.screenshots_path = screenshots_path
+        self.screenshots_history = []
         self.global_yaml_path = global_yaml_path
 
         # Logger
@@ -251,6 +258,8 @@ class BotUI:
             if not self.run_step(step):
                 self.logger.error("❌ Step falhou na pipeline '%s'.", pipeline_name)
                 return False
+        
+        self._create_final_media()
 
         return True
 
@@ -266,8 +275,8 @@ class BotUI:
         self.init_actions(step_info)
         # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
         # o action bool deve ser algo como "finalizou a acao"
-        action_bool, action_error_log = self.actions.run_action() 
-
+        action_bool, action_error_log, screenshots_action_history = self.actions.run_action() 
+        self.screenshots_history.extend(screenshots_action_history)
         if action_error_log:
             self.finish(action_error_log)
             return False
@@ -295,3 +304,96 @@ class BotUI:
         self.logger.error(f"❌ {reason}")
         finish_page(self.pw, self.browser)
 
+    # def _create_final_gif(self):
+    #     git_output_path = os.path.join(self.screenshots_path, "final_gif.gif")
+
+    #     self.logger.error("Criando GIF com o processo completo")
+    #     frames = []
+
+    #     for screenshot in self.screenshots_history:
+
+    #         # Caso 1 — veio do Playwright (bytes)
+    #         if isinstance(screenshot, (bytes, bytearray)):
+    #             img = Image.open(BytesIO(screenshot)).convert("RGB")
+
+    #         # Caso 2 — veio do OpenCV (numpy array BGR)
+    #         elif isinstance(screenshot, np.ndarray):
+    #             img = Image.fromarray(
+    #                 cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+    #             )
+
+    #         else:
+    #             raise TypeError(
+    #                 f"Tipo de screenshot não suportado: {type(screenshot)}"
+    #             )
+
+    #         frames.append(img)
+
+    #     if not frames:
+    #         return
+
+    #     frames[0].save(
+    #         git_output_path,
+    #         format="GIF",
+    #         save_all=True,
+    #         append_images=frames[1:],
+    #         duration=300,
+    #         loop=0
+    #     )
+
+    def _create_final_media(self, output_format="mp4", fps=5):
+        frames = []
+        # 1️⃣ Normaliza tudo para PIL.Image (RGB)
+        for screenshot in self.screenshots_history:
+
+            if isinstance(screenshot, (bytes, bytearray)):
+                img = Image.open(BytesIO(screenshot)).convert("RGB")
+
+            elif isinstance(screenshot, np.ndarray):
+                img = Image.fromarray(
+                    cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+                )
+
+            else:
+                raise TypeError(
+                    f"Tipo de screenshot não suportado: {type(screenshot)}"
+                )
+
+            frames.append(img)
+
+        if not frames:
+            return
+
+        # 2️⃣ Decide formato de saída
+        if output_format == "gif":
+            output_path = os.path.join(self.screenshots_path, "media.gif")
+
+            frames[0].save(
+                output_path,
+                format="GIF",
+                save_all=True,
+                append_images=frames[1:],
+                duration=int(1000 / fps),
+                loop=0
+            )
+
+        elif output_format == "mp4":
+            output_path = os.path.join(self.screenshots_path, "media.mp4")
+
+            # PIL -> OpenCV
+            frame_np = np.array(frames[0])
+            height, width, _ = frame_np.shape
+
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+            for frame in frames:
+                video.write(
+                    cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+                )
+
+            video.release()
+
+        else:
+            raise ValueError("output_format deve ser 'gif' ou 'mp4'")
+        return output_path

@@ -30,7 +30,8 @@ class BotActions:
         # Screenshots
         self.screenshots_path = screenshots_path
         self.screenshot_check_page = None
-
+        self.screenshots_action_history = []
+        
         self.init_variables()
 
 
@@ -50,13 +51,13 @@ class BotActions:
         function = self.ACTION_MAP.get(action)
 
         if not function:
-            False, f"Ação não implementada: {action}"
+            False, f"Ação não implementada: {action}", self.screenshots_action_history
         
         self._take_screenshot()
         try:
             result = function()
             if not isinstance(result, bool) and result[1]:
-                return False, result[1] 
+                return False, result[1], self.screenshots_action_history
             
             if self.step_info.get("refresh", False):
                 self.page.reload()
@@ -71,16 +72,18 @@ class BotActions:
                 self.data_store[self.step_info.get("save_url")] = self.page.url
             
         except Exception as e:
-            return False, f"Erro ao executar step '{self.step_info}': {e}" 
+            return False, f"Erro ao executar step '{self.step_info}': {e}", self.screenshots_action_history
         
         self._take_screenshot()
 
-        return True, None
+        return True, None, self.screenshots_action_history
 
-    def debug(self, coord, image_path):
+    def _debug(self, coord, image_path):
         screenshot_parent = os.path.dirname(self.screenshot_check_page)
         output_path = os.path.join(screenshot_parent, "debug.png") 
-        return marcar_x_na_imagem(image_path, coord, output_path)
+        output_path, img = marcar_x_na_imagem(image_path, coord, output_path)
+        self.screenshots_action_history.append(img)
+        return output_path
 
     def init_variables(self):
         for key_name  in self.step_info:
@@ -88,8 +91,8 @@ class BotActions:
 
     def _take_screenshot(self, screenshot_name="screenshot_check_page.png"):
         full_screenshot_path = os.path.join(self.screenshots_path, screenshot_name)
-        self.screenshot_check_page = get_screenshot(self.page, full_screenshot_path) 
-
+        self.screenshot_check_page, data = get_screenshot(self.page, full_screenshot_path) 
+        self.screenshots_action_history.append(data)
         return self.screenshot_check_page
 
     # ----------------------
@@ -341,7 +344,7 @@ class BotActions:
 
         # --- (3) Modo debug ---
         if debug_mode:
-            self.debug(object_coord, self.screenshot_check_page)
+            self._debug(object_coord, self.screenshot_check_page)
 
         # --- (4) Clique final ---
         if click_enabled and object_coord:

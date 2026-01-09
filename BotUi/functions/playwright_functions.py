@@ -98,11 +98,11 @@ def get_screenshot(page, output_path):
     if not output_path.lower().endswith(".png"):
         output_path += ".png"
 
-    page.screenshot(
+    data = page.screenshot(
         path=output_path,
         #full_page=True
     )
-    return output_path
+    return output_path, data
 
 # ---------------------- #
 # SCROLLs
