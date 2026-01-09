@@ -341,7 +341,7 @@ class BotUI:
     #         loop=0
     #     )
 
-    def _create_final_media(self, output_format="mp4", fps=5):
+    def _create_final_media(self, output_format="gif", fps=5):
         frames = []
         # 1️⃣ Normaliza tudo para PIL.Image (RGB)
         for screenshot in self.screenshots_history:
