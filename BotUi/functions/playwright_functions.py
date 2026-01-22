@@ -34,7 +34,7 @@ def finish_page(pw, browser):
 def write_input(page, text):
     try:
         # tentativa rápida (melhor caso)
-        page.keyboard.insertText(text)
+        page.keyboard.insert_text(text)
         return True, None
 
     except Exception:
