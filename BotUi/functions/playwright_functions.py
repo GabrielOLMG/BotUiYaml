@@ -30,30 +30,22 @@ def finish_page(pw, browser):
     finally:
         pw.stop()
 
+
 def write_input(page, text):
     try:
-        page.bring_to_front()
-
-        # injeta texto no clipboard
-        # page.evaluate(
-        #     """
-        #     async (text) => {
-        #         await navigator.clipboard.writeText(text);
-        #     }
-        #     """,
-        #     text,
-        # )
-        page.keyboard.type(text)
-
-        # cola (Ctrl+V ou Cmd+V)
-        # if page.evaluate("navigator.platform").startswith("Mac"):
-        #     page.keyboard.press("Meta+V")
-        # else:
-        #     page.keyboard.press("Control+V")
-
+        # tentativa rápida (melhor caso)
+        page.keyboard.insertText(text)
         return True, None
-    except Exception as e:
-        return False, e
+
+    except Exception:
+        try:
+            # fallback universal
+            page.keyboard.type(text)
+            return True, None
+
+        except Exception as e:
+            return False, e
+
 
 
 def click_coord(page, object_coord, delay_ms=100):
