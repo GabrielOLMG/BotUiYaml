@@ -32,99 +32,41 @@ COLOR_DEFINITION = { # TODO: Melhor locel?
     "black": ([[0, 0, 0], [180, 255, 80]], )
 }
 
-# def find_image_center(screenshot_path: str, template_path: str, threshold=0.9, try_gray_fallback=True):
-#     """
-#     Localiza o template na tela e retorna o centro (x, y) em pixels.
-#     Agora suporta matching colorido (melhor para imagens com cores específicas).
-#     return: 
-#         Foi executado?, Erro?, Coord
-#     """
-#     # 1. Carrega em colorido (BGR padrão OpenCV)
-#     screen_color = cv2.imread(screenshot_path)
-#     template_color = cv2.imread(template_path)
-
-#     if screen_color is None:
-#         return False, f"Screenshot não encontrada em {screenshot_path}", None
-#     if template_color is None:
-#         return False, f"Template não encontrado em {template_path}", None
-
-#     # 2. Faz matching colorido (usa todos os canais)
-#     h, w = template_color.shape[:2]
-#     res = cv2.matchTemplate(screen_color, template_color, cv2.TM_CCOEFF_NORMED)
-#     _, max_val, _, max_loc = cv2.minMaxLoc(res)
-
-#     # 3. Se não passou o threshold e try_gray_fallback=True, tenta em grayscale
-#     if max_val < threshold and try_gray_fallback:
-#         screen_gray = cv2.cvtColor(screen_color, cv2.COLOR_BGR2GRAY)
-#         template_gray = cv2.cvtColor(template_color, cv2.COLOR_BGR2GRAY)
-#         res = cv2.matchTemplate(screen_gray, template_gray, cv2.TM_CCOEFF_NORMED)
-#         _, max_val, _, max_loc = cv2.minMaxLoc(res)
-
-#     # 4. Retorna resultado se passou o threshold
-#     if max_val < threshold:
-#         return False, f"Não Foi Possivel Localizar a Image {template_path}", None
-
-#     center_x = max_loc[0] + w // 2
-#     center_y = max_loc[1] + h // 2
-#     return True, None, (center_x, center_y)
-
-def find_image_center_robust(screenshot_path: str, template_path: str, min_matches=10, scales=None):
+def find_image_center(screenshot_path: str, template_path: str, threshold=0.9, try_gray_fallback=True):
     """
-    Localiza o template na tela usando ORB feature matching e multi-scale.
-    Retorna o centro (x, y) em pixels da área detectada.
+    Localiza o template na tela e retorna o centro (x, y) em pixels.
+    Agora suporta matching colorido (melhor para imagens com cores específicas).
+    return: 
+        Foi executado?, Erro?, Coord
     """
-    screen = cv2.imread(screenshot_path)
-    template = cv2.imread(template_path)
+    # 1. Carrega em colorido (BGR padrão OpenCV)
+    screen_color = cv2.imread(screenshot_path)
+    template_color = cv2.imread(template_path)
 
-    if screen is None:
+    if screen_color is None:
         return False, f"Screenshot não encontrada em {screenshot_path}", None
-    if template is None:
+    if template_color is None:
         return False, f"Template não encontrado em {template_path}", None
 
-    screen_gray = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
-    template_gray_original = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    # 2. Faz matching colorido (usa todos os canais)
+    h, w = template_color.shape[:2]
+    res = cv2.matchTemplate(screen_color, template_color, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, max_loc = cv2.minMaxLoc(res)
 
-    # ORB detector
-    orb = cv2.ORB_create(1000)
+    # 3. Se não passou o threshold e try_gray_fallback=True, tenta em grayscale
+    if max_val < threshold and try_gray_fallback:
+        screen_gray = cv2.cvtColor(screen_color, cv2.COLOR_BGR2GRAY)
+        template_gray = cv2.cvtColor(template_color, cv2.COLOR_BGR2GRAY)
+        res = cv2.matchTemplate(screen_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, max_loc = cv2.minMaxLoc(res)
 
-    kp_screen, des_screen = orb.detectAndCompute(screen_gray, None)
-    if des_screen is None or len(kp_screen) == 0:
-        return False, "Não foi possível detectar keypoints na screenshot.", None
+    # 4. Retorna resultado se passou o threshold
+    if max_val < threshold:
+        return False, f"Não Foi Possivel Localizar a Image {template_path}", None
 
-    # Define escala para tentar múltiplos tamanhos do template
-    if scales is None:
-        scales = np.linspace(0.8, 1.2, 9)  # 80% a 120%
-
-    best_center = None
-    best_match_count = 0
-
-    for scale in scales:
-        w_scaled = int(template_gray_original.shape[1] * scale)
-        h_scaled = int(template_gray_original.shape[0] * scale)
-        if w_scaled < 10 or h_scaled < 10:
-            continue  # ignora templates muito pequenos
-
-        template_gray = cv2.resize(template_gray_original, (w_scaled, h_scaled))
-        kp_template, des_template = orb.detectAndCompute(template_gray, None)
-        if des_template is None or len(kp_template) == 0:
-            continue
-
-        # Matcher ORB
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-        matches = bf.match(des_template, des_screen)
-        matches = sorted(matches, key=lambda x: x.distance)
-
-        if len(matches) >= min_matches and len(matches) > best_match_count:
-            best_match_count = len(matches)
-            points = np.array([kp_screen[m.trainIdx].pt for m in matches])
-            center_x = int(np.mean(points[:, 0]))
-            center_y = int(np.mean(points[:, 1]))
-            best_center = (center_x, center_y)
-
-    if best_center is None:
-        return False, f"Template não encontrado. Melhor match: {best_match_count} correspondências.", None
-
-    return True, None, best_center
+    center_x = max_loc[0] + w // 2
+    center_y = max_loc[1] + h // 2
+    return True, None, (center_x, center_y)
 
 def preprocess_for_ocr(image):
     
