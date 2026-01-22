@@ -35,20 +35,21 @@ def write_input(page, text):
         page.bring_to_front()
 
         # injeta texto no clipboard
-        page.evaluate(
-            """
-            async (text) => {
-                await navigator.clipboard.writeText(text);
-            }
-            """,
-            text,
-        )
+        # page.evaluate(
+        #     """
+        #     async (text) => {
+        #         await navigator.clipboard.writeText(text);
+        #     }
+        #     """,
+        #     text,
+        # )
+        page.keyboard.type(text)
 
         # cola (Ctrl+V ou Cmd+V)
-        if page.evaluate("navigator.platform").startswith("Mac"):
-            page.keyboard.press("Meta+V")
-        else:
-            page.keyboard.press("Control+V")
+        # if page.evaluate("navigator.platform").startswith("Mac"):
+        #     page.keyboard.press("Meta+V")
+        # else:
+        #     page.keyboard.press("Control+V")
 
         return True, None
     except Exception as e:
