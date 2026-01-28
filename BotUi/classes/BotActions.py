@@ -160,7 +160,7 @@ class BotActions:
         # --- (3) Escolhe função de busca ---
         find_fn_map = {
             "IMG": lambda: find_image_center(
-                screenshot_path=self.screenshot_check_page,
+                image_source_path=self.screenshot_check_page,
                 template_path=step["image_path"]
             ),
             "TEXT": lambda: encontrar_texto_central(
