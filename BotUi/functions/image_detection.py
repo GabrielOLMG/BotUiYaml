@@ -113,7 +113,7 @@ def find_image_center_sift(source_image, template_image, min_matches = 10, ransa
     if debug:
         debug_image = get_draw_image(matches_mask, good_maches, source_image, template_image, keypoints_source, keypoints_template)
     
-    return True, None, center
+    return True, None, center.tolist()
 
 # ------------------------------------ #
 # Match Template Magnetude
