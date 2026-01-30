@@ -184,7 +184,7 @@ def get_bbox_center(top_left, bottom_right):
     """
     center_x = top_left[0] + (bottom_right[0] - top_left[0]) // 2
     center_y = top_left[1] + (bottom_right[1] - top_left[1]) // 2
-    return (center_x, center_y)
+    return (float(center_x), float(center_y))
 
 def find_image_center_match_template(image_source, template, threshold=0.95):
     # Original Magnitude
