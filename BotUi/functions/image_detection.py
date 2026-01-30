@@ -92,7 +92,7 @@ def find_image_center_sift(source_image, template_image, min_matches = 10, ransa
 
     matches_mask , mask, M = get_ransac_result(good_maches, keypoints_source, keypoints_template)
 
-    if not matches_mask:
+    if matches_mask is not None:
         return False, f"Homography failed, tente usar uma imagem mais descritiva", None
     
     confidence_percent = (np.sum(mask) / len(good_maches))

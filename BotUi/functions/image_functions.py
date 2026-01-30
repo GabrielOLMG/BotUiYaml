@@ -214,13 +214,13 @@ def find_image_center(image_source_path: str, template_path: str):
 
     # First Try: Match template
     ok, error_log, center = find_image_center_match_template(source_image, template_image)
-    if not error_log:
+    if error_log is not None:
         return ok, error_log, center
     
 
     # Second Try: SIFT
     ok, error_log, center = find_image_center_sift(source_image, template_image)
-    if not error_log:
+    if error_log is not None:
         return ok, error_log, center
     
     # Nada Funcionou!
