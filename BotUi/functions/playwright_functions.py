@@ -1,5 +1,7 @@
 from pathlib import Path
-
+import subprocess
+import os
+import signal
 from playwright.sync_api import sync_playwright
 
 def get_page( viewport=(1920, 1080)):
@@ -21,14 +23,38 @@ def get_page( viewport=(1920, 1080)):
     page = context.new_page()
     return pw, browser, page
 
-def finish_page(pw, browser):
+
+
+def finish_page(pw, browser=None):
     """
-    Finaliza corretamente Playwright.
+    Finaliza o Playwright de forma robusta, garantindo que
+    todos os processos sejam encerrados.
+    
+    :param pw: objeto Playwright
+    :param browser: browser ativo (opcional)
     """
+    # 1️⃣ Tenta fechar o browser, se existir
+    if browser is not None:
+        try:
+            browser.close()
+        except Exception as e:
+            print(f"[WARN] Browser já fechado ou erro ao fechar: {e}")
+
+    # 2️⃣ Tenta parar o Playwright
     try:
-        browser.close()
-    finally:
         pw.stop()
+    except Exception as e:
+        print(f"[WARN] Playwright já parado ou erro ao parar: {e}")
+
+    # 3️⃣ Kill “processos zumbis” do Playwright (Linux/Mac/Windows)
+    try:
+        # Busca por processos de node que são usados pelo Playwright
+        if os.name == "posix":
+            subprocess.run("pkill -f 'playwright'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        elif os.name == "nt":
+            subprocess.run('taskkill /F /IM node.exe /T', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        print(f"[WARN] Erro ao matar processos zumbis do Playwright: {e}")
 
 
 def write_input(page, text):

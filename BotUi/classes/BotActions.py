@@ -54,9 +54,9 @@ class BotActions:
         
         self._take_screenshot()
         try:
-            result = function()
-            if not isinstance(result, bool) and result[1]:
-                return False, result[1], self.screenshots_action_history
+            runned, error = function()
+            if not runned:
+                return False, error, self.screenshots_action_history
             
             if self.step_info.get("refresh", False):
                 self.page.reload()
@@ -183,7 +183,7 @@ class BotActions:
         # --- (5) Check se achou e aplica devida regra ---
         if error is not None:
             return False, error
-        elif not target_found: # TODO: Verificar se esta Ok, uma vez que se for false, pode ter erro aqui!
+        elif not target_found: 
             return self._not_find_consequence(step, error)
         else:
             return self._find_consequence(step, object_coord=target_center)
@@ -270,35 +270,37 @@ class BotActions:
     # ----------------------
     # Find Actions Secondary Functions
     # ----------------------
-    def _scroll_to_find(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
-        # --- Aplica Log ---
-        self.logger.debug(
-            f"🔄 Scrolling to locate the object "
-            f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
-        )
-        # --- Atualiza A Tentativa ---
-        self.scroll_attempt += 1
-        
-        # TODO: REMOVER E GARANTIR QUE FUNCIONA!
-        """
-        # --- Localiza Scroll Na Pagina ---
-        scroll_status, scroll_error, scroll_coord = find_image_center(
-            screenshot_path=self.screenshot_check_page,
-            template_path=step["scroll_image_path"]
-        )
-        if not scroll_status:
-            return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
-        """
-        scroll_coord = [500, 500]
-        # --- Aplica o Scroll ---
-        drag_vertical(
-            page=self.page,
-            coord=scroll_coord,
-            direction=scroll_direction,
-            delta_y=ScrollConstants.DISTANCE
-        )
-
-        return self.find()
+    def _scroll_page(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
+        try: 
+            # --- Aplica Log ---
+            self.logger.debug(
+                f"🔄 Scrolling to locate the object "
+                f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
+            )
+            # --- Atualiza A Tentativa ---
+            self.scroll_attempt += 1
+            
+            # TODO: REMOVER E GARANTIR QUE FUNCIONA!
+            """
+            # --- Localiza Scroll Na Pagina ---
+            scroll_status, scroll_error, scroll_coord = find_image_center(
+                screenshot_path=self.screenshot_check_page,
+                template_path=step["scroll_image_path"]
+            )
+            if not scroll_status:
+                return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
+            """
+            scroll_coord = [500, 500]
+            # --- Aplica o Scroll ---
+            drag_vertical(
+                page=self.page,
+                coord=scroll_coord,
+                direction=scroll_direction,
+                delta_y=ScrollConstants.DISTANCE
+            )
+            return True, None
+        except Exception as err:
+            return False, err
     
     def _not_find_consequence(self, step, error_text):
         scroll_enabled = step.get("scroll", False)
@@ -308,14 +310,14 @@ class BotActions:
 
         # TODO : Remover esse chek, por hora vai ter que ser assim pq n acho uma solucao que funciione
         if scroll_enabled and until_find:
-            raise ValueError(
-                "[FIND] não é permitido usar 'scroll' e 'until_find' ao mesmo tempo"
-            )
-
+            return False, "[FIND] não é permitido usar 'scroll' e 'until_find' ao mesmo tempo"
 
         # Continua dando scroll?
         if scroll_enabled and self.scroll_attempt < ScrollConstants.MAX_ATTEMPTS:
-            return self._scroll_to_find(step, scroll_direction) 
+            scrolled, error = self._scroll_page(step, scroll_direction)
+            if not scrolled:
+                return False, error
+            return self.find()
         
 
         # TODO: Fazer um check se chegou no final da pagina ou topo da pagina!
@@ -330,7 +332,7 @@ class BotActions:
         if not optional:
             return False, f"[FIND] {error_text}"
         else:
-            return False, None # Nao Encontrou o objeto!
+            return True, None # Nao Encontrou o objeto!
     
     def _find_consequence(self, step, object_coord):
         click_enabled = step.get("click", False)

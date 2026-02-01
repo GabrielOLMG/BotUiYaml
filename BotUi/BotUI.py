@@ -266,7 +266,7 @@ class BotUI:
     # -----------------------
     # Execução de step
     # -----------------------
-    def run_step(self, step_info: dict):
+    def run_step(self, step_info: dict): # TODO: Mudar para retornar o erro!
         helper_msg = step_info.get("helper")
         if helper_msg:
             self.logger.info("🔹 Step: %s", helper_msg)
@@ -275,10 +275,11 @@ class BotUI:
         self.init_actions(step_info)
         # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
         # o action bool deve ser algo como "finalizou a acao"
-        action_bool, action_error_log, screenshots_action_history = self.actions.run_action() 
+        action_done, action_error, screenshots_action_history = self.actions.run_action() 
         self.screenshots_history.extend(screenshots_action_history)
-        if action_error_log:
-            self.finish(action_error_log)
+
+        if not action_done:
+            self.finish(action_error)
             return False
         return True
 
