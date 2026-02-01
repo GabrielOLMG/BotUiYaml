@@ -17,7 +17,6 @@ def open_file(path):
         content = f.read()
     return content
 
-
 def resolve_variables(value, data_store):
     """
     Substitui ocorrências de $VAR em strings por valores do data_store.
@@ -75,3 +74,4 @@ def run_script(script_path, flags):
 
     except subprocess.CalledProcessError as e:
         return False, f"Script {script_path} failed:\n{e.stderr}", None
+

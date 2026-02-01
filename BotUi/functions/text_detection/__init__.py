@@ -1,0 +1,1 @@
+from .rapid_ocr_approach import find_text_in_image_rapidocr

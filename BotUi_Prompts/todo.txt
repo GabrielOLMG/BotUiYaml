@@ -1,0 +1,3 @@
+explicar o modo debug!
+falar sobre a opcao. refresh que action pode ter!
+falar sobre a opcao. save_url que action pode ter!

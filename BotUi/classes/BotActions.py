@@ -6,7 +6,7 @@ from ..functions.key_map import *
 from ..functions.utils import *
 from ..functions.image_functions import *
 from .BotConstants import *
-
+from .BotTargetLocator import BotTargetLocator
 
 
 class BotActions:
@@ -33,7 +33,6 @@ class BotActions:
         self.screenshots_action_history = []
         
         self.init_variables()
-
 
         self.ACTION_MAP = {
                 "WRITE": self.write,
@@ -77,13 +76,6 @@ class BotActions:
         self._take_screenshot()
 
         return True, None, self.screenshots_action_history
-
-    def _debug(self, coord, image_path):
-        screenshot_parent = os.path.dirname(self.screenshot_check_page)
-        output_path = os.path.join(screenshot_parent, "debug.png") 
-        output_path, img = marcar_x_na_imagem(image_path, coord, output_path)
-        self.screenshots_action_history.append(img)
-        return output_path
 
     def init_variables(self):
         for key_name  in self.step_info:
@@ -158,31 +150,43 @@ class BotActions:
         self._take_screenshot()
 
         # --- (3) Escolhe função de busca ---
-        find_fn_map = {
-            "IMG": lambda: find_image_center(
-                image_source_path=self.screenshot_check_page,
-                template_path=step["image_path"]
-            ),
-            "TEXT": lambda: encontrar_texto_central(
-                image_path=self.screenshot_check_page,
-                text=step["text"],
-                contain_=self.step_info.get("in_text", True),
-                debug=self.step_info.get("debug", False)
-            ),
+        bot_target_detector = BotTargetLocator(
+            image_source_path=self.screenshot_check_page,
+            debug=self.step_info.get("debug", False),
+            debug_path = os.path.join(os.path.dirname(self.screenshot_check_page), "debug.png"),
+            offset_x = step.get("x_coord", 0),
+            offset_y = step.get("y_coord", 0),
+            logger = self.logger
+        )
+
+        detector_args_map = {
+            "IMG": {
+                "template_path": step.get("image_path"),
+            },
+            "TEXT": {
+                "target_text": step.get("text"),
+                "contain": self.step_info.get("in_text", True),
+            },
         }
 
-        if object_type not in find_fn_map:
-            return False, f"[FIND] Tipo de objeto inválido: {object_type}"
-
         # --- (4) Tenta localizar o objeto ---
-        executed, error, output = find_fn_map[object_type]()
-        
+        args = detector_args_map.get(object_type, {})
+        target_found, error, target_center, (debug_result_path, debug_result) = bot_target_detector.dealer(
+            detector_type=object_type,
+            **args
+        )
+
+        if debug_result_path:
+            self.screenshots_action_history.append(debug_result)
+
 
         # --- (5) Check se achou e aplica devida regra ---
-        if not output:
+        if error is not None:
+            return False, error
+        elif not target_found: # TODO: Verificar se esta Ok, uma vez que se for false, pode ter erro aqui!
             return self._not_find_consequence(step, error)
         else:
-            return self._find_consequence(step, object_coord=output)
+            return self._find_consequence(step, object_coord=target_center)
 
     def write(self):
         allowed_fields = {"text", "file_path"}
@@ -329,22 +333,11 @@ class BotActions:
             return False, None # Nao Encontrou o objeto!
     
     def _find_consequence(self, step, object_coord):
-        offset_x = step.get("x_coord", 0)
-        offset_y = step.get("y_coord", 0)
-        debug_mode = step.get("debug", False)
         click_enabled = step.get("click", False)
         if_find = step.get("if_find", None)
 
-        # --- (1) Aplica offset (x, y) ---
-        if offset_x or offset_y:
-            object_coord = (object_coord[0] + offset_x, object_coord[1] + offset_y)
-
         # --- (2) Save coord---
         self._save_output([float(object_coord[0]), float(object_coord[1])], error=False)
-
-        # --- (3) Modo debug ---
-        if debug_mode:
-            self._debug(object_coord, self.screenshot_check_page)
 
         # --- (4) Clique final ---
         if click_enabled and object_coord:
