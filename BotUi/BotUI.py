@@ -209,14 +209,9 @@ class BotUI:
 
         self.logger.info("🔄 Iniciando execução de pipelines")
 
-        try:
-            status = self.process_pipelines()
-        except Exception as e:
-            self.logger.exception(f"❌ Erro inesperado durante execução: {e}")
-            status = False
-        finally:
-            self.logger.info("🧹 Finalizando e encerrando o driver...")
-            self._finish_page()
+        status = self.process_pipelines()
+        self.logger.info("🧹 Finalizando e encerrando o driver...")
+        self._finish_page()
 
         return status
 
@@ -255,33 +250,29 @@ class BotUI:
 
         # Executa os steps definidos
         for step in steps:
-            if not self.run_step(step):
-                self.logger.error("❌ Step falhou na pipeline '%s'.", pipeline_name)
+            step_completed, _ = self.run_step(step)
+            if not step_completed:
                 return False
         
         self._create_final_media()
 
         return True
 
-    # -----------------------
-    # Execução de step
-    # -----------------------
-    def run_step(self, step_info: dict): # TODO: Mudar para retornar o erro!
+    def run_step(self, step_info: dict): 
         helper_msg = step_info.get("helper")
         if helper_msg:
             self.logger.info("🔹 Step: %s", helper_msg)
 
-
         self.init_actions(step_info)
-        # TODO: O action bool deve ser revisto. para o find é se achou, mas para o resto é se deu erro, entao vou olhar apenas para op texto de erro se existe
-        # o action bool deve ser algo como "finalizou a acao"
-        action_done, action_error, screenshots_action_history = self.actions.run_action() 
-        self.screenshots_history.extend(screenshots_action_history)
+        
+        action_completed, action_log = self.actions.run_action() 
+        self.screenshots_history.extend(self.actions.screenshots_action_history)
 
-        if not action_done:
-            self.finish(action_error)
-            return False
-        return True
+        if action_log is not None:
+            self.logger.error(f"{action_log} | Step Info: {step_info}")
+
+
+        return action_completed, action_log
 
     # -----------------------
     # Funções auxiliares
@@ -300,47 +291,6 @@ class BotUI:
 
     def _finish_page(self):
         finish_page(self.pw, self.browser)
-
-    def finish(self, reason):
-        self.logger.error(f"❌ {reason}")
-        finish_page(self.pw, self.browser)
-
-    # def _create_final_gif(self):
-    #     git_output_path = os.path.join(self.screenshots_path, "final_gif.gif")
-
-    #     self.logger.error("Criando GIF com o processo completo")
-    #     frames = []
-
-    #     for screenshot in self.screenshots_history:
-
-    #         # Caso 1 — veio do Playwright (bytes)
-    #         if isinstance(screenshot, (bytes, bytearray)):
-    #             img = Image.open(BytesIO(screenshot)).convert("RGB")
-
-    #         # Caso 2 — veio do OpenCV (numpy array BGR)
-    #         elif isinstance(screenshot, np.ndarray):
-    #             img = Image.fromarray(
-    #                 cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-    #             )
-
-    #         else:
-    #             raise TypeError(
-    #                 f"Tipo de screenshot não suportado: {type(screenshot)}"
-    #             )
-
-    #         frames.append(img)
-
-    #     if not frames:
-    #         return
-
-    #     frames[0].save(
-    #         git_output_path,
-    #         format="GIF",
-    #         save_all=True,
-    #         append_images=frames[1:],
-    #         duration=300,
-    #         loop=0
-    #     )
 
     def _create_final_media(self, output_format="gif", fps=5):
         frames = []

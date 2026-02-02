@@ -43,7 +43,7 @@ def find_text_in_image_rapidocr(image_path, text, threshold=0.8, contain=True, f
     # TODO: Dividir a tela em 2 e tentar localizar, para poupar uso de memoria!
     try:
         texts = extract_base_text_info(image_path)
-        text_flat = [t["text"] for t in texts]
+        # text_flat = [t["text"] for t in texts]
         for texts_data in texts:
             text_extracted = texts_data["text"]
             center_extracted = texts_data["center"]

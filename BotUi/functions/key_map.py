@@ -75,5 +75,6 @@ def send_key_sequence(page, sequence):
         # Solta modificadores no final
         for mod in reversed(pressed_modifiers):
             page.keyboard.up(mod)
+        return True, None
     except Exception as e:
         return False, e

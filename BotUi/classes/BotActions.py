@@ -48,34 +48,44 @@ class BotActions:
     def run_action(self):
         action = self.step_info["action"]
         function = self.ACTION_MAP.get(action)
+        wait_time = self.step_info.get("wait")
+        refresh = self.step_info.get("refresh", False)
+        save_url = self.step_info.get("save_url", None)
 
         if not function:
-            False, f"Ação não implementada: {action}", self.screenshots_action_history
+            log_text = f"Ação não implementada: {action}"
+            return False, log_text
         
-        self._take_screenshot()
-        try:
-            runned, error = function()
-            if not runned:
-                return False, error, self.screenshots_action_history
-            
-            if self.step_info.get("refresh", False):
-                self.page.reload()
-
-
-            wait_time = self.step_info.get("wait")
-            if wait_time:
-                self.logger.debug("⏱ Aguardando %.2f segundos", wait_time)
-                time.sleep(wait_time)
-            
-            if self.step_info.get("save_url", None): # TODO: Como posso melhorar essa opcao?
-                self.data_store[self.step_info.get("save_url")] = self.page.url
-            
-        except Exception as e:
-            return False, f"Erro ao executar step '{self.step_info}': {e}", self.screenshots_action_history
-        
+        # [1]
         self._take_screenshot()
 
-        return True, None, self.screenshots_action_history
+        # [2]
+        task_completed, error = function() # Cada action DEVE retornar: (bool task_completed, Optional[str] error)
+        if error is not None:
+            log_text = f"❌ Acao '{action}' foi finalizada com erro: {error}"
+            return False, log_text
+        elif not task_completed:
+            log_text = f"❓ Acao '{action}' nao finalizou sua task como deveria(Reveja os parametros passados)." #TODO: Como posso saber o motivo?
+            return False, log_text
+        
+        # [3]
+        if refresh:
+            self.logger.debug("Dando refresh na pagina")
+            self.page.reload()
+        if wait_time:
+            self.logger.debug("Aguardando %.2f segundos", wait_time)
+            time.sleep(wait_time)
+        if save_url:
+            self.logger.debug(f"Salvando URL {self.page.url} na variavel {save_url}")
+            self.data_store[save_url] = self.page.url
+            
+        self._take_screenshot()
+
+        return True, None
+    
+
+
+
 
     def init_variables(self):
         for key_name  in self.step_info:
@@ -202,6 +212,7 @@ class BotActions:
         value = self.step_info[field]
         if field == "file_path":
             value = open_file(value)
+            
         executed, error = write_input(self.page, value)
         return executed, error
 
@@ -273,10 +284,11 @@ class BotActions:
     def _scroll_page(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
         try: 
             # --- Aplica Log ---
-            self.logger.debug(
-                f"🔄 Scrolling to locate the object "
-                f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
-            )
+            if not self.scroll_attempt%5:
+                self.logger.debug(
+                    f"🔄 Scrolling to locate the object "
+                    f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
+                )
             # --- Atualiza A Tentativa ---
             self.scroll_attempt += 1
             
@@ -330,9 +342,10 @@ class BotActions:
 
     
         if not optional:
-            return False, f"[FIND] {error_text}"
+            self.logger.debug(f"Nao foi possivel localizar o objeto.")
+            return False, None
         else:
-            return True, None # Nao Encontrou o objeto!
+            return True, None # Nao Encontrou o objeto mas finalizou corretamente!
     
     def _find_consequence(self, step, object_coord):
         click_enabled = step.get("click", False)

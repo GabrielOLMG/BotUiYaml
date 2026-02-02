@@ -1,5 +1,5 @@
 class ScrollConstants:
-    MAX_ATTEMPTS = 50
+    MAX_ATTEMPTS = 20
     DISTANCE = 500
     DEFAULT_DIRECTION = "DOWN"
 
