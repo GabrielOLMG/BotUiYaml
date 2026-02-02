@@ -105,3 +105,40 @@ ACTION_SCHEMA = {
     }
 }
 
+
+PW_KEYS = {
+    # Controle
+    "BACKSPACE": "Backspace",
+    "TAB": "Tab",
+    "ENTER": "Enter",
+    "RETURN": "Enter",
+    "ESCAPE": "Escape",
+    "SPACE": " ",
+    "DELETE": "Delete",
+    "INSERT": "Insert",
+
+    # Navegação
+    "HOME": "Home",
+    "END": "End",
+    "PAGE_UP": "PageUp",
+    "PAGE_DOWN": "PageDown",
+
+    # Setas
+    "LEFT": "ArrowLeft",
+    "RIGHT": "ArrowRight",
+    "UP": "ArrowUp",
+    "DOWN": "ArrowDown",
+
+    # Modificadores
+    "SHIFT": "Shift",
+    "CONTROL": "Control",
+    "ALT": "Alt",
+    "META": "Meta",
+    "COMMAND": "Meta",
+
+    # Funções
+    **{f"F{i}": f"F{i}" for i in range(1, 13)},
+}
+
+
+MODIFIER_KEYS = {"SHIFT", "CONTROL", "ALT", "META", "COMMAND"}

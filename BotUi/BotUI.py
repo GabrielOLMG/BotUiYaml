@@ -14,13 +14,13 @@ from pydantic import ValidationError
 
 
 from .functions.utils import *
-from .functions.key_map import *
 from .functions.image_functions import *
-from .functions.playwright_functions import *
 
 
 from .classes.BotValidation import *
 from .classes.BotActions import BotActions
+from .classes.drivers.PlaywrightDriver import PlaywrightDriver
+
 
 class BotUI:
     """
@@ -30,7 +30,7 @@ class BotUI:
     - Executa ações via Selenium
     - Logging profissional com níveis, cores e arquivo
     """
-
+    DEFAULT_DRIVER = PlaywrightDriver
     def __init__(
             self,
             yaml_path: str,
@@ -39,16 +39,18 @@ class BotUI:
             log_file: str | None = None,
             log_level=logging.INFO,
     ):
+        # Tipo de driver que sera usado
+        self.bot_driver = self.DEFAULT_DRIVER()
+        
+
         # Configuração
-        self.yaml_conf = open_yaml(yaml_path)
-        self.page = None
-        self.pw = None
-        self.browser = None 
+        self.yaml_conf = open_yaml(yaml_path)        
         self.data_store = {}
         self.actions = None  
         self.screenshots_path = screenshots_path
         self.screenshots_history = []
         self.global_yaml_path = global_yaml_path
+
 
         # Logger
         self.logger = self._setup_logger(log_file, log_level)
@@ -61,7 +63,7 @@ class BotUI:
 
     def init_actions(self, step_info):
         self.actions = BotActions(
-            page=self.page,
+            bot_driver=self.bot_driver,
             data_store=self.data_store,
             logger=self.logger,
             step_info=step_info,
@@ -211,7 +213,7 @@ class BotUI:
 
         status = self.process_pipelines()
         self.logger.info("🧹 Finalizando e encerrando o driver...")
-        self._finish_page()
+        self.bot_driver.close()
 
         return status
 
@@ -231,22 +233,15 @@ class BotUI:
             url = resolve_variables(url, self.data_store)
 
         steps = self.expand_for_each(pipeline_infos["steps"])
-
-        if not self.pw:
-            if not self._init_driver():
-                return False
+        # TODO: Fazer check se prmieria pipeline tem url!
 
         if url:
-            status = self._go_to_url(url)
+            status = self.bot_driver.goto(url)
             if status:
                 self.logger.info("🚀 Pipeline '%s' iniciada na URL: %s", pipeline_name, url)
             else:
                 self.logger.error("❌ Erro ao iniciar Pipeline '%s' na URL: %s", pipeline_name, url)
-
                 return False
-        elif not self.pw:
-            self.logger.error("⚠️ Pipeline '%s' não define URL e nenhum driver foi inicializado.", pipeline_name)
-            return False
 
         # Executa os steps definidos
         for step in steps:
@@ -277,21 +272,6 @@ class BotUI:
     # -----------------------
     # Funções auxiliares
     # -----------------------
-    def _init_driver(self):
-        self.pw, self.browser, self.page = get_page()
-        return True
-
-    def _go_to_url(self, url: str, wait_time: float = 5.0) -> bool:
-        try:
-            self.page.goto(url, wait_until="networkidle")
-            time.sleep(wait_time)
-            return True
-        except Exception as e:
-            return False
-
-    def _finish_page(self):
-        finish_page(self.pw, self.browser)
-
     def _create_final_media(self, output_format="gif", fps=5):
         frames = []
         # 1️⃣ Normaliza tudo para PIL.Image (RGB)

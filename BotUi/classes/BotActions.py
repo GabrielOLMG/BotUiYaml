@@ -1,8 +1,7 @@
 import os
 import time
 
-from ..functions.playwright_functions import *
-from ..functions.key_map import *
+#from ..functions.playwright_functions import *
 from ..functions.utils import *
 from ..functions.image_functions import *
 from .BotConstants import *
@@ -15,8 +14,9 @@ class BotActions:
     Mantém driver, data_store e funções comuns.
     """
 
-    def __init__(self, page, step_info, logger, screenshots_path, data_store=None):
-        self.page = page
+    def __init__(self, bot_driver, step_info, logger, screenshots_path, data_store=None):
+        self.bot_driver = bot_driver
+        
         self.data_store = data_store if data_store is not None else {}
 
 
@@ -71,29 +71,25 @@ class BotActions:
         # [3]
         if refresh:
             self.logger.debug("Dando refresh na pagina")
-            self.page.reload()
+            self.bot_driver.reload()
         if wait_time:
             self.logger.debug("Aguardando %.2f segundos", wait_time)
             time.sleep(wait_time)
         if save_url:
-            self.logger.debug(f"Salvando URL {self.page.url} na variavel {save_url}")
-            self.data_store[save_url] = self.page.url
+            self.logger.debug(f"Salvando URL {self.bot_driver.get_url()} na variavel {save_url}")
+            self.data_store[save_url] = self.bot_driver.get_url()
             
         self._take_screenshot()
 
         return True, None
     
-
-
-
-
     def init_variables(self):
         for key_name  in self.step_info:
             self.step_info[key_name] = resolve_variables(self.step_info[key_name], self.data_store)
 
     def _take_screenshot(self, screenshot_name="screenshot_check_page.png"):
         full_screenshot_path = os.path.join(self.screenshots_path, screenshot_name)
-        self.screenshot_check_page, data = get_screenshot(self.page, full_screenshot_path) 
+        self.screenshot_check_page, data = self.bot_driver.get_screenshot(full_screenshot_path) 
         self.screenshots_action_history.append(data)
         return self.screenshot_check_page, data
 
@@ -111,7 +107,7 @@ class BotActions:
             for i, do_action in enumerate(do_actions): # As Acoes Nao podem dar Erro
                 print(f"fazendo action_{i}")
                 actions = BotActions(
-                    page=self.page,
+                    bot_driver=self.bot_driver,
                     data_store=self.data_store,
                     logger=self.logger,
                     step_info=do_action,
@@ -127,7 +123,7 @@ class BotActions:
                 if while_action["action"] not in allowed_while_actions:
                     return False, f"Atualmente o while pode apenas conter as acoes: {allowed_while_actions}"
                 actions = BotActions(
-                    driver=self.page,
+                    bot_driver=self.bot_driver,
                     data_store=self.data_store,
                     logger=self.logger,
                     step_info=while_action,
@@ -213,11 +209,11 @@ class BotActions:
         if field == "file_path":
             value = open_file(value)
             
-        executed, error = write_input(self.page, value)
+        executed, error = self.bot_driver.write(value)
         return executed, error
 
     def keys_selections(self):
-        executed, error = send_key_sequence(self.page, self.step_info["keys"])
+        executed, error = self.bot_driver.key_sequence(self.step_info["keys"]) 
         return executed, error
 
     def run_script(self):
@@ -258,7 +254,7 @@ class BotActions:
         if not self._check_path(file_path):
             return False, f"UPLOAD file {file_path} does not exist"
 
-        executed, error = upload_file(self.page, file_path, coord)
+        executed, error = self.bot_driver.upload_file(file_path, coord)
         self._take_screenshot()
         return executed, error
 
@@ -305,11 +301,10 @@ class BotActions:
 
             
             # --- Aplica o Scroll ---
-            drag_vertical(
-                page=self.page,
-                coord=scroll_coord,
+            self.bot_driver.scroll(
                 direction=scroll_direction,
-                delta_y=ScrollConstants.DISTANCE
+                delta_y=ScrollConstants.DISTANCE,
+                coord=scroll_coord,
             )
             return True, None
         except Exception as err:
@@ -372,7 +367,7 @@ class BotActions:
 
         # --- (4) Clique final ---
         if click_enabled and object_coord:
-            click_coord(self.page, object_coord)
+            self.bot_driver.click(object_coord)
 
         # --- (5)  Acoes de Encontrar---
         if if_find:
