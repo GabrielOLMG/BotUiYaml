@@ -1,6 +1,6 @@
 import re
 import subprocess
-
+import hashlib
 from ruamel.yaml import YAML
 
 def open_yaml(path):
@@ -75,3 +75,5 @@ def run_script(script_path, flags):
     except subprocess.CalledProcessError as e:
         return False, f"Script {script_path} failed:\n{e.stderr}", None
 
+def hash_from_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).digest()

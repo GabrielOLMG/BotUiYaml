@@ -95,7 +95,7 @@ class BotActions:
         full_screenshot_path = os.path.join(self.screenshots_path, screenshot_name)
         self.screenshot_check_page, data = get_screenshot(self.page, full_screenshot_path) 
         self.screenshots_action_history.append(data)
-        return self.screenshot_check_page
+        return self.screenshot_check_page, data
 
     # ----------------------
     # Main Actions
@@ -284,11 +284,10 @@ class BotActions:
     def _scroll_page(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
         try: 
             # --- Aplica Log ---
-            if not self.scroll_attempt%5:
-                self.logger.debug(
-                    f"🔄 Scrolling to locate the object "
-                    f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
-                )
+            self.logger.debug(
+                f"🔄 Scrolling to locate the object "
+                f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
+            )
             # --- Atualiza A Tentativa ---
             self.scroll_attempt += 1
             
@@ -303,6 +302,8 @@ class BotActions:
                 return False, f"[FIND] Falha ao localizar imagem de scroll: {scroll_error}"
             """
             scroll_coord = [500, 500]
+
+            
             # --- Aplica o Scroll ---
             drag_vertical(
                 page=self.page,
@@ -314,6 +315,18 @@ class BotActions:
         except Exception as err:
             return False, err
     
+    def _check_if_scrolled(self):
+        # TEm como objetivo saber se chegou no fim da pagina ou n, mas podes er usado para outras coisas em momentos futuros
+        # TODO: armazenar hashes para agilizar este processo, ao menos a primeira parte: Parte meio lenta!
+        hash_before_scroll = hash_from_bytes(self.screenshots_action_history[-1])
+        self._take_screenshot()
+        hash_after_scroll = hash_from_bytes(self.screenshots_action_history[-1])
+
+        if hash_before_scroll == hash_after_scroll:
+            self.logger.warning("🧊 Tela não mudou após scroll, finalizando possibilidade de scroll neste step")
+            return False
+        return True
+
     def _not_find_consequence(self, step, error_text):
         scroll_enabled = step.get("scroll", False)
         scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
@@ -329,6 +342,9 @@ class BotActions:
             scrolled, error = self._scroll_page(step, scroll_direction)
             if not scrolled:
                 return False, error
+            scrolled = self._check_if_scrolled()
+            if not scrolled:
+                self.scroll_attempt = ScrollConstants.MAX_ATTEMPTS + 1 # Se nao teve diferenca visual entre o antes do scroll e o depois, entao nao tem pq continuar dando scroll
             return self.find()
         
 

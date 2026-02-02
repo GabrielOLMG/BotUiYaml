@@ -23,8 +23,6 @@ def get_page( viewport=(1920, 1080)):
     page = context.new_page()
     return pw, browser, page
 
-
-
 def finish_page(pw, browser=None):
     """
     Finaliza o Playwright de forma robusta, garantindo que
@@ -56,7 +54,6 @@ def finish_page(pw, browser=None):
     except Exception as e:
         print(f"[WARN] Erro ao matar processos zumbis do Playwright: {e}")
 
-
 def write_input(page, text):
     try:
         # tentativa rápida (melhor caso)
@@ -71,8 +68,6 @@ def write_input(page, text):
 
         except Exception as e:
             return False, e
-
-
 
 def click_coord(page, object_coord, delay_ms=100):
     """
@@ -135,66 +130,3 @@ def drag_vertical(page, coord=None, direction="DOWN", delta_y=100, delta_x=0):
         delta_y *= -1
 
     page.mouse.wheel(delta_x, delta_y)
-
-def is_at_page_edge(page, at_end: bool=True) -> bool:
-    """
-    Verifica se a página está no início (at_end=False)
-    ou no fim (at_end=True)
-    """
-    return page.evaluate(
-        """
-        (atEnd) => {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const viewportHeight = window.innerHeight;
-            const scrollHeight = document.documentElement.scrollHeight;
-
-            if (atEnd) {
-                return scrollTop + viewportHeight >= scrollHeight - 1;
-            }
-            return scrollTop <= 0;
-        }
-        """,
-        at_end
-    )
-
-def scroll_until_edge(
-    page,
-    direction: str,
-    delta: int = 1500,
-    max_idle: int = 3,
-    pause_ms: int = 80,
-):
-    """
-    Scroll adaptativo até o topo ou fundo da página.
-
-    direction:
-        "DOWN" -> vai até o fim
-        "UP"   -> vai até o topo
-    """
-
-    if direction not in ("UP", "DOWN"):
-        raise ValueError("direction must be 'UP' or 'DOWN'")
-
-    wheel_delta = delta if direction == "DOWN" else -delta
-    idle_count = 0
-    last_position = None
-
-    while True:
-        page.mouse.wheel(0, wheel_delta)
-        page.wait_for_timeout(pause_ms)
-
-        try:
-            current_position = page.evaluate("window.scrollY")
-        except Exception:
-            # Flutter pode bloquear acesso ao scroll global
-            break
-
-        if current_position == last_position:
-            idle_count += 1
-        else:
-            idle_count = 0
-
-        if idle_count >= max_idle:
-            break
-
-        last_position = current_position
