@@ -1,8 +1,6 @@
 
 
-from BotUi.BotUI import BotUI
-from BotUi.classes.BotActions import BotActions
-import logging
+from BotUi.BotUIApp import BotUIApp
 import sys
 import os
 
@@ -14,17 +12,15 @@ sys.stderr.reconfigure(encoding='utf-8')
 if __name__ == "__main__":
     example_path = "BotUi_Examples/example_2"
     yaml_path = os.path.join(example_path ,"bot_yaml.yaml")
-    output_path = os.path.join(example_path , "output")
-    log_path = os.path.join(output_path, "example.log")
 
-    os.makedirs(output_path, exist_ok=True)
+    output_folder = os.path.join(example_path , "output")
 
 
 
-    bot_ui = BotUI(
+
+
+    bot_ui = BotUIApp(
             yaml_path=yaml_path,
-            log_file=log_path,
-            log_level=logging.DEBUG,
-            screenshots_path=output_path,
+            output_folder=output_folder
         )
     status = bot_ui.run()

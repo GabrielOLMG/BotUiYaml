@@ -1,7 +1,6 @@
 import os
 import time
 
-#from ..functions.playwright_functions import *
 from ..functions.utils import *
 from ..functions.image_functions import *
 from .BotConstants import *
@@ -14,25 +13,19 @@ class BotActions:
     Mantém driver, data_store e funções comuns.
     """
 
-    def __init__(self, bot_driver, step_info, logger, screenshots_path, data_store=None):
+    def __init__(self, bot_driver, bot_app, step_info):
         self.bot_driver = bot_driver
-        
-        self.data_store = data_store if data_store is not None else {}
-
-
+        self.bot_app = bot_app
         self.step_info = step_info
-        self.logger = logger
 
         # Counts
         self.scroll_attempt = 0
         self.find_retry_attempts = 0
 
         # Screenshots
-        self.screenshots_path = screenshots_path
         self.screenshot_check_page = None
         self.screenshots_action_history = []
         
-        self.init_variables()
 
         self.ACTION_MAP = {
                 "WRITE": self.write,
@@ -70,26 +63,21 @@ class BotActions:
         
         # [3]
         if refresh:
-            self.logger.debug("Dando refresh na pagina")
+            self.bot_app.logger.debug("Dando refresh na pagina")
             self.bot_driver.reload()
         if wait_time:
-            self.logger.debug("Aguardando %.2f segundos", wait_time)
+            self.bot_app.logger.debug("Aguardando %.2f segundos", wait_time)
             time.sleep(wait_time)
         if save_url:
-            self.logger.debug(f"Salvando URL {self.bot_driver.get_url()} na variavel {save_url}")
+            self.bot_app.logger.debug(f"Salvando URL {self.bot_driver.get_url()} na variavel {save_url}")
             self.data_store[save_url] = self.bot_driver.get_url()
             
         self._take_screenshot()
 
         return True, None
-    
-    def init_variables(self):
-        for key_name  in self.step_info:
-            self.step_info[key_name] = resolve_variables(self.step_info[key_name], self.data_store)
 
-    def _take_screenshot(self, screenshot_name="screenshot_check_page.png"):
-        full_screenshot_path = os.path.join(self.screenshots_path, screenshot_name)
-        self.screenshot_check_page, data = self.bot_driver.get_screenshot(full_screenshot_path) 
+    def _take_screenshot(self):
+        self.screenshot_check_page, data = self.bot_driver.get_screenshot(self.bot_app.screenshot_path) 
         self.screenshots_action_history.append(data)
         return self.screenshot_check_page, data
 
@@ -108,10 +96,8 @@ class BotActions:
                 print(f"fazendo action_{i}")
                 actions = BotActions(
                     bot_driver=self.bot_driver,
-                    data_store=self.data_store,
-                    logger=self.logger,
+                    bot_app=self.bot_app,
                     step_info=do_action,
-                    screenshots_path=self.screenshots_path
                 )
                 print(f"iniciando acao do Action_{i}")
 
@@ -124,10 +110,8 @@ class BotActions:
                     return False, f"Atualmente o while pode apenas conter as acoes: {allowed_while_actions}"
                 actions = BotActions(
                     bot_driver=self.bot_driver,
-                    data_store=self.data_store,
-                    logger=self.logger,
+                    bot_app=self.bot_app,
                     step_info=while_action,
-                    screenshots_path=self.screenshots_path
                 )
                 while_bool, while_error_log = actions.run_action()
                 if while_error_log: 
@@ -159,10 +143,10 @@ class BotActions:
         bot_target_detector = BotTargetLocator(
             image_source_path=self.screenshot_check_page,
             debug=self.step_info.get("debug", False),
-            debug_path = os.path.join(os.path.dirname(self.screenshot_check_page), "debug.png"),
+            debug_path = self.bot_app.debug_path,
             offset_x = step.get("x_coord", 0),
             offset_y = step.get("y_coord", 0),
-            logger = self.logger
+            logger = self.bot_app.logger
         )
 
         detector_args_map = {
@@ -280,7 +264,7 @@ class BotActions:
     def _scroll_page(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
         try: 
             # --- Aplica Log ---
-            self.logger.debug(
+            self.bot_app.logger.debug(
                 f"🔄 Scrolling to locate the object "
                 f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
             )
@@ -318,7 +302,7 @@ class BotActions:
         hash_after_scroll = hash_from_bytes(self.screenshots_action_history[-1])
 
         if hash_before_scroll == hash_after_scroll:
-            self.logger.warning("🧊 Tela não mudou após scroll, finalizando possibilidade de scroll neste step")
+            self.bot_app.logger.warning("🧊 Tela não mudou após scroll, finalizando possibilidade de scroll neste step")
             return False
         return True
 
@@ -353,7 +337,7 @@ class BotActions:
 
     
         if not optional:
-            self.logger.debug(f"Nao foi possivel localizar o objeto.")
+            self.bot_app.logger.debug(f"Nao foi possivel localizar o objeto.")
             return False, None
         else:
             return True, None # Nao Encontrou o objeto mas finalizou corretamente!
