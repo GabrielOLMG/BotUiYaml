@@ -44,47 +44,57 @@ class PlaywrightDriver(BotDriver):
         self.page.reload()
     
     def click(self, coord: tuple, delay_ms:int=100):
-        if isinstance(coord, dict):
-            x = coord.get("x")
-            y = coord.get("y")
-        else:
-            x, y = coord
+        try:
+            if isinstance(coord, dict):
+                x = coord.get("x")
+                y = coord.get("y")
+            else:
+                x, y = coord
 
-        if x is None or y is None:
-            raise ValueError("Coordenadas inválidas")
+            if x is None or y is None:
+                raise ValueError("Coordenadas inválidas")
 
-        # Garante que a página tem foco
-        self.page.mouse.move(x, y)
-        self.page.wait_for_timeout(delay_ms)
-        self.page.mouse.click(x, y)
-
-    def upload_file(self, file_path:str, coord:tuple):
-        try: 
-            file_path = str(Path(file_path).resolve())
-            x, y = coord
-
-            with self.page.expect_file_chooser() as fc_info:
-                self.click_coord(coord=(x, y))
-
-            file_chooser = fc_info.value
-            file_chooser.set_files(file_path)
+            # Garante que a página tem foco
+            self.page.mouse.move(x, y)
+            self.page.wait_for_timeout(delay_ms)
+            self.page.mouse.click(x, y)
             return True, None
         except Exception as e:
-            return False, e
+            return False, f"[CLICK] Falha ao clicar na coord {coord}: {e}"
+        
+    def upload_file(self, file_path: str, coord: tuple):
+        try: 
+            file_path = str(Path(file_path).resolve())
+        except Exception as e:
+            return False, f"[UPLOAD] Erro ao resolver path do arquivo '{file_path}': {e}"
+
+        try:
+            x, y = coord
+        except Exception as e:
+            return False, f"[UPLOAD] Coord inválida {coord}: {e}"
+
+        try:
+            with self.page.expect_file_chooser() as fc_info:
+                self.click_coord(coord=(x, y)) # Testar se n é click !
+
+            file_chooser = fc_info.value
+        except Exception as e:
+            return False, f"[UPLOAD] Falha ao abrir file chooser: {e}"
+
+        try:
+            file_chooser.set_files(file_path)
+        except Exception as e:
+            return False, f"[UPLOAD] Falha ao setar arquivo '{file_path}' no file chooser: {e}"
+
+        return True, None
+
     
     def write(self, text):
         try:
-            # tentativa rápida (melhor caso)
             self.page.keyboard.insert_text(text)
             return True, None
-        except Exception:
-            try:
-                # fallback lento
-                self.page.keyboard.type(text)
-                return True, None
-
-            except Exception as e:
-                return False, e
+        except Exception as e:
+            return False, f"[WRITE] {e}"
             
     def scroll(self, direction: str, delta_x: int=0, delta_y: int=100, coord: tuple=None):
         if coord is not None:
@@ -121,7 +131,7 @@ class PlaywrightDriver(BotDriver):
             print(f"[WARN] Erro ao matar processos zumbis do Playwright: {e}")
     
     def key_sequence(self, keys: list):
-        try: 
+        try:
             pressed_modifiers = []
 
             for item in keys:
@@ -136,8 +146,6 @@ class PlaywrightDriver(BotDriver):
                 # Teclas especiais
                 elif key in PW_KEYS:
                     pw_key = PW_KEYS[key]
-
-                    # Espaço real
                     if pw_key == " ":
                         self.page.keyboard.type(" ")
                     else:
@@ -150,9 +158,12 @@ class PlaywrightDriver(BotDriver):
             # Solta modificadores no final
             for mod in reversed(pressed_modifiers):
                 self.page.keyboard.up(mod)
+
             return True, None
+
         except Exception as e:
-            return False, e
+            return False, f"[DRIVER] Falha ao executar key_sequence: {e}"
+
         
     # ---------------------- #
     # Gets

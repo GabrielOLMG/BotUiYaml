@@ -88,7 +88,6 @@ class BotUI:
         # Executa a ação via dispatcher
         action_completed, action_log = self.actions_dispatch.dispatch(step_info)
 
-        # Log de erro (o dispatcher já cuidou da formatação)
         if action_log:
             self.bot_app.logger.error("%s | Step Info: %s", action_log, step_info)
 
