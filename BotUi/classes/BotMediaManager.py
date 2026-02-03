@@ -1,3 +1,5 @@
+from BotUi.functions.utils import hash_from_bytes
+
 class BotMediaManager:
     def __init__(self, bot_driver, output_path, logger):
         self.bot_driver = bot_driver
@@ -11,19 +13,47 @@ class BotMediaManager:
         path, data = self.bot_driver.get_screenshot(self.output_path)
 
         self.last_path = path
-        self.history.append(data)
 
+        self.record({
+                "type": "image",
+                "label": label,
+                "data": data,
+                "path": path,
+                "hash": hash_from_bytes(data) # Verificar se nao vai deixar lento o processo!
+            })
+        
         if label:
             self.logger.debug(f"📸 Screenshot capturado: {label}")
 
         return path, data
 
-    def get_last(self):
-        return self.last_path
+
+    def get_last_image_info(self):
+        for item in reversed(self.history):
+            if item["type"] == "image":
+                return item
+        return None
+
+
+    def record(self, media):
+        self.history.append(media)
+
 
     def get_history(self):
         return self.history
 
+    def has_page_changed(self, last_n: int = 2) -> bool:
+        """
+        Verifica se houve mudança entre as últimas 'last_n' screenshots.
+        Retorna True se houver mudança, False se forem iguais.
+        """
+        if len(self.history) < 2:
+            return True  # Considera como mudou se não houver histórico suficiente
+
+        last = self.history[-1]["hash"]
+        prev = self.history[-last_n]["hash"] if len(self.history) >= last_n else self.history[-2]["hash"]
+
+        return last != prev
 
 
 

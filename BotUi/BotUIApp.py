@@ -17,9 +17,12 @@ from BotUi.BotUI import BotUI
 from BotUi.classes.BotValidation import PipelineConfig
 from BotUi.classes.BotMediaManager import BotMediaManager
 from BotUi.functions.utils import open_yaml, resolve_variables
+from BotUi.classes.drivers.PlaywrightDriver import PlaywrightDriver
 
 
 class BotUIApp:
+    DEFAULT_DRIVER = PlaywrightDriver
+
     def __init__(
             self,
             yaml_path: str,
@@ -57,11 +60,7 @@ class BotUIApp:
 
         # 4) Others
         self.data_store = {}
-        self.screenshot_manager = BotMediaManager(
-            bot_driver=self.bot_driver,
-            output_path=self.screenshot_path,
-            logger=self.logger
-        )
+        self.bot_driver = self.DEFAULT_DRIVER()
 
 
 
@@ -91,13 +90,20 @@ class BotUIApp:
         self.processed_yaml = self._pre_process_main_yaml()
         self._save_preprocessed_yaml()
 
-        
+        # 5) Define Media Manager
+        self.media_manager = BotMediaManager(
+            bot_driver=self.bot_driver,
+            output_path=self.screenshot_path,
+            logger=self.logger
+        )
 
-        # 5) Run BotUI
-        bot_ui = BotUI(bot_app=self)
+        # 6) Run BotUI
+        bot_ui = BotUI(
+            bot_app=self,
+            bot_driver=self.bot_driver)
         status = bot_ui.run()
 
-        # 6) Cria Midia Final!
+        # 7) Cria Midia Final!
 
 
     # -----------------------

@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import hashlib
@@ -77,3 +78,27 @@ def run_script(script_path, flags):
 
 def hash_from_bytes(data: bytes) -> str:
     return hashlib.sha256(data).digest()
+
+def parse_coord(coord):
+    if coord is None:
+        return None
+
+    if isinstance(coord, str):
+        try:
+            coord = coord.strip("[]")
+            x, y = coord.split(",")
+            coord = [float(x), float(y)]
+        except Exception:
+            return None
+
+    if (
+        isinstance(coord, (list, tuple))
+        and len(coord) == 2
+        and all(isinstance(v, (int, float)) for v in coord)
+    ):
+        return coord
+
+    return None
+
+def check_path(path: str) -> bool:
+    return os.path.exists(path)

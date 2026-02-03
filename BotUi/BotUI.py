@@ -1,20 +1,14 @@
-from BotUi.classes.BotActions import BotActions
-from BotUi.classes.drivers.PlaywrightDriver import PlaywrightDriver
+from BotUi.classes.BotActionDispatcher import BotActionDispatcher
 
 
 class BotUI:
-    DEFAULT_DRIVER = PlaywrightDriver
 
-    def __init__(self, bot_app):
+    def __init__(self, bot_app, bot_driver):
         # App (config, logger, yaml processado, data_store)
         self.bot_app = bot_app
 
         # Driver
-        self.bot_driver = self.DEFAULT_DRIVER()
-
-        # Runtime state
-        self.screenshots_history: list = []
-
+        self.bot_driver = bot_driver
 
     # -----------------------
     # API pública
@@ -82,31 +76,32 @@ class BotUI:
     # -----------------------
 
     def _run_step(self, step_info: dict):
+        # Exibe mensagem de ajuda, se houver
         helper_msg = step_info.get("helper")
         if helper_msg:
             self.bot_app.logger.info("🔹 Step: %s", helper_msg)
 
-        self._init_actions(step_info)
+        # Inicializa dispatcher se ainda não estiver
+        if not hasattr(self, "actions_dispatch"):
+            self._init_actions_dispatch()
 
-        action_completed, action_log = self.actions.run_action()
-        self.screenshots_history.extend(self.actions.screenshots_action_history)
+        # Executa a ação via dispatcher
+        action_completed, action_log = self.actions_dispatch.dispatch(step_info)
 
+        # Log de erro (o dispatcher já cuidou da formatação)
         if action_log:
-            self.bot_app.logger.error(
-                "%s | Step Info: %s",
-                action_log,
-                step_info,
-            )
+            self.bot_app.logger.error("%s | Step Info: %s", action_log, step_info)
 
+        # Retorna resultado da ação
         return action_completed, action_log
+
 
 
     # -----------------------
     # Helpers internos
     # -----------------------
-    def _init_actions(self, step_info: dict):
-        self.actions = BotActions(
+    def _init_actions_dispatch(self):
+        self.actions_dispatch = BotActionDispatcher(
             bot_driver=self.bot_driver,
             bot_app=self.bot_app,
-            step_info=step_info,
         )
