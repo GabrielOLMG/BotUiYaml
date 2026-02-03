@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 from BotUi.BotUI import BotUI
 from BotUi.classes.BotValidation import PipelineConfig
+from BotUi.classes.BotMediaManager import BotMediaManager
 from BotUi.functions.utils import open_yaml, resolve_variables
 
 
@@ -56,6 +57,12 @@ class BotUIApp:
 
         # 4) Others
         self.data_store = {}
+        self.screenshot_manager = BotMediaManager(
+            bot_driver=self.bot_driver,
+            output_path=self.screenshot_path,
+            logger=self.logger
+        )
+
 
 
     # -----------------------
@@ -260,65 +267,6 @@ class BotUIApp:
 
 
 
-
-
-
-    # def _create_final_media(self, output_format="gif", fps=5):
-    #     frames = []
-    #     # 1️⃣ Normaliza tudo para PIL.Image (RGB)
-    #     for screenshot in self.screenshots_history:
-
-    #         if isinstance(screenshot, (bytes, bytearray)):
-    #             img = Image.open(BytesIO(screenshot)).convert("RGB")
-
-    #         elif isinstance(screenshot, np.ndarray):
-    #             img = Image.fromarray(
-    #                 cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-    #             )
-
-    #         else:
-    #             raise TypeError(
-    #                 f"Tipo de screenshot não suportado: {type(screenshot)}"
-    #             )
-
-    #         frames.append(img)
-
-    #     if not frames:
-    #         return
-
-    #     # 2️⃣ Decide formato de saída
-    #     if output_format == "gif":
-    #         output_path = os.path.join(self.screenshots_path, "media.gif")
-
-    #         frames[0].save(
-    #             output_path,
-    #             format="GIF",
-    #             save_all=True,
-    #             append_images=frames[1:],
-    #             duration=int(1000 / fps),
-    #             loop=0
-    #         )
-
-    #     elif output_format == "mp4":
-    #         output_path = os.path.join(self.screenshots_path, "media.mp4")
-
-    #         # PIL -> OpenCV
-    #         frame_np = np.array(frames[0])
-    #         height, width, _ = frame_np.shape
-
-    #         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    #         video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-    #         for frame in frames:
-    #             video.write(
-    #                 cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
-    #             )
-
-    #         video.release()
-
-    #     else:
-    #         raise ValueError("output_format deve ser 'gif' ou 'mp4'")
-    #     return output_path
 
 
 
