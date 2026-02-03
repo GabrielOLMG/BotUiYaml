@@ -19,7 +19,7 @@ class UploadAction(BaseAction):
 
         coord = parse_coord(raw_coord)
         if coord is None:
-            return False, "[UPLOAD] Coordenadas inválidas ou não informadas", (None, None) 
+            return False, f"[UPLOAD] Coordenadas inválidas ou não informadas: coord='{coord}'", (None, None) 
         
         if not check_path(file_path):
             return False, f"[UPLOAD] Arquivo não existe: {file_path}", (None, None)

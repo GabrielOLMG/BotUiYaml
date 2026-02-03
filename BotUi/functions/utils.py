@@ -18,7 +18,7 @@ def open_file(path):
         content = f.read()
     return content
 
-def resolve_variables(value, data_store):
+def resolve_variables(value, data_store, ignore_miss=True):
     """
     Substitui ocorrências de $VAR em strings por valores do data_store.
     Exemplo:
@@ -32,7 +32,10 @@ def resolve_variables(value, data_store):
     def replacer(match):
         var_name = match.group(1)
         if var_name not in data_store:
-            raise ValueError(f"Variable ${var_name} not found in data_store")
+            if ignore_miss:
+                return f"${var_name}" # Volta para o valor orignal!
+            else:
+                raise ValueError(f"Variable ${var_name} not found in data_store")
         return str(data_store[var_name])
 
     return pattern.sub(replacer, value)

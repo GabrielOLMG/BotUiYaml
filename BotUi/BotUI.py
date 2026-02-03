@@ -1,3 +1,4 @@
+from BotUi.functions.utils import resolve_variables
 from BotUi.classes.BotActionDispatcher import BotActionDispatcher
 
 
@@ -85,11 +86,14 @@ class BotUI:
         if not hasattr(self, "actions_dispatch"):
             self._init_actions_dispatch()
 
+        # Resolve variaveis que ainda nao foram carregadas 
+        resolved_step = self._resolve_step_vars(step_info)
+
         # Executa a ação via dispatcher
-        action_completed, action_log = self.actions_dispatch.dispatch(step_info)
+        action_completed, action_log = self.actions_dispatch.dispatch(resolved_step)
 
         if action_log:
-            self.bot_app.logger.error("%s | Step Info: %s", action_log, step_info)
+            self.bot_app.logger.error("%s | Step Info: %s", action_log, resolved_step)
 
         # Retorna resultado da ação
         return action_completed, action_log
@@ -104,3 +108,11 @@ class BotUI:
             bot_driver=self.bot_driver,
             bot_app=self.bot_app,
         )
+
+    def _resolve_step_vars(self, step_info):
+        resolved = {}
+
+        for key, value in step_info.items():
+            resolved[key] = resolve_variables(value, self.bot_app.data_store, ignore_miss=False)
+
+        return resolved

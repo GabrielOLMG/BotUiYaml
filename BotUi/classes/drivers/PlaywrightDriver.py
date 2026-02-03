@@ -75,7 +75,7 @@ class PlaywrightDriver(BotDriver):
 
         try:
             with self.page.expect_file_chooser() as fc_info:
-                self.click_coord(coord=(x, y)) # Testar se n é click !
+                self.click(coord=(x, y))
 
             file_chooser = fc_info.value
         except Exception as e:
