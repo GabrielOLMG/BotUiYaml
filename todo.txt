@@ -1,0 +1,7 @@
+1) No find seria elgal se desse para escolher ou quadrantes ou poder dividir a tela em 2(ou 3)
+ e voce poder escolher onde procurar, para ser mais facil ou evitar duplicadas
+
+2) Modo debug na imagem(para texto) pode dar todas as aparicoes de um determinado texto e vc dizer 
+qual o numero q vc quer(tem q ordenar de alguma forma)
+
+3) Dar print dos textos na tela!

@@ -46,7 +46,7 @@ class BotActionDispatcher:
         # Executa a ação
         task_completed, log_text =  action_instance.run()
 
-        if log_text is not None or not task_completed:
+        if log_text is not None and not task_completed: # TODO: Garantir que esta funcional com 'and'
             return False, log_text
         
         # Global Actions
