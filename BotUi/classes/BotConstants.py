@@ -37,6 +37,8 @@ ACTION_SCHEMA = {
             "save_as": str,
             "optional": bool,
             "if_find": str,
+            "position": int,
+            "side": str,
             **GLOBAL_FIELDS
         },
     },

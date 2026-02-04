@@ -33,7 +33,10 @@ class FindAction(BaseAction):
             },
             "TEXT": {
                 "target_text": self.step_info.get("text"),
-                "contain": self.step_info.get("in_text", True),
+                "in_text": self.step_info.get("in_text", True),
+                "position": self.step_info.get("position", 0),
+                "side": self.step_info.get("side", None),
+
             },
         }
 

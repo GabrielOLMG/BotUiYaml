@@ -57,13 +57,12 @@ pipelines:
       - action: WRITE
         text: $NAME
         helper: "Enter name"
-
+      
       - action: FIND
         object_type: TEXT
-        text: Signup
-        in_text: False
-        y_coord: -40
+        text: Email Address
         click: true
+        side: RIGHT
         helper: "Focus on Email field"
 
       - action: WRITE
@@ -235,7 +234,6 @@ pipelines:
         scroll: true
         click: true
         helper: "Click Create Account button"
-        debug: true
       
       - action: FIND
         object_type: TEXT
@@ -250,14 +248,12 @@ pipelines:
         image_path: "BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_1.png"
         optional: True
         click: True
-        debug: True
 
       - action: FIND
         object_type: IMG
         image_path: "BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_2.png"
         optional: True
         click: True
-        debug: True
       
       - action: FIND
         object_type: TEXT

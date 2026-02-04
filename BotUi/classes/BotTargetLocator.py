@@ -27,19 +27,21 @@ class BotTargetLocator:
     def image_target_center(
             self, 
             template_path: str, 
+            debug:bool=False,
         ):
         from BotUi.functions.image_detection import find_image_center_match_template, find_image_center_sift
+        debug_image = None
         approaches_functions = [find_image_center_match_template, find_image_center_sift]
         image_source = cv2.imread(self.image_source_path, 0)
         template = cv2.imread(template_path, 0)
 
         for approach_function in approaches_functions:
-            target_found, error_log, target_center  = approach_function(image_source, template)
+            target_found, error_log, target_center  = approach_function(image_source, template) # TODO: Acrescentar o debug image!
 
             if target_found:
                 break
         
-        return target_found, error_log, target_center
+        return target_found, error_log, target_center, debug_image
     
     
     # ------------------------------------ #
@@ -48,17 +50,20 @@ class BotTargetLocator:
     def text_target_center(
             self,
             target_text: str,
-            contain: bool = True,
+            in_text: bool = True,
+            debug:bool=False,
+            position:int=0,
+            side:str=None
         ):
         from BotUi.functions.text_detection import find_text_in_image_rapidocr
         approaches_functions = [find_text_in_image_rapidocr]
 
         for approach_function in approaches_functions:
-            target_found, error_log, target_center  = approach_function(image_path=self.image_source_path, text=target_text, contain=contain)
+            target_found, error_log, target_center, debug_image  = approach_function(image_path=self.image_source_path, text_target=target_text, in_text=in_text, debug=debug, position=position, side=side)
             if target_found:
                 break
         
-        return target_found, error_log, target_center
+        return target_found, error_log, target_center, debug_image
     
     # ------------------------------------ #
     # Others
@@ -70,52 +75,6 @@ class BotTargetLocator:
             return False, f"Missing required args: {missing}"
         return True, None
     
-    def _highlight_target(self, markerSize=30, thickness = 2):
-        image_source = cv2.imread(self.image_source_path)
-
-        x, y = map(int, self.target_center)
-
-        cor_marker = (0, 0, 255)
-        cor_circulo = (0, 255, 255)
-
-        # Marker
-        cv2.drawMarker(
-            image_source,
-            (x, y),
-            cor_marker,
-            markerType=cv2.MARKER_CROSS,
-            markerSize=markerSize,
-            thickness=thickness
-        )
-
-        # Círculo
-        cv2.circle(image_source, (x, y), markerSize, cor_circulo, thickness)
-
-        # Texto com coordenadas
-        texto = f"({x}, {y})"
-        (w, h), _ = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-
-        cv2.rectangle(
-            image_source,
-            (x + 10, y - h - 10),
-            (x + 10 + w, y),
-            (0, 0, 0),
-            -1
-        )
-
-        cv2.putText(
-            image_source,
-            texto,
-            (x + 10, y - 5),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (255, 255, 255),
-            1
-        )
-
-        cv2.imwrite(self.debug_path, image_source)
-        return self.debug_path, image_source
-
     def debug_mark_shift(
         self,
         marker_size: int = 20,
@@ -169,11 +128,15 @@ class BotTargetLocator:
         else:
             return self.target_original_center
 
-    def _debug(self):
+    def _debug(self, debug_image = None):
         #TODO:  Deixar esta funcao mais complexa
         if not self.debug:
             return None, None
-        return self.debug_mark_shift()
+        elif debug_image is not None:
+            cv2.imwrite(self.debug_path, debug_image)
+            return self.debug_path, debug_image
+        else:
+            return self.debug_mark_shift()
 
 
     # ------------------------------------ #
@@ -190,13 +153,14 @@ class BotTargetLocator:
             return False, error, None, (None, None)
 
         detector_function = getattr(self, config["function"])
-        ok, error_log, center = detector_function(**kwargs)
+        kwargs["debug"]=self.debug
+        ok, error_log, center, debug_image = detector_function(**kwargs)
 
         self.target_original_center = center
         self.target_shif_center = self.shift_coord()
 
         if ok:
-            image_result_path, image_result = self._debug()
+            image_result_path, image_result = self._debug(debug_image)
         else:
             image_result_path, image_result = None, None
 

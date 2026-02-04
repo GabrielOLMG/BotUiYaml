@@ -52,6 +52,8 @@ class BotActionDispatcher:
         # Global Actions
         self._apply_global_step_behavior(step_info)
 
+        if "debug"in step_info and step_info["debug"]==True:
+            return False, f"Debug Foi ativado para este step, logo o codigo ira finalizar"
 
         return task_completed, log_text
     

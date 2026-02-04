@@ -37,26 +37,152 @@ def extract_base_text_info(image):
 
     return final_results
 
+def split_image_half(image):
+    """
+    Por hora Apenas em 2!
+    """
+    _, w, _ = image.shape
+    images = {
+        "LEFT": image[:, :w//2],
+        "RIGHT": image[:, w//2:]
+    }
 
-def find_text_in_image_rapidocr(image_path, text, threshold=0.8, contain=True, first=True, debug=False): # TODO: E se nao quiser o primeiro? 
-    # TODO: Dividir a tela em 2 e tentar localizar, para poupar uso de memoria!
-    try:
-        image = cv2.imread(image_path)
-        texts = extract_base_text_info(image)
-        # text_flat = [t["text"] for t in texts]
-        for texts_data in texts:
-            text_extracted = texts_data["text"]
-            center_extracted = texts_data["center"]
-            confidence_extracted = texts_data["score"]
+    return images
 
-            if text in text_extracted and contain:
-                if first:
-                    return True, None, center_extracted
-            elif text == text_extracted and not contain:
-                if first:
-                    return True, None, center_extracted
-        return False, None, None 
-    except Exception as err:
-        return False, err, None
-        # TODO: Esse log nao é de erro, deveria ser so o primeoro como False e o erro ser none, fazer try except p preencher esse log!
+def same_detection(a, b, dist=20):
+    return (
+        a["text"] == b["text"] and
+        abs(a["center"][0] - b["center"][0]) < dist and
+        abs(a["center"][1] - b["center"][1]) < dist
+    )
+
+def merge_candidates(*lists):
+    merged = []
+
+    for candidates in lists:
+        for c in candidates:
+            found = False
+            for i, m in enumerate(merged):
+                if same_detection(c, m):
+                    # mantém o de maior confidence
+                    if c["confidence_extracted"] > m["confidence_extracted"]:
+                        merged[i] = c
+                    found = True
+                    break
+
+            if not found:
+                merged.append(c)
+
+    return merged
+
+
+def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None, debug=True, position=0):
+    """
+    Encontra texto em uma imagem usando RapidOCR, dividindo a imagem em LEFT, RIGHT e FULL para aumentar acurácia.
     
+    Args:
+        image_path: str, caminho da imagem
+        text_target: str, texto a ser localizado
+        in_text: bool, se True, considera matches que contêm o texto_target
+        side: 'LEFT' ou 'RIGHT', caso queira buscar apenas em uma metade
+        debug: bool, se True desenha caixas e confidence na imagem
+        position: int, qual ocorrência usar se houver múltiplos matches (0 = maior confidence)
+    
+    Returns:
+        tuple: (success: bool, log_text: str|None, center: list[float, float]|None, debug_image|None)
+    """
+    try:
+        original_image = cv2.imread(image_path)
+        if original_image is None:
+            return False, f"Falha ao ler a imagem: {image_path}", None, None
+
+        h, w, _ = original_image.shape
+        images_parts = split_image_half(original_image)
+
+        # validação do parâmetro side
+        if side and side.upper() not in ["LEFT", "RIGHT"]:
+            return False, f"Opção de lado inválida: {side}", None, None
+        elif side:
+            # remove a outra metade
+            images_parts.pop(list({"LEFT", "RIGHT"} - {side.upper()})[0])
+        else:
+            # adiciona FULL para considerar toda a imagem
+            images_parts["FULL"] = original_image
+
+        texts = {}
+        for side_name, image in images_parts.items():
+            try:
+                texts_extracted_data = extract_base_text_info(image)
+            except Exception as e:
+                return False, f"Erro ao extrair texto da imagem ({side_name}): {e}", None, None
+
+            possibles = []
+            for text_extracted_data in texts_extracted_data:
+                text_extracted = text_extracted_data["text"].strip()
+                confidence_extracted = text_extracted_data["score"]
+                center_extracted = text_extracted_data["center"]
+
+                x_offset = 0
+                if side_name == "RIGHT":
+                    x_offset = w // 2
+                center_extracted = [
+                    center_extracted[0] + x_offset,
+                    center_extracted[1]
+                ]
+                box = np.array(text_extracted_data["box"], dtype=np.int32)
+                box[:, 0] += x_offset
+
+                # aplica filtro
+                if (in_text and text_target in text_extracted) or (not in_text and text_target == text_extracted):
+                    possibles.append({
+                        "text": text_extracted,
+                        "confidence_extracted": confidence_extracted,
+                        "center": center_extracted,
+                        "box": box
+                    })
+            texts[side_name] = possibles
+
+        # merge e ordenação final
+        final_candidates = merge_candidates(
+            texts.get("LEFT", []),
+            texts.get("RIGHT", []),
+            texts.get("FULL", [])
+        )
+        final_candidates = sorted(
+            final_candidates,
+            key=lambda c: (
+                c["center"][1],         # cy top → bottom
+                c["center"][0],         # cx left → right
+                -c["confidence_extracted"]  # maior confidence primeiro
+            )
+        )
+
+        # debug overlay
+        debug_image = None
+        if debug:
+            debug_image = original_image.copy()
+            for index, c in enumerate(final_candidates):
+                box = np.array(c["box"], dtype=np.int32)
+                cx, cy = map(int, c["center"])
+
+                cv2.polylines(debug_image, [box], True, (0, 255, 0), 2)
+                cv2.putText(
+                    debug_image,
+                    f"[{index}] {c['confidence_extracted']*100:.2f}%",
+                    (cx, cy - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
+
+        # validação do index escolhido
+        if position >= len(final_candidates):
+            return False, f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}", None, None
+
+        final_candidate = final_candidates[position]
+        return True, None, final_candidate["center"], debug_image
+
+    except Exception as e:
+        # catch geral com log completo
+        return False, f"Erro inesperado ao localizar texto '{text_target}' em {image_path}: {e}", None, None

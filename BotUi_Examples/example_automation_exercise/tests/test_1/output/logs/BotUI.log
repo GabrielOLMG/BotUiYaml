@@ -753,3 +753,167 @@ pipelines.signup_and_delete_account.steps.13
 2026-02-03 17:59:45 [INFO] 🔹 Step: Continue after account deletion
 2026-02-03 17:59:46 [INFO] ✅ Todas as pipelines concluídas
 2026-02-03 17:59:46 [INFO] 🧹 Finalizando driver
+2026-02-04 14:58:09 [INFO] ✅ YAML válido!
+2026-02-04 14:58:09 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 14:58:09 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 14:58:09 [INFO] 🚀 Iniciando BotUI
+2026-02-04 14:58:09 [INFO] 🔄 Executando pipelines
+2026-02-04 14:58:17 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 14:58:17 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 14:58:17 [INFO] 🧹 Finalizando driver
+2026-02-04 14:58:47 [INFO] ✅ YAML válido!
+2026-02-04 14:58:47 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 14:58:47 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 14:58:47 [INFO] 🚀 Iniciando BotUI
+2026-02-04 14:58:47 [INFO] 🔄 Executando pipelines
+2026-02-04 14:58:54 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 14:58:54 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 14:58:57 [INFO] 🔹 Step: Google consent
+2026-02-04 14:59:00 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 14:59:03 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 14:59:05 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 14:59:07 [INFO] 🔹 Step: Enter name
+2026-02-04 14:59:07 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 14:59:09 [INFO] 🔹 Step: Enter email address
+2026-02-04 14:59:09 [INFO] 🔹 Step: Click Signup button
+2026-02-04 14:59:11 [INFO] 🔹 Step: Select title
+2026-02-04 14:59:12 [INFO] 🧹 Finalizando driver
+2026-02-04 15:00:38 [INFO] ✅ YAML válido!
+2026-02-04 15:00:38 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:00:38 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:00:38 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:00:38 [INFO] 🔄 Executando pipelines
+2026-02-04 15:00:46 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:00:46 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:00:50 [INFO] 🔹 Step: Google consent
+2026-02-04 15:00:53 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:00:56 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:00:58 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:01:00 [INFO] 🔹 Step: Enter name
+2026-02-04 15:01:00 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:01:02 [INFO] 🧹 Finalizando driver
+2026-02-04 15:01:18 [INFO] ✅ YAML válido!
+2026-02-04 15:01:18 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:01:18 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:01:18 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:01:18 [INFO] 🔄 Executando pipelines
+2026-02-04 15:01:26 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:01:26 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:01:28 [INFO] 🔹 Step: Google consent
+2026-02-04 15:01:31 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:01:34 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:01:36 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:01:38 [INFO] 🔹 Step: Enter name
+2026-02-04 15:01:38 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:01:40 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:01:40 [INFO] 🧹 Finalizando driver
+2026-02-04 15:06:17 [INFO] ✅ YAML válido!
+2026-02-04 15:06:17 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:06:17 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:06:17 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:06:17 [INFO] 🔄 Executando pipelines
+2026-02-04 15:06:25 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:06:25 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:06:28 [INFO] 🔹 Step: Google consent
+2026-02-04 15:06:31 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:06:34 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:06:36 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:06:38 [INFO] 🔹 Step: Enter name
+2026-02-04 15:06:38 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:06:40 [ERROR] Debug Foi ativado para este step, logo o codigo ira finalizar | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Email Address', 'debug': True, 'helper': 'Focus on Email field'}
+2026-02-04 15:06:40 [INFO] 🧹 Finalizando driver
+2026-02-04 15:09:41 [INFO] ✅ YAML válido!
+2026-02-04 15:09:41 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:09:41 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:09:41 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:09:41 [INFO] 🔄 Executando pipelines
+2026-02-04 15:09:49 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:09:49 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:09:52 [INFO] 🔹 Step: Google consent
+2026-02-04 15:09:55 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:09:59 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:10:00 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:10:02 [INFO] 🔹 Step: Enter name
+2026-02-04 15:10:02 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:10:04 [INFO] 🔹 Step: Enter email address
+2026-02-04 15:10:04 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:10:04 [INFO] 🧹 Finalizando driver
+2026-02-04 15:10:22 [INFO] ✅ YAML válido!
+2026-02-04 15:10:22 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:10:22 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:10:22 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:10:22 [INFO] 🔄 Executando pipelines
+2026-02-04 15:10:30 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:10:30 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:10:32 [INFO] 🔹 Step: Google consent
+2026-02-04 15:10:35 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:10:39 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:10:41 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:10:42 [INFO] 🔹 Step: Enter name
+2026-02-04 15:10:42 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:10:44 [INFO] 🔹 Step: Enter email address
+2026-02-04 15:10:44 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:10:44 [INFO] 🧹 Finalizando driver
+2026-02-04 15:11:01 [INFO] ✅ YAML válido!
+2026-02-04 15:11:01 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:11:01 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:11:01 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:11:01 [INFO] 🔄 Executando pipelines
+2026-02-04 15:11:09 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:11:09 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:11:12 [INFO] 🔹 Step: Google consent
+2026-02-04 15:11:15 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:11:18 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:11:20 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:11:21 [INFO] 🔹 Step: Enter name
+2026-02-04 15:11:21 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:11:22 [INFO] 🔹 Step: Enter email address
+2026-02-04 15:11:22 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:11:22 [INFO] 🧹 Finalizando driver
+2026-02-04 15:11:52 [INFO] ✅ YAML válido!
+2026-02-04 15:11:52 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:11:52 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:11:52 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:11:52 [INFO] 🔄 Executando pipelines
+2026-02-04 15:12:00 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:12:00 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:12:02 [INFO] 🔹 Step: Google consent
+2026-02-04 15:12:05 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:12:09 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:12:11 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:12:13 [INFO] 🔹 Step: Enter name
+2026-02-04 15:12:13 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:12:14 [ERROR] Debug Foi ativado para este step, logo o codigo ira finalizar | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Email Address', 'debug': True, 'click': True, 'side': 'RIGHT', 'helper': 'Focus on Email field'}
+2026-02-04 15:12:14 [INFO] 🧹 Finalizando driver
+2026-02-04 15:12:56 [INFO] ✅ YAML válido!
+2026-02-04 15:12:56 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:12:56 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:12:56 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:12:56 [INFO] 🔄 Executando pipelines
+2026-02-04 15:13:03 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:13:03 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:13:07 [INFO] 🔹 Step: Google consent
+2026-02-04 15:13:10 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:13:14 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:13:16 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:13:18 [INFO] 🔹 Step: Enter name
+2026-02-04 15:13:18 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:13:19 [INFO] 🔹 Step: Enter email address
+2026-02-04 15:13:19 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:13:19 [INFO] 🧹 Finalizando driver
+2026-02-04 15:13:57 [INFO] ✅ YAML válido!
+2026-02-04 15:13:57 [INFO] Iniciando Pre Processamento do Yaml
+2026-02-04 15:13:57 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_automation_exercise/tests/test_1/output/expanded_yaml.yaml'
+2026-02-04 15:13:57 [INFO] 🚀 Iniciando BotUI
+2026-02-04 15:13:57 [INFO] 🔄 Executando pipelines
+2026-02-04 15:14:04 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-02-04 15:14:04 [INFO] 🔹 Step: Verify that home page is visible
+2026-02-04 15:14:08 [INFO] 🔹 Step: Google consent
+2026-02-04 15:14:11 [INFO] 🔹 Step: Click Signup / Login button
+2026-02-04 15:14:14 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-02-04 15:14:16 [INFO] 🔹 Step: Focus on Name field
+2026-02-04 15:14:18 [INFO] 🔹 Step: Enter name
+2026-02-04 15:14:18 [INFO] 🔹 Step: Focus on Email field
+2026-02-04 15:14:19 [INFO] 🔹 Step: Enter email address
+2026-02-04 15:14:19 [INFO] ✅ Todas as pipelines concluídas
+2026-02-04 15:14:19 [INFO] 🧹 Finalizando driver
