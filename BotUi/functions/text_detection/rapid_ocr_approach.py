@@ -12,8 +12,7 @@ rapid_ocr = RapidOCR(
 )
 
 
-def extract_base_text_info(image_path):
-    image = cv2.imread(image_path)
+def extract_base_text_info(image):
     results, _ = rapid_ocr(image)
 
     final_results = []
@@ -42,7 +41,8 @@ def extract_base_text_info(image_path):
 def find_text_in_image_rapidocr(image_path, text, threshold=0.8, contain=True, first=True, debug=False): # TODO: E se nao quiser o primeiro? 
     # TODO: Dividir a tela em 2 e tentar localizar, para poupar uso de memoria!
     try:
-        texts = extract_base_text_info(image_path)
+        image = cv2.imread(image_path)
+        texts = extract_base_text_info(image)
         # text_flat = [t["text"] for t in texts]
         for texts_data in texts:
             text_extracted = texts_data["text"]
