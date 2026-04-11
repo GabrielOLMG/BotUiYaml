@@ -14,6 +14,7 @@ class RetryConstants:
 
 GLOBAL_FIELDS = {
     "helper": str,
+    "save_url": str,
     "wait": (int, float),
     "debug": bool
 }
