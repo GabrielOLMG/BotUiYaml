@@ -88,7 +88,6 @@ class PlaywrightDriver(BotDriver):
 
         return True, None
 
-    
     def write(self, text):
         try:
             self.page.keyboard.insert_text(text)
