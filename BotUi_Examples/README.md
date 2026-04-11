@@ -1,7 +1,10 @@
-site: https://automationexercise.com/test_cases
+# BotUi Examples
 
-# Tests
-## Test Case 1: Register User
+## Folder example_1
+
+Task From: https://automationexercise.com/test_cases
+
+### Task
 
 1. Launch browser
 2. Navigate to url 'http://automationexercise.com'
@@ -21,5 +24,3 @@ site: https://automationexercise.com/test_cases
 16. Verify that 'Logged in as username' is visible
 17. Click 'Delete Account' button
 18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
-
----

@@ -1,0 +1,2 @@
+- Rever Exemplos 
+- Modo debug pode ficar esperando input do utilizador para ver se quer continuar ou parar(posso nesse caso até fazer com que ele possa ajudar no debug, por exmeplo...)

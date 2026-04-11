@@ -1,125 +1,275 @@
 config:
   variables:
-    USERNAME: LucianMosegaw
-    PASSWORD: gabriel999
-
+    URL: http://automationexercise.com
+    NAME: TestUser
+    EMAIL: botui_is_working@example.com
+    PASSWORD: test1234
+    DOB_DAY: "10"
+    DOB_MONTH: "May"
+    DOB_YEAR: "1995"
+    FIRST_NAME: Test
+    LAST_NAME: User
+    COMPANY: TestCompany
+    ADDRESS1: "123 Test Street"
+    ADDRESS2: "Apt 456"
+    COUNTRY: India
+    STATE: TestState
+    CITY: TestCity
+    ZIPCODE: "12345"
+    MOBILE: "9999999999"
+    TITLE: "Mr."
 
 pipelines:
-  teste:
-    url: https://play.pokemonshowdown.com
+  signup_and_delete_account:
+    url: $URL
     steps:
+      - action: FIND
+        object_type: TEXT
+        text: AutomationExercise
+        until_find: retry
+        helper: "Verify that home page is visible"
+
       - action: FIND
         object_type: TEXT
         text: Consent
-        in_text: False
-        click: True
-        optional: True
-        helper: Procura Botao de Escolha do Nome
-  
-  login:
-    steps:
+        optional: true
+        click: true
+        helper: "Google consent"
+
       - action: FIND
         object_type: TEXT
-        text: Choose name
-        in_text: False
-        click: True
-        helper: Procura Botao de Escolha do Nome
+        text: Signup / Login
+        click: true
+        helper: "Click Signup / Login button"
+      
+      - action: FIND
+        object_type: TEXT
+        text: New User Signup!
+        until_find: retry
+        helper: "Verify New User Signup is visible"
+
+      - action: FIND
+        object_type: TEXT
+        text: Name
+        click: true
+        helper: "Focus on Name field"
+
       - action: WRITE
-        text: $USERNAME
-      - action: KEYS_SELECTIONS
-        keys:
-          - Enter
-        wait: 0.5
+        text: $NAME
+        helper: "Enter name"
+      
+      - action: FIND
+        object_type: TEXT
+        text: Email Address
+        click: true
+        side: RIGHT
+        helper: "Focus on Email field"
+
+      - action: WRITE
+        text: $EMAIL
+        helper: "Enter email address"
+
+      - action: FIND
+        object_type: TEXT
+        text: Signup
+        in_text: False
+        click: true
+        helper: "Click Signup button"
+
+      - action: FIND
+        object_type: TEXT
+        text: $TITLE 
+        click: true
+        until_find: retry
+        helper: "Select title"
+      
+      - action: FIND
+        object_type: TEXT
+        text: Password
+        click: true
+        y_coord: 20
+        helper: "Focus on Password field"
+
       - action: WRITE
         text: $PASSWORD
+        helper: "Enter password"
+
+      # DATA Inicia aqui!
+      - action: FIND
+        object_type: TEXT
+        text: Day
+        helper: "Day Date of birth section visible"
+        click: true
+
       - action: KEYS_SELECTIONS
         keys:
-          - Enter
-        wait: 1.0
-        
-  combat_format:
-    steps:
-      - action: FIND
-        object_type: TEXT
-        text: "Format:"
-        y_coord: 10
-        in_text: False
-        click: True
-        helper: Procura Botao de Escolha do Formato
-        wait: 0.5
-      - action: FIND
-        object_type: TEXT
-        text: Randomized Metas
-        in_text: False
-        click: True
-        helper: Escolhe o Modo de Batalha
-        wait: 0.3
-      - action: FIND
-        object_type: TEXT
-        text: Challenge Cup 1v1
-        in_text: False
-        click: True
-        helper: Escolhe o Modo de Batalha
-      - action: FIND
-        object_type: TEXT
-        text: "Battle!"
-        in_text: False
-        click: True
-        helper: Inicia Batalha     
-        wait: 5.0
-      - action: FIND
-        object_type: TEXT
-        text: "Connecting"
-        helper: Esperando Conectar    
-        if_find: retry
-        optional: True
-        wait: 1.0
-      - action: FIND
-        object_type: TEXT
-        text: "Searching..."
-        helper: Esperando Achar Alguem    
-        if_find: retry
-        optional: True
-        wait: 3.0
+          - "20"
+          - ENTER
+        helper: "Enter day"
 
-  combat_loop:
-    steps:
-      - action: DO_WHILE
-        while_condition: # TODO : WHILE SO TER FIND? pode ser? Como negar? until_find(?)
-          - action: FIND
-            object_type: TEXT
-            text: "Battle Options" # Mudar Para Algo que Permanecesse enquant oo jogo esta ativo
-            helper: Verifica While condition
-            in_text: False
-        do:
-          - action: FIND
-            object_type: TEXT
-            text: "Choose"
-            y_coord: 25
-            click: True
-            helper: Tentado Escolher Pokemon
-            optional: True
-          - action: FIND 
-            object_type: TEXT
-            text: "Attack"
-            in_text: False
-            y_coord: 25
-            click: True
-            optional: True
-            helper: Tenatndo Usa Primeiro Ataque # Atravez do primeiro ataque eu consigo localizar todos os ataques!
-  
-      # Loop Até Algum momento acontecer(jogo manualmente até alguem vence rou perder até e contrar algo especifico de vitoria ou deerrota para usar aqui)
+      - action: FIND
+        object_type: TEXT
+        text: Month
+        helper: "Day Date of birth section visible"
+        click: true
 
+      - action: KEYS_SELECTIONS
+        keys:
+          - "abril"
+          - ENTER
+        helper: "Enter month"
+
+      - action: FIND
+        object_type: TEXT
+        text: Year
+        helper: "Day Date of birth section visible"
+        click: true
+
+      - action: KEYS_SELECTIONS
+        keys:
+          - "1998"
+          - ENTER
+        helper: "Enter Year"
+      # DATA Finaliza aqui!
+
+      - action: FIND
+        object_type: TEXT
+        text: Sign up for our newsletter!
+        click: true
+        helper: "Select newsletter checkbox"
+
+      - action: FIND
+        object_type: TEXT
+        text: Receive special offers
+        click: true
+        helper: "Select special offers checkbox"
+
+      - action: FIND
+        object_type: TEXT
+        text: First name
+        click: true
+        y_coord: 20
+        helper: "Focus on First Name field"
+
+      - action: WRITE
+        text: $FIRST_NAME
+
+      - action: FIND
+        object_type: TEXT
+        text: Last name
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $LAST_NAME
+
+      - action: FIND
+        object_type: TEXT
+        text: Company
+        scroll: true
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $COMPANY
+
+      - action: FIND
+        object_type: TEXT
+        text: Address
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $ADDRESS1
+
+      - action: FIND
+        object_type: TEXT
+        text: Address 2
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $ADDRESS2
+
+      - action: FIND
+        object_type: TEXT
+        text: State
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $STATE
+
+      - action: FIND
+        object_type: TEXT
+        text: City
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $CITY
+
+      - action: FIND
+        object_type: TEXT
+        text: Zipcode
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $ZIPCODE
+
+      - action: FIND
+        object_type: TEXT
+        text: Mobile Number
+        scroll: true
+        click: true
+        y_coord: 20
+
+      - action: WRITE
+        text: $MOBILE
+
+      - action: FIND
+        object_type: TEXT
+        text: Create Account
+        scroll: true
+        click: true
+        helper: "Click Create Account button"
       
+      - action: FIND
+        object_type: TEXT
+        text: Continue
+        until_find: retry
+        click: true
+        helper: "Continue after account creation"
+        wait: 1
 
-# Ler o chat e ver qual meu time ( $USERNAME's team: (proxima linha é a lista do meu time)-> mais dificl!)(posso comecar com Choose Lead abaixo, para escollher qlq um)
-# Aparece ususario oppoennte sent out ___ para pegar o nome do pokemon adv
-# Na parte de atacks tem algo escrito "Attack". Eu posso selecionar no comeo o primeiro abaixo dele
+      - action: FIND
+        object_type: IMG
+        image_path: "BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_1.png"
+        optional: True
+        click: True
 
+      - action: FIND
+        object_type: IMG
+        image_path: "BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_2.png"
+        optional: True
+        click: True
+      
+      - action: FIND
+        object_type: TEXT
+        text: Logged in as
+        in_text: true
+        helper: "Verify logged in as username"
 
+      - action: FIND
+        object_type: TEXT
+        text: Delete Account
+        click: true
+        helper: "Click Delete Account button"
 
-# FUTURE ACTIONS
-
-# DO -> varias actions seguidas e no final tem um where, ou algo do genero, que ira parar o DO, se nao parar, volta a repetir!
-# FIND -> alguma forma de se encontrar algo, seja imagem ou texto, ele deve voltar repetir o find, até encontrar ou nao encontrar, serve para os 2. passo mais simples do anterior!
-  # FIND TEXT 'Searching...'' if_find(ou until_find ou os dois): [retry(volta a tentar encontrar), finalzia o codigo, passa para a proxima acao, e etc]
+      - action: FIND
+        object_type: TEXT
+        text: Continue
+        click: true
+        until_find: retry
+        helper: "Continue after account deletion"

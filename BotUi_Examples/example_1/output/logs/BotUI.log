@@ -1,0 +1,88 @@
+2026-04-11 13:59:54 [INFO] ✅ YAML válido!
+2026-04-11 13:59:54 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-11 13:59:54 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_1/output/expanded_yaml.yaml'
+2026-04-11 13:59:54 [INFO] 🚀 Iniciando BotUI
+2026-04-11 13:59:54 [INFO] 🔄 Executando pipelines
+2026-04-11 14:00:03 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-04-11 14:00:03 [INFO] 🔹 Step: Verify that home page is visible
+2026-04-11 14:00:06 [INFO] 🔹 Step: Google consent
+2026-04-11 14:00:08 [INFO] 🔹 Step: Click Signup / Login button
+2026-04-11 14:00:11 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-04-11 14:00:12 [INFO] 🔹 Step: Focus on Name field
+2026-04-11 14:00:14 [INFO] 🔹 Step: Enter name
+2026-04-11 14:00:14 [INFO] 🔹 Step: Focus on Email field
+2026-04-11 14:00:14 [INFO] 🔹 Step: Enter email address
+2026-04-11 14:00:14 [INFO] 🔹 Step: Click Signup button
+2026-04-11 14:00:16 [INFO] 🔹 Step: Select title
+2026-04-11 14:00:17 [INFO] 🔹 Step: Focus on Password field
+2026-04-11 14:00:19 [INFO] 🔹 Step: Enter password
+2026-04-11 14:00:19 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:00:21 [INFO] 🔹 Step: Enter day
+2026-04-11 14:00:21 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:00:23 [INFO] 🔹 Step: Enter month
+2026-04-11 14:00:23 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:00:25 [INFO] 🔹 Step: Enter Year
+2026-04-11 14:00:25 [INFO] 🔹 Step: Select newsletter checkbox
+2026-04-11 14:00:27 [INFO] 🔹 Step: Select special offers checkbox
+2026-04-11 14:00:29 [INFO] 🔹 Step: Focus on First Name field
+2026-04-11 14:00:47 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Mobile Number', 'scroll': True, 'click': True, 'y_coord': 20}
+2026-04-11 14:00:47 [INFO] 🧹 Finalizando driver
+2026-04-11 14:01:50 [INFO] ✅ YAML válido!
+2026-04-11 14:01:50 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-11 14:01:50 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_1/output/expanded_yaml.yaml'
+2026-04-11 14:01:50 [INFO] 🚀 Iniciando BotUI
+2026-04-11 14:01:50 [INFO] 🔄 Executando pipelines
+2026-04-11 14:01:57 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-04-11 14:01:57 [INFO] 🔹 Step: Verify that home page is visible
+2026-04-11 14:02:00 [INFO] 🔹 Step: Google consent
+2026-04-11 14:02:02 [INFO] 🔹 Step: Click Signup / Login button
+2026-04-11 14:02:05 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-04-11 14:02:07 [INFO] 🔹 Step: Focus on Name field
+2026-04-11 14:02:08 [INFO] 🔹 Step: Enter name
+2026-04-11 14:02:08 [INFO] 🔹 Step: Focus on Email field
+2026-04-11 14:02:09 [INFO] 🔹 Step: Enter email address
+2026-04-11 14:02:09 [INFO] 🔹 Step: Click Signup button
+2026-04-11 14:02:11 [INFO] 🔹 Step: Select title
+2026-04-11 14:02:13 [INFO] 🔹 Step: Focus on Password field
+2026-04-11 14:02:15 [INFO] 🔹 Step: Enter password
+2026-04-11 14:02:15 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:02:17 [INFO] 🔹 Step: Enter day
+2026-04-11 14:02:17 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:02:19 [INFO] 🔹 Step: Enter month
+2026-04-11 14:02:19 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:02:21 [INFO] 🔹 Step: Enter Year
+2026-04-11 14:02:21 [INFO] 🔹 Step: Select newsletter checkbox
+2026-04-11 14:02:23 [INFO] 🔹 Step: Select special offers checkbox
+2026-04-11 14:02:25 [INFO] 🔹 Step: Focus on First Name field
+2026-04-11 14:02:41 [ERROR] Debug Foi ativado para este step, logo o codigo ira finalizar | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Mobile Number', 'scroll': True, 'click': True, 'debug': True, 'y_coord': 20}
+2026-04-11 14:02:41 [INFO] 🧹 Finalizando driver
+2026-04-11 14:03:23 [INFO] ✅ YAML válido!
+2026-04-11 14:03:23 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-11 14:03:23 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_1/output/expanded_yaml.yaml'
+2026-04-11 14:03:23 [INFO] 🚀 Iniciando BotUI
+2026-04-11 14:03:23 [INFO] 🔄 Executando pipelines
+2026-04-11 14:03:31 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-04-11 14:03:31 [INFO] 🔹 Step: Verify that home page is visible
+2026-04-11 14:03:33 [INFO] 🔹 Step: Google consent
+2026-04-11 14:03:36 [INFO] 🔹 Step: Click Signup / Login button
+2026-04-11 14:03:39 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-04-11 14:03:40 [INFO] 🔹 Step: Focus on Name field
+2026-04-11 14:03:41 [INFO] 🔹 Step: Enter name
+2026-04-11 14:03:41 [INFO] 🔹 Step: Focus on Email field
+2026-04-11 14:03:42 [INFO] 🔹 Step: Enter email address
+2026-04-11 14:03:42 [INFO] 🔹 Step: Click Signup button
+2026-04-11 14:03:44 [INFO] 🔹 Step: Select title
+2026-04-11 14:03:46 [INFO] 🔹 Step: Focus on Password field
+2026-04-11 14:03:48 [INFO] 🔹 Step: Enter password
+2026-04-11 14:03:48 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:03:50 [INFO] 🔹 Step: Enter day
+2026-04-11 14:03:50 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:03:52 [INFO] 🔹 Step: Enter month
+2026-04-11 14:03:53 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-11 14:03:55 [INFO] 🔹 Step: Enter Year
+2026-04-11 14:03:55 [INFO] 🔹 Step: Select newsletter checkbox
+2026-04-11 14:03:57 [INFO] 🔹 Step: Select special offers checkbox
+2026-04-11 14:03:59 [INFO] 🔹 Step: Focus on First Name field
+2026-04-11 14:04:19 [INFO] 🔹 Step: Click Create Account button
+2026-04-11 14:04:21 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Create Account', 'scroll': True, 'click': True, 'helper': 'Click Create Account button'}
+2026-04-11 14:04:21 [INFO] 🧹 Finalizando driver

@@ -6,7 +6,7 @@
 IMAGE_NAME = botui
 
 # Caminho padrão do script Python
-SCRIPT ?= BotUi_Examples/example_automation_exercise/run.py #projects_examples/run.py
+SCRIPT ?= BotUi_Examples/run.py
 
 # Caminho da pasta de setup (onde está o Dockerfile e entrypoint)
 SETUP_DIR = BotUi_Setup_Docker
@@ -38,7 +38,6 @@ shell:
 		$(IMAGE_NAME)
 
 
-
 ## 🚀 Executa a biblioteca (padrão: run.py)
 run:
 	@echo "====================================="
@@ -49,25 +48,6 @@ run:
 		--workdir /app \
 		$(IMAGE_NAME) \
 		python3 $(SCRIPT)
-
-## 🧩 Executa um script Python à sua escolha
-script_docker:
-	@echo "====================================="
-	@echo "🧩 Executando script customizado via docker: $(SCRIPT)"
-	@echo "====================================="
-	docker run --rm -it \
-		-v $(PWD):/app \
-		--workdir /app \
-		$(IMAGE_NAME) \
-		python3 -u $(SCRIPT)
-
-script_local:
-	@echo "====================================="
-	@echo "🧩 Executando script localmente: $(SCRIPT)"
-	@echo "====================================="
-	./BotUi_Setup_Local/entrypoint.sh python3 $(SCRIPT)
-
-
 
 # ==========================================
 # 🔍 Testes e Diagnóstico

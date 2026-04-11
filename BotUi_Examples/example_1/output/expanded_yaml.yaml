@@ -1,0 +1,228 @@
+config:
+  variables:
+    URL: http://automationexercise.com
+    NAME: TestUser
+    EMAIL: botui_is_working@example.com
+    PASSWORD: test1234
+    DOB_DAY: '10'
+    DOB_MONTH: May
+    DOB_YEAR: '1995'
+    FIRST_NAME: Test
+    LAST_NAME: User
+    COMPANY: TestCompany
+    ADDRESS1: 123 Test Street
+    ADDRESS2: Apt 456
+    COUNTRY: India
+    STATE: TestState
+    CITY: TestCity
+    ZIPCODE: '12345'
+    MOBILE: '9999999999'
+    TITLE: Mr.
+pipelines:
+  signup_and_delete_account:
+    url: http://automationexercise.com
+    steps:
+    - action: FIND
+      object_type: TEXT
+      text: AutomationExercise
+      until_find: retry
+      helper: Verify that home page is visible
+    - action: FIND
+      object_type: TEXT
+      text: Consent
+      optional: true
+      click: true
+      helper: Google consent
+    - action: FIND
+      object_type: TEXT
+      text: Signup / Login
+      click: true
+      helper: Click Signup / Login button
+    - action: FIND
+      object_type: TEXT
+      text: New User Signup!
+      until_find: retry
+      helper: Verify New User Signup is visible
+    - action: FIND
+      object_type: TEXT
+      text: Name
+      click: true
+      helper: Focus on Name field
+    - action: WRITE
+      text: TestUser
+      helper: Enter name
+    - action: FIND
+      object_type: TEXT
+      text: Email Address
+      click: true
+      side: RIGHT
+      helper: Focus on Email field
+    - action: WRITE
+      text: botui_is_working@example.com
+      helper: Enter email address
+    - action: FIND
+      object_type: TEXT
+      text: Signup
+      in_text: false
+      click: true
+      helper: Click Signup button
+    - action: FIND
+      object_type: TEXT
+      text: Mr.
+      click: true
+      until_find: retry
+      helper: Select title
+    - action: FIND
+      object_type: TEXT
+      text: Password
+      click: true
+      y_coord: 20
+      helper: Focus on Password field
+    - action: WRITE
+      text: test1234
+      helper: Enter password
+    - action: FIND
+      object_type: TEXT
+      text: Day
+      helper: Day Date of birth section visible
+      click: true
+    - action: KEYS_SELECTIONS
+      keys:
+      - '20'
+      - ENTER
+      helper: Enter day
+    - action: FIND
+      object_type: TEXT
+      text: Month
+      helper: Day Date of birth section visible
+      click: true
+    - action: KEYS_SELECTIONS
+      keys:
+      - abril
+      - ENTER
+      helper: Enter month
+    - action: FIND
+      object_type: TEXT
+      text: Year
+      helper: Day Date of birth section visible
+      click: true
+    - action: KEYS_SELECTIONS
+      keys:
+      - '1998'
+      - ENTER
+      helper: Enter Year
+    - action: FIND
+      object_type: TEXT
+      text: Sign up for our newsletter!
+      click: true
+      helper: Select newsletter checkbox
+    - action: FIND
+      object_type: TEXT
+      text: Receive special offers
+      click: true
+      helper: Select special offers checkbox
+    - action: FIND
+      object_type: TEXT
+      text: First name
+      click: true
+      y_coord: 20
+      helper: Focus on First Name field
+    - action: WRITE
+      text: Test
+    - action: FIND
+      object_type: TEXT
+      text: Last name
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: User
+    - action: FIND
+      object_type: TEXT
+      text: Company
+      scroll: true
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: TestCompany
+    - action: FIND
+      object_type: TEXT
+      text: Address
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: 123 Test Street
+    - action: FIND
+      object_type: TEXT
+      text: Address 2
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: Apt 456
+    - action: FIND
+      object_type: TEXT
+      text: State
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: TestState
+    - action: FIND
+      object_type: TEXT
+      text: City
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: TestCity
+    - action: FIND
+      object_type: TEXT
+      text: Zipcode
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: '12345'
+    - action: FIND
+      object_type: TEXT
+      text: Mobile Number
+      scroll: true
+      click: true
+      y_coord: 20
+    - action: WRITE
+      text: '9999999999'
+    - action: FIND
+      object_type: TEXT
+      text: Create Account
+      scroll: true
+      click: true
+      helper: Click Create Account button
+    - action: FIND
+      object_type: TEXT
+      text: Continue
+      until_find: retry
+      click: true
+      helper: Continue after account creation
+      wait: 1
+    - action: FIND
+      object_type: IMG
+      image_path: BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_1.png
+      optional: true
+      click: true
+    - action: FIND
+      object_type: IMG
+      image_path: BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_2.png
+      optional: true
+      click: true
+    - action: FIND
+      object_type: TEXT
+      text: Logged in as
+      in_text: true
+      helper: Verify logged in as username
+    - action: FIND
+      object_type: TEXT
+      text: Delete Account
+      click: true
+      helper: Click Delete Account button
+    - action: FIND
+      object_type: TEXT
+      text: Continue
+      click: true
+      until_find: retry
+      helper: Continue after account deletion
