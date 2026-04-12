@@ -86,3 +86,33 @@
 2026-04-11 14:04:19 [INFO] 🔹 Step: Click Create Account button
 2026-04-11 14:04:21 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Create Account', 'scroll': True, 'click': True, 'helper': 'Click Create Account button'}
 2026-04-11 14:04:21 [INFO] 🧹 Finalizando driver
+2026-04-12 00:39:31 [INFO] ✅ YAML válido!
+2026-04-12 00:39:31 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-12 00:39:31 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_1/output/expanded_yaml.yaml'
+2026-04-12 00:39:31 [INFO] 🚀 Iniciando BotUI
+2026-04-12 00:39:31 [INFO] 🔄 Executando pipelines
+2026-04-12 00:39:39 [INFO] 🚀 Pipeline 'signup_and_delete_account' iniciada na URL: http://automationexercise.com
+2026-04-12 00:39:39 [INFO] 🔹 Step: Verify that home page is visible
+2026-04-12 00:39:42 [INFO] 🔹 Step: Google consent
+2026-04-12 00:39:44 [INFO] 🔹 Step: Click Signup / Login button
+2026-04-12 00:39:47 [INFO] 🔹 Step: Verify New User Signup is visible
+2026-04-12 00:39:49 [INFO] 🔹 Step: Focus on Name field
+2026-04-12 00:39:50 [INFO] 🔹 Step: Enter name
+2026-04-12 00:39:50 [INFO] 🔹 Step: Focus on Email field
+2026-04-12 00:39:51 [INFO] 🔹 Step: Enter email address
+2026-04-12 00:39:51 [INFO] 🔹 Step: Click Signup button
+2026-04-12 00:39:53 [INFO] 🔹 Step: Select title
+2026-04-12 00:39:55 [INFO] 🔹 Step: Focus on Password field
+2026-04-12 00:39:57 [INFO] 🔹 Step: Enter password
+2026-04-12 00:39:57 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-12 00:39:59 [INFO] 🔹 Step: Enter day
+2026-04-12 00:39:59 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-12 00:40:01 [INFO] 🔹 Step: Enter month
+2026-04-12 00:40:01 [INFO] 🔹 Step: Day Date of birth section visible
+2026-04-12 00:40:02 [INFO] 🔹 Step: Enter Year
+2026-04-12 00:40:03 [INFO] 🔹 Step: Select newsletter checkbox
+2026-04-12 00:40:04 [INFO] 🔹 Step: Select special offers checkbox
+2026-04-12 00:40:06 [INFO] 🔹 Step: Focus on First Name field
+2026-04-12 00:40:21 [INFO] 🔹 Step: Click Create Account button
+2026-04-12 00:40:22 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Create Account', 'scroll': True, 'click': True, 'helper': 'Click Create Account button'}
+2026-04-12 00:40:22 [INFO] 🧹 Finalizando driver
