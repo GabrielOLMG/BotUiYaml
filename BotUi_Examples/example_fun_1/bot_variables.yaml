@@ -1,0 +1,5 @@
+config:
+  variables:
+    URL: "https://play.pokemonshowdown.com"
+    USERNAME: "LucianMosegaw"
+    PASSWORD: "gabriel999"

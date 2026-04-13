@@ -24,3 +24,7 @@ Task From: https://automationexercise.com/test_cases
 16. Verify that 'Logged in as username' is visible
 17. Click 'Delete Account' button
 18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
+
+## Folder example_fun_1
+
+Task from: https://play.pokemonshowdown.com

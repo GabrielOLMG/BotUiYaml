@@ -1,0 +1,42 @@
+pipelines:
+  google_consent:
+    url: $URL
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: "Consent"
+        optional: True
+        click: True
+        debug: True
+
+  
+  login:
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: "Choose name"
+        click: True
+      - action: FIND
+        object_type: TEXT
+        text: "Username"
+        y_coord: 2
+        click: True
+      - action: WRITE
+        text: $USERNAME
+      - action: FIND
+        object_type: TEXT
+        text: "Choose name"
+        click: True
+        position: 1
+      - action: FIND
+        object_type: TEXT
+        text: "Password"
+        y_coord: 2
+        click: True
+      - action: WRITE
+        text: $PASSWORD
+      - action: FIND
+        object_type: TEXT
+        text: "Log in"
+        click: True
+        refresh: True

@@ -1,0 +1,40 @@
+pipelines:
+  google_consent:
+    url: https://play.pokemonshowdown.com
+    steps:
+    - action: FIND
+      object_type: TEXT
+      text: Consent
+      optional: true
+      click: true
+  login:
+    steps:
+    - action: FIND
+      object_type: TEXT
+      text: Choose name
+      click: true
+    - action: FIND
+      object_type: TEXT
+      text: Username
+      y_coord: 2
+      click: true
+    - action: WRITE
+      text: LucianMosegaw
+    - action: FIND
+      object_type: TEXT
+      text: Choose name
+      click: true
+      position: 1
+    - action: FIND
+      object_type: TEXT
+      text: Password
+      y_coord: 2
+      click: true
+    - action: WRITE
+      text: gabriel999
+    - action: FIND
+      object_type: TEXT
+      text: Log in
+      click: true
+      refresh: true
+      debug: true
