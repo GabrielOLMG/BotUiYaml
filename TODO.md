@@ -1,2 +1,1 @@
-- Rever Exemplos 
-- Modo debug pode ficar esperando input do utilizador para ver se quer continuar ou parar(posso nesse caso até fazer com que ele possa ajudar no debug, por exmeplo...)
+- continuar o modo deug, deixar a classe mais complexa. se possivel conseguir fazer com que a pagina do debug abra automaticamente!
