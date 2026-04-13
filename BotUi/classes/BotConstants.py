@@ -16,7 +16,8 @@ GLOBAL_FIELDS = {
     "helper": str,
     "save_url": str,
     "wait": (int, float),
-    "debug": bool
+    "debug": bool,
+    "refresh": bool
 }
 
 ACTION_SCHEMA = {
