@@ -32,6 +32,7 @@ shell:
 	@echo "🐚 Abrindo shell dentro do container..."
 	@echo "====================================="
 	docker run -it --rm \
+		-p 8000:8000 \
 		--entrypoint bash \
 		-v $(PWD):/app \
 		--workdir /app \
@@ -48,6 +49,14 @@ run:
 		--workdir /app \
 		$(IMAGE_NAME) \
 		python3 $(SCRIPT)
+
+run-api:
+	docker run --rm -p 8000:8000 \
+			-v $(PWD):/app \
+			--workdir /app \
+			$(IMAGE_NAME) \
+			uvicorn BotUi.api.init_api:app --host 0.0.0.0 --port 8000
+
 
 # ==========================================
 # 🔍 Testes e Diagnóstico

@@ -13,7 +13,9 @@ setup(
         "pytesseract",
         "rapidocr-onnxruntime",
         "webdriver-manager",
-        "ruamel.yaml"
+        "ruamel.yaml",
+        "fastapi",
+        "uvicorn"
     ],
     python_requires=">=3.10",
 )

@@ -59,6 +59,7 @@ RUN playwright install chromium
 
 WORKDIR /app
 COPY ../ /app
+EXPOSE 8000
 RUN pip install --no-cache-dir -e .
 
 # ============================
