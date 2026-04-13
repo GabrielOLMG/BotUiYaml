@@ -7,7 +7,6 @@ pipelines:
         text: "Consent"
         optional: True
         click: True
-        debug: True
 
   
   login:
@@ -35,8 +34,20 @@ pipelines:
         click: True
       - action: WRITE
         text: $PASSWORD
+      - action: KEYS_SELECTIONS
+        keys:
+          - ENTER
       - action: FIND
         object_type: TEXT
-        text: "Log in"
-        click: True
-        refresh: True
+        text: $USERNAME
+        until_find: retry
+        helper: "Tentando localizar nome logado!"
+        
+
+  game_mode:
+    steps:
+      - action: FIND
+        object_type: TEXT
+        text: "Format"
+        y_coord: 20
+        debug: True
