@@ -42,27 +42,28 @@ class FindAction(BaseAction):
 
         # --- (4) Tenta localizar o objeto ---
         args = detector_args_map.get(object_type, {})
-        target_found, error, target_center, (debug_result_path, debug_result) = bot_target_detector.dealer(
+
+        target_result = bot_target_detector.dealer(
             detector_type=object_type,
             **args
         )
-        if debug_result_path:
+        if target_result.debug_image_path:
             self.bot_app.media_manager.record({
                 "type": "image",
                 "label": "Debug",
-                "data": debug_result,
-                "path": debug_result_path,
+                "data": target_result.debug_image,
+                "path": target_result.debug_image_path,
                 "hash": None
             })
 
-
         # --- (5) Check se achou e aplica devida regra ---
-        if error is not None:
-            executed = False
-        elif not target_found: 
-            executed, error =  self._not_find_consequence(self.step_info, error)
+        if target_result.error:
+           executed = False
+           error = target_result.log_message
+        if not target_result.found:
+            executed, error = self._not_find_consequence(self.step_info)
         else:
-            executed, error =   self._find_consequence(self.step_info, object_coord=target_center) # Garantido ser <ok, error>
+            executed, error = self._find_consequence(self.step_info, object_coord=target_result.center)
         
         return executed, error
     
@@ -91,7 +92,7 @@ class FindAction(BaseAction):
         
         return True, None
 
-    def _not_find_consequence(self, step, error_text):
+    def _not_find_consequence(self, step):
         scroll_enabled = step.get("scroll", False)
         scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
         until_find = step.get("until_find", None)

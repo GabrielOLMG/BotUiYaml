@@ -178,7 +178,7 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
                     2
                 )
 
-        if len(final_candidate) == 0:
+        if len(final_candidates) == 0:
             return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado")
         elif position > len(final_candidates):
             return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida")

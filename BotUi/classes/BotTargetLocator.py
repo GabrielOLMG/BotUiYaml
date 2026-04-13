@@ -158,7 +158,7 @@ class BotTargetLocator:
         target_result = detector_function(**kwargs)
 
         # TODO: Melhorar esta parte!
-        self.target_result.center = target_result.center
+        self.target_original_center = target_result.center
         self.target_shif_center = self.shift_coord()
         target_result.center = self.target_shif_center
 
