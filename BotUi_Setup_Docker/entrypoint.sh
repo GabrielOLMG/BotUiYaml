@@ -22,7 +22,7 @@ XVFB_PID=$!
 export DISPLAY=:99
 
 # Garante shutdown limpo
-trap "echo '🧹 Encerrando Xvfb'; kill $XVFB_PID" EXIT
+trap "echo '🧹 Encerrando Xvfb e FastAPI'; kill $XVFB_PID $API_PID" EXIT
 
 # Espera Xvfb subir de verdade
 for i in {1..10}; do
@@ -53,6 +53,19 @@ with sync_playwright() as p:
     browser.close()
 print("✅ Playwright OK")
 EOF
+
+# ================================
+# 🚀 Iniciando FastAPI Debug Server
+# ================================
+echo ""
+echo "🚀 Iniciando FastAPI Debug Server"
+
+uvicorn BotUi.api.init_api:app \
+  --host 0.0.0.0 \
+  --port 8000 &
+API_PID=$!
+
+echo "✅ FastAPI rodando em background (PID: $API_PID)"
 
 # ================================
 # 🚀 Execução principal

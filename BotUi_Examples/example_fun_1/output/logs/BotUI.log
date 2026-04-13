@@ -95,3 +95,98 @@ pipelines.login.steps.6
 2026-04-13 12:24:20 [INFO] 🔄 Executando pipelines
 2026-04-13 12:24:28 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
 2026-04-13 12:25:17 [INFO] 🧹 Finalizando driver
+2026-04-13 13:35:41 [INFO] ✅ YAML válido!
+2026-04-13 13:35:41 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:35:41 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:35:41 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:35:41 [INFO] 🔄 Executando pipelines
+2026-04-13 13:35:54 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:36:00 [INFO] 🧹 Finalizando driver
+2026-04-13 13:37:14 [INFO] ✅ YAML válido!
+2026-04-13 13:37:14 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:37:14 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:37:14 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:37:14 [INFO] 🔄 Executando pipelines
+2026-04-13 13:37:22 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:37:26 [INFO] 🧹 Finalizando driver
+2026-04-13 13:39:11 [INFO] ✅ YAML válido!
+2026-04-13 13:39:11 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:39:11 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:39:11 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:39:11 [INFO] 🔄 Executando pipelines
+2026-04-13 13:39:18 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:39:22 [INFO] 🧹 Finalizando driver
+2026-04-13 13:43:50 [INFO] ✅ YAML válido!
+2026-04-13 13:43:50 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:43:50 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:43:50 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:43:50 [INFO] 🔄 Executando pipelines
+2026-04-13 13:43:58 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:44:02 [INFO] 🧹 Finalizando driver
+2026-04-13 13:45:45 [INFO] ✅ YAML válido!
+2026-04-13 13:45:45 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:45:45 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:45:45 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:45:45 [INFO] 🔄 Executando pipelines
+2026-04-13 13:45:53 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:45:58 [INFO] 🧹 Finalizando driver
+2026-04-13 13:47:24 [INFO] ✅ YAML válido!
+2026-04-13 13:47:24 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:47:24 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:47:24 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:47:24 [INFO] 🔄 Executando pipelines
+2026-04-13 13:47:32 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:47:36 [INFO] 🧹 Finalizando driver
+2026-04-13 13:47:49 [INFO] ✅ YAML válido!
+2026-04-13 13:47:49 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:47:49 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:47:49 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:47:49 [INFO] 🔄 Executando pipelines
+2026-04-13 13:47:56 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:48:28 [INFO] 🧹 Finalizando driver
+2026-04-13 13:50:10 [INFO] ✅ YAML válido!
+2026-04-13 13:50:10 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:50:10 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:50:10 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:50:10 [INFO] 🔄 Executando pipelines
+2026-04-13 13:50:18 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:50:28 [ERROR] Debug: execução interrompida pelo usuário | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Consent', 'optional': True, 'click': True, 'debug': True}
+2026-04-13 13:50:28 [INFO] 🧹 Finalizando driver
+2026-04-13 13:50:33 [INFO] ✅ YAML válido!
+2026-04-13 13:50:33 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:50:33 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:50:33 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:50:33 [INFO] 🔄 Executando pipelines
+2026-04-13 13:50:41 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:51:08 [INFO] ✅ Todas as pipelines concluídas
+2026-04-13 13:51:08 [INFO] 🧹 Finalizando driver
+2026-04-13 13:53:24 [INFO] ✅ YAML válido!
+2026-04-13 13:53:24 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:53:24 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:53:24 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:53:24 [INFO] 🔄 Executando pipelines
+2026-04-13 13:53:32 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 13:54:03 [INFO] 🧹 Finalizando driver
+2026-04-13 13:54:08 [INFO] ✅ YAML válido!
+2026-04-13 13:54:08 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 13:54:08 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 13:54:08 [INFO] 🚀 Iniciando BotUI
+2026-04-13 13:54:08 [INFO] 🔄 Executando pipelines
+2026-04-13 13:54:16 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:29:11 [INFO] 🧹 Finalizando driver
+2026-04-13 15:32:41 [INFO] ✅ YAML válido!
+2026-04-13 15:32:41 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:32:41 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:32:41 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:32:41 [INFO] 🔄 Executando pipelines
+2026-04-13 15:32:49 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:33:23 [INFO] 🧹 Finalizando driver
+2026-04-13 15:33:31 [INFO] ✅ YAML válido!
+2026-04-13 15:33:31 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:33:31 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:33:31 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:33:31 [INFO] 🔄 Executando pipelines
+2026-04-13 15:33:39 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:33:43 [INFO] Pipeline Pausada, va até http://localhost:8000/docs#/
+2026-04-13 15:35:12 [INFO] ✅ Todas as pipelines concluídas
+2026-04-13 15:35:12 [INFO] 🧹 Finalizando driver

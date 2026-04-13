@@ -1,4 +1,5 @@
 import time
+import requests
 
 from BotUi.classes.actions.WriteAction import WriteAction
 from BotUi.classes.actions.FindAction import FindAction
@@ -52,8 +53,19 @@ class BotActionDispatcher:
         # Global Actions
         self._apply_global_step_behavior(step_info)
 
-        if "debug"in step_info and step_info["debug"]==True:
-            return False, f"Debug Foi ativado para este step, logo o codigo ira finalizar"
+        
+
+        if step_info.get("debug") is True:
+            self.bot_app.logger.info("Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/") # TODO: Redirecionar para a pagina que mostra a imagem de debug, ou dados de debug!
+
+            response = requests.post("http://127.0.0.1:8000/debug/pause")
+
+            # backend vai liberar aqui depois do /resume
+            action = response.json().get("action")
+
+            if action == "stop":
+                return False, "Debug: execução interrompida pelo usuário"
+
 
         return task_completed, log_text
     

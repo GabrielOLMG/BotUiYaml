@@ -7,6 +7,7 @@ pipelines:
       text: Consent
       optional: true
       click: true
+      debug: true
   login:
     steps:
     - action: FIND
@@ -37,4 +38,3 @@ pipelines:
       text: Log in
       click: true
       refresh: true
-      debug: true

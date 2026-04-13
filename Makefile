@@ -44,7 +44,7 @@ run:
 	@echo "====================================="
 	@echo "🚀 Executando script padrão: $(SCRIPT)"
 	@echo "====================================="
-	docker run --rm \
+	docker run --rm -p 8000:8000 \
 		-v $(PWD):/app \
 		--workdir /app \
 		$(IMAGE_NAME) \
