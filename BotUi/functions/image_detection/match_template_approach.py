@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+from BotUi.classes.BotTargetResult import BotTargetResult
+
 # ------------------------------------ #
 # HELPERS
 # ------------------------------------ #
@@ -125,8 +127,8 @@ def find_image_center_match_template(image_source, template, threshold=0.95):
                 center = get_bbox_center(top_left, bottom_right)
 
         if image_with_bbox is not None:
-            return True, None, center
-        return False, None, None
+            return BotTargetResult(error=False, found=True, center=center, confidence=score, debug_image=image_with_bbox)
+        return BotTargetResult(error=False)
     except Exception as err:
-        return False, err, None
+        return BotTargetResult(error=True, log_message=str(err))
 

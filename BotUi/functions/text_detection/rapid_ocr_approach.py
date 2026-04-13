@@ -1,6 +1,8 @@
 import numpy as np
 import cv2 
+
 from rapidocr_onnxruntime import RapidOCR
+from BotUi.classes.BotTargetResult import BotTargetResult
 
 rapid_ocr = RapidOCR(
     det_limit_side_len=960,  # mais parecido com o Spaces
@@ -94,14 +96,14 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
     try:
         original_image = cv2.imread(image_path)
         if original_image is None:
-            return False, f"Falha ao ler a imagem: {image_path}", None, None
+            return BotTargetResult(error=True, log_message=f"Falha ao ler a imagem: {image_path}")
 
         h, w, _ = original_image.shape
         images_parts = split_image_half(original_image)
 
         # validação do parâmetro side
         if side and side.upper() not in ["LEFT", "RIGHT"]:
-            return False, f"Opção de lado inválida: {side}", None, None
+            return BotTargetResult(error=True, log_message=f"Opção de lado inválida: {side}")
         elif side:
             # remove a outra metade
             images_parts.pop(list({"LEFT", "RIGHT"} - {side.upper()})[0])
@@ -114,7 +116,7 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
             try:
                 texts_extracted_data = extract_base_text_info(image)
             except Exception as e:
-                return False, f"Erro ao extrair texto da imagem ({side_name}): {e}", None, None
+                return BotTargetResult(error=True, log_message=f"Erro ao extrair texto da imagem ({side_name}): {e}")
 
             possibles = []
             for text_extracted_data in texts_extracted_data:
@@ -176,13 +178,15 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
                     2
                 )
 
-        # validação do index escolhido
-        if position >= len(final_candidates):
-            return False, f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}", None, None
+        if len(final_candidate) == 0:
+            return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado")
+        elif position > len(final_candidates):
+            return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida")
+
 
         final_candidate = final_candidates[position]
-        return True, None, final_candidate["center"], debug_image
+        return BotTargetResult(error=False, found=True, center=final_candidate["center"], debug_image=debug_image, confidence=final_candidate["confidence_extracted"])
 
     except Exception as e:
         # catch geral com log completo
-        return False, f"Erro inesperado ao localizar texto '{text_target}' em {image_path}: {e}", None, None
+        return BotTargetResult(error=True, log_message=f"Erro inesperado ao localizar texto '{text_target}' em {image_path}: {e}")

@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+from BotUi.classes.BotTargetResult import BotTargetResult
+
 # ------------------------------------ #
 # HELPERS
 # ------------------------------------ #
@@ -90,8 +92,8 @@ def find_image_center_sift(source_image, template_image, min_matches = 10, ransa
         good_maches = ratio_test(matches)
 
         if len(good_maches) < min_matches:
-            # TODO: TO LOG: f"Numero De Matches({len(good_maches)}) entre Image e Template nao foi alto o suficiente, tente localizar uma imagem mais descritiva"
-            return False, None, None
+            return BotTargetResult(error=False, log_message=f"Numero De Matches({len(good_maches)}) entre Image e Template nao foi alto o suficiente, tente localizar uma imagem mais descritiva")
+            
         
         # if debug:
         #     print(f"Total de Matches: {len(matches)} || Total de Matches Bons: {len(good_maches)}")
@@ -99,14 +101,14 @@ def find_image_center_sift(source_image, template_image, min_matches = 10, ransa
         matches_mask , mask, M = get_ransac_result(good_maches, keypoints_source, keypoints_template)
 
         if matches_mask is not None:
-            # TODO: To LOG f"Homography failed, tente usar uma imagem mais descritiva"
-            return False, None, None
+            return BotTargetResult(error=False, log_message=f"Homography failed, tente usar uma imagem mais descritiva")
+
         
         confidence_percent = (np.sum(mask) / len(good_maches))
 
         if confidence_percent < ransac_threshold:
-            # TODO: To LOG f"Homography failed , tente usar uma imagem mais descritiva(Confiança total: {(confidence_percent*100):.1f}% || inliers: {np.sum(mask)})"
-            return False, None, None
+            return BotTargetResult(error=False, log_message=f"Homography failed , tente usar uma imagem mais descritiva(Confiança total: {(confidence_percent*100):.1f}% || inliers: {np.sum(mask)})")
+
         
         # if debug:
         #     print(f"Confiança total: {(confidence_percent*100):.1f}% || inliers: {np.sum(mask)}")
@@ -117,13 +119,12 @@ def find_image_center_sift(source_image, template_image, min_matches = 10, ransa
 
         center = np.mean(dst.reshape(-1, 2), axis=0)
 
-        # if debug:
-        #     debug_image = get_draw_image(matches_mask, good_maches, source_image, template_image, keypoints_source, keypoints_template)
+        debug_image = get_draw_image(matches_mask, good_maches, source_image, template_image, keypoints_source, keypoints_template)
 
-        return True, None, center.tolist()
+        return BotTargetResult(error=False, found=True, center=center.tolist(), debug_image=debug_image, confidence=confidence_percent)
         
     except Exception as err:
-        return False, err, None
+        return BotTargetResult(error=True, log_message=str(err))
     
 
 
