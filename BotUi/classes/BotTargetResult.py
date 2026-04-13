@@ -8,6 +8,7 @@ class BotTargetResult:
 
         confidence: float = None,
         debug_image=None,
+        debug_image_path=None,
         log_message: str = "",
     ):
         self.error = error
@@ -15,4 +16,6 @@ class BotTargetResult:
         self.center = center
         self.confidence = confidence
         self.debug_image = debug_image
+        self.debug_image_path = debug_image
+
         self.message = log_message

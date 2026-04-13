@@ -1,5 +1,7 @@
 import cv2
 
+from BotUi.classes.BotTargetResult import BotTargetResult
+
 class BotTargetLocator:
     DETECTOR_TYPES = {
             "IMG": {"required": {"template_path"}, "function": "image_target_center"},
@@ -30,18 +32,17 @@ class BotTargetLocator:
             debug:bool=False,
         ):
         from BotUi.functions.image_detection import find_image_center_match_template, find_image_center_sift
-        debug_image = None
         approaches_functions = [find_image_center_match_template, find_image_center_sift]
         image_source = cv2.imread(self.image_source_path, 0)
         template = cv2.imread(template_path, 0)
 
         for approach_function in approaches_functions:
-            target_found, error_log, target_center  = approach_function(image_source, template) # TODO: Acrescentar o debug image!
+            target_result = approach_function(image_source, template)
 
-            if target_found:
+            if target_result.found:
                 break
         
-        return target_found, error_log, target_center, debug_image
+        return target_result
     
     
     # ------------------------------------ #
@@ -59,11 +60,11 @@ class BotTargetLocator:
         approaches_functions = [find_text_in_image_rapidocr]
 
         for approach_function in approaches_functions:
-            target_found, error_log, target_center, debug_image  = approach_function(image_path=self.image_source_path, text_target=target_text, in_text=in_text, debug=debug, position=position, side=side)
-            if target_found:
+            target_result  = approach_function(image_path=self.image_source_path, text_target=target_text, in_text=in_text, debug=debug, position=position, side=side)
+            if target_result.found:
                 break
         
-        return target_found, error_log, target_center, debug_image
+        return target_result
     
     # ------------------------------------ #
     # Others
@@ -142,28 +143,30 @@ class BotTargetLocator:
     # ------------------------------------ #
     # Dealer Functions
     # ------------------------------------ #
-    def dealer(self, detector_type: str, **kwargs):
+    def dealer(self, detector_type: str, **kwargs)-> 'BotTargetLocator':
         if detector_type not in self.DETECTOR_TYPES:
-            return False, f"Invalid detector_type: {detector_type}", None, (None, None)
+            return BotTargetLocator(error=True, log_message=f"Invalid detector_type: {detector_type}")
         
         config = self.DETECTOR_TYPES[detector_type]
 
         valid, error = self._validate_kwargs(kwargs, config["required"])
         if not valid:
-            return False, error, None, (None, None)
+            return BotTargetLocator(error=True, log_message=error)
 
         detector_function = getattr(self, config["function"])
         kwargs["debug"]=self.debug
-        ok, error_log, center, debug_image = detector_function(**kwargs)
+        target_result = detector_function(**kwargs)
 
-        self.target_original_center = center
+        # TODO: Melhorar esta parte!
+        self.target_result.center = target_result.center
         self.target_shif_center = self.shift_coord()
+        target_result.center = self.target_shif_center
 
-        if ok:
-            image_result_path, image_result = self._debug(debug_image)
-        else:
-            image_result_path, image_result = None, None
+        if not target_result.error:
+            image_result_path, image_result = self._debug(target_result.debug_image)
+            target_result.debug_image = image_result
+            target_result.debug_image_path = image_result_path
 
         
-        return ok, error_log, self.target_shif_center, (image_result_path, image_result)
+        return target_result
     
