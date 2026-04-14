@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "BotUi"
+version = "0.1.0"
+description = "Bot UI Automation Framework"
+requires-python = ">=3.10"
+
+dependencies = [
+    "selenium",
+    "opencv-python",
+    "pillow",
+    "pydantic",
+    "pyyaml",
+    "pytesseract",
+    "rapidocr-onnxruntime",
+    "webdriver-manager",
+    "ruamel.yaml",
+    "fastapi",
+    "uvicorn"
+]
+
+[tool.setuptools]
+packages = ["BotUi", "BotUi.*"]
