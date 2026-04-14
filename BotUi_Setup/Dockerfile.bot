@@ -1,5 +1,5 @@
 # ================================
-# 🐳 Dockerfile — BotUI Environment (No GUI)
+# Dockerfile — BotUI Environment (No GUI)
 # ================================
 
 FROM python:3.10-slim
@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # ================================
-# 🔧 Dependências do Sistema
+# Dependências do Sistema
 # ================================
 
 RUN apt-get update -y && apt-get install -y \
@@ -34,7 +34,7 @@ RUN apt-get update -y && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-por \
     \
-    # 🔥 Xvfb + Flutter CanvasKit (NOVO)
+    # Xvfb + Flutter CanvasKit (NOVO)
     xvfb \
     libxcomposite1 \
     libxdamage1 \
@@ -47,14 +47,14 @@ RUN apt-get update -y && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # ================================
-# 🧠 Playwright
+# Playwright
 # ================================
 
 RUN pip install --no-cache-dir playwright
 RUN playwright install chromium
 
 # ============================
-# 📦 Configuração da Aplicação
+# Configuração da Aplicação
 # ============================
 
 WORKDIR /app
@@ -63,7 +63,7 @@ COPY . /app
 RUN pip install --no-cache-dir -e .
 
 # ============================
-# ⚙️ Entrypoint e Execução
+# Entrypoint e Execução
 # ============================
 
 COPY BotUi_Setup/entrypoint.sh /entrypoint.sh
