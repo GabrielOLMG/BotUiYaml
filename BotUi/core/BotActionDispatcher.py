@@ -54,14 +54,21 @@ class BotActionDispatcher:
         self._apply_global_step_behavior(step_info)
 
         
-
+        # TODO: Horrivel, melhorar!
         if step_info.get("debug") is True:
             self.bot_app.logger.info("Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/") # TODO: Redirecionar para a pagina que mostra a imagem de debug, ou dados de debug!
 
-            response = requests.post("http://127.0.0.1:8000/debug/pause")
+            requests.post("http://host.docker.internal:8000/debug/pause")
 
-            # backend vai liberar aqui depois do /resume
-            action = response.json().get("action")
+            while True:
+                res = requests.get("http://host.docker.internal:8000/debug/status").json()
+
+                if not res["paused"]:
+                    action = res["action"]
+                    break
+
+                print("⏸️ Bot pausado... aguardando resume")
+                time.sleep(1)
 
             if action == "stop":
                 return False, "Debug: execução interrompida pelo usuário"

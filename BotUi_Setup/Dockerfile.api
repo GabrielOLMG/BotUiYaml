@@ -4,8 +4,11 @@ WORKDIR /app
 
 COPY ../ /app
 
+RUN apt-get update && apt-get install -y docker-cli
+
 RUN pip install --no-cache-dir -e .
 
 RUN pip install fastapi uvicorn
+
 
 CMD ["uvicorn", "BotUi.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

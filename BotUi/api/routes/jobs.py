@@ -6,10 +6,9 @@ router = APIRouter()
 
 @router.post("/jobs/run")
 def run_job(payload: dict):
-    yaml_path = payload.get("yaml_path")
-    data_path = payload.get("data_path")
-
-    result = run_bot_container(yaml_path, data_path)
+    bot_folder_path = payload.get("bot_path", "BotUi_Examples")
+    print("bot_folder_path")
+    result = run_bot_container(bot_folder_path)
 
     return {
         "status": "started",

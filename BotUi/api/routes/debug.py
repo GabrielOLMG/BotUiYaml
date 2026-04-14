@@ -10,8 +10,8 @@ router = APIRouter()
 # =========================
 class DebugState:
     def __init__(self):
-        self.event = threading.Event()
-        self.action = None  # "continue" | "stop"
+        self.paused = False
+        self.action = "continue"
 
 state = DebugState()
 
@@ -25,21 +25,16 @@ def root():
 
 
 # =========================
-# PAUSE (bot bloqueia aqui)
+# PAUSE
 # =========================
 @router.post("/pause")
 def pause():
-    """
-    Bot chama isso e fica bloqueado até /resume
-    """
-    state.event.clear()
-    state.event.wait() 
-
-    return {"status": "resumed", "action": state.action}
+    state.paused = True
+    return {"status": "paused"}
 
 
 # =========================
-# RESUME (frontend libera bot)
+# RESUME 
 # =========================
 
 class ResumeRequest(BaseModel):
@@ -48,13 +43,17 @@ class ResumeRequest(BaseModel):
 
 @router.post("/resume")
 def resume(req: ResumeRequest):
-    """
-    Frontend decide o que fazer
-    """
+    state.paused = False
     state.action = req.action
-    state.event.set()
+    return {"status": "ok", "action_received": req.action}
 
+
+# =========================
+# STATUS
+# =========================
+@router.get("/status")
+def status():
     return {
-        "status": "ok",
-        "action_received": req.action
+        "paused": state.paused,
+        "action": state.action
     }

@@ -2,18 +2,18 @@ import subprocess
 import uuid
 
 
-def run_bot_container(yaml_path: str, data_path: str):
+def run_bot_container(bot_folder_path: str):
     job_id = str(uuid.uuid4())
 
     container_name = f"botui_{job_id}"
-
+    import os
+    print(os.listdir())
     cmd = [
-        "docker", "run", "-d",
+        "docker", "run", "-d", "--rm",
         "--name", container_name,
-        "-v", f"{data_path}:/app/data",
-        "-v", f"{yaml_path}:/app/yaml",
-        "botui-image", 
-        "python", "run.py"
+        "-v", "/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/BotUi_Examples:/app/BotUi_Examples",
+        "botui", 
+        "python", "BotUi_Examples/run.py"
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
