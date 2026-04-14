@@ -49,5 +49,4 @@ pipelines:
       - action: FIND
         object_type: TEXT
         text: "Format"
-        y_coord: 20
         debug: True

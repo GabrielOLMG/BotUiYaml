@@ -7,7 +7,6 @@ pipelines:
       text: Consent
       optional: true
       click: true
-      debug: true
   login:
     steps:
     - action: FIND
@@ -33,8 +32,18 @@ pipelines:
       click: true
     - action: WRITE
       text: gabriel999
+    - action: KEYS_SELECTIONS
+      keys:
+      - ENTER
     - action: FIND
       object_type: TEXT
-      text: Log in
-      click: true
-      refresh: true
+      text: LucianMosegaw
+      until_find: retry
+      helper: Tentando localizar nome logado!
+  game_mode:
+    steps:
+    - action: FIND
+      object_type: TEXT
+      text: Format
+      y_coord: 20
+      debug: true

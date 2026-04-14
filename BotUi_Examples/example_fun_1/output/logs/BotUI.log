@@ -190,3 +190,215 @@ pipelines.login.steps.6
 2026-04-13 15:33:43 [INFO] Pipeline Pausada, va até http://localhost:8000/docs#/
 2026-04-13 15:35:12 [INFO] ✅ Todas as pipelines concluídas
 2026-04-13 15:35:12 [INFO] 🧹 Finalizando driver
+2026-04-13 15:41:42 [INFO] ✅ YAML válido!
+2026-04-13 15:41:42 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:41:42 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:41:42 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:41:42 [INFO] 🔄 Executando pipelines
+2026-04-13 15:41:51 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:42:19 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'LucianMosegaw', 'click': True, 'until_find': 'retry'}
+2026-04-13 15:42:19 [INFO] 🧹 Finalizando driver
+2026-04-13 15:43:09 [INFO] ✅ YAML válido!
+2026-04-13 15:43:09 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:43:09 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:43:09 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:43:09 [INFO] 🔄 Executando pipelines
+2026-04-13 15:43:16 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:43:39 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Password', 'y_coord': 2, 'click': True}
+2026-04-13 15:43:39 [INFO] 🧹 Finalizando driver
+2026-04-13 15:44:54 [INFO] ✅ YAML válido!
+2026-04-13 15:44:54 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:44:54 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:44:54 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:44:54 [INFO] 🔄 Executando pipelines
+2026-04-13 15:45:02 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:45:07 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 15:45:39 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 15:45:56 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'LucianMosegaw', 'click': True, 'until_find': 'retry'}
+2026-04-13 15:45:56 [INFO] 🧹 Finalizando driver
+2026-04-13 15:47:38 [INFO] ✅ YAML válido!
+2026-04-13 15:47:38 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:47:38 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:47:38 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:47:38 [INFO] 🔄 Executando pipelines
+2026-04-13 15:48:08 [ERROR] ❌ Falha ao iniciar Pipeline 'google_consent' na URL: https://play.pokemonshowdown.com
+2026-04-13 15:48:08 [INFO] 🧹 Finalizando driver
+2026-04-13 15:48:24 [INFO] ✅ YAML válido!
+2026-04-13 15:48:24 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:48:24 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:48:24 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:48:24 [INFO] 🔄 Executando pipelines
+2026-04-13 15:48:54 [ERROR] ❌ Falha ao iniciar Pipeline 'google_consent' na URL: https://play.pokemonshowdown.com
+2026-04-13 15:48:54 [INFO] 🧹 Finalizando driver
+2026-04-13 15:49:14 [INFO] ✅ YAML válido!
+2026-04-13 15:49:14 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:49:14 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:49:14 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:49:14 [INFO] 🔄 Executando pipelines
+2026-04-13 15:49:22 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:49:44 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 15:49:47 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'LucianMosegaw', 'click': True, 'until_find': 'retry', 'helper': 'Tentando localizar nome logado!'}
+2026-04-13 15:49:47 [INFO] 🧹 Finalizando driver
+2026-04-13 15:50:30 [INFO] ✅ YAML válido!
+2026-04-13 15:50:30 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:50:30 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:50:30 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:50:30 [INFO] 🔄 Executando pipelines
+2026-04-13 15:50:38 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:51:04 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 15:51:11 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose name', 'click': True}
+2026-04-13 15:51:11 [INFO] 🧹 Finalizando driver
+2026-04-13 15:51:47 [INFO] ✅ YAML válido!
+2026-04-13 15:51:47 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:51:47 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:51:47 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:51:47 [INFO] 🔄 Executando pipelines
+2026-04-13 15:51:55 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:52:16 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 15:52:19 [ERROR] Existem 0 candidatos, mas foi passado position=0 | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'LucianMosegaw', 'until_find': 'retry', 'helper': 'Tentando localizar nome logado!'}
+2026-04-13 15:52:19 [INFO] 🧹 Finalizando driver
+2026-04-13 15:56:54 [INFO] ✅ YAML válido!
+2026-04-13 15:56:54 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 15:56:54 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 15:56:54 [INFO] 🚀 Iniciando BotUI
+2026-04-13 15:56:54 [INFO] 🔄 Executando pipelines
+2026-04-13 15:57:03 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 15:57:22 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 15:57:31 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 15:59:18 [INFO] ✅ Todas as pipelines concluídas
+2026-04-13 15:59:18 [INFO] 🧹 Finalizando driver
+2026-04-13 16:49:37 [INFO] ✅ YAML válido!
+2026-04-13 16:49:37 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:49:37 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:49:37 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:49:37 [INFO] 🔄 Executando pipelines
+2026-04-13 16:49:47 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:49:51 [INFO] 🧹 Finalizando driver
+2026-04-13 16:51:18 [INFO] ✅ YAML válido!
+2026-04-13 16:51:18 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:51:18 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:51:18 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:51:18 [INFO] 🔄 Executando pipelines
+2026-04-13 16:51:25 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:51:28 [INFO] 🧹 Finalizando driver
+2026-04-13 16:51:54 [INFO] ✅ YAML válido!
+2026-04-13 16:51:54 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:51:54 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:51:54 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:51:54 [INFO] 🔄 Executando pipelines
+2026-04-13 16:52:02 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:52:06 [ERROR] [FIND] Objeto não encontrado, mas optional=True | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Consent', 'optional': True, 'click': True}
+2026-04-13 16:52:09 [ERROR] [FIND] Objeto não encontrado | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose name', 'click': True}
+2026-04-13 16:52:09 [INFO] 🧹 Finalizando driver
+2026-04-13 16:52:32 [INFO] ✅ YAML válido!
+2026-04-13 16:52:32 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:52:32 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:52:32 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:52:32 [INFO] 🔄 Executando pipelines
+2026-04-13 16:52:40 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:52:44 [ERROR] [FIND] Objeto não encontrado, mas optional=True | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Consent', 'optional': True, 'click': True}
+2026-04-13 16:52:47 [ERROR] [FIND] Objeto não encontrado | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose name', 'click': True}
+2026-04-13 16:52:47 [INFO] 🧹 Finalizando driver
+2026-04-13 16:53:20 [INFO] ✅ YAML válido!
+2026-04-13 16:53:20 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:53:20 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:53:20 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:53:20 [INFO] 🔄 Executando pipelines
+2026-04-13 16:53:28 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:53:32 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 16:53:47 [ERROR] [FIND] Objeto não encontrado, mas optional=True | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Consent', 'optional': True, 'click': True, 'debug': True}
+2026-04-13 16:53:51 [ERROR] [FIND] Objeto não encontrado | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose name', 'click': True}
+2026-04-13 16:53:51 [INFO] 🧹 Finalizando driver
+2026-04-13 16:59:35 [INFO] ✅ YAML válido!
+2026-04-13 16:59:35 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 16:59:35 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 16:59:35 [INFO] 🚀 Iniciando BotUI
+2026-04-13 16:59:35 [INFO] 🔄 Executando pipelines
+2026-04-13 16:59:46 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 16:59:50 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 17:00:08 [ERROR] [FIND] Objeto não encontrado, mas optional=True | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'pokemon', 'in_text': True, 'optional': True, 'click': True, 'debug': True}
+2026-04-13 17:00:12 [ERROR] [FIND] Objeto não encontrado | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Choose name', 'click': True}
+2026-04-13 17:00:12 [INFO] 🧹 Finalizando driver
+2026-04-13 17:01:52 [INFO] ✅ YAML válido!
+2026-04-13 17:01:52 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 17:01:52 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 17:01:52 [INFO] 🚀 Iniciando BotUI
+2026-04-13 17:01:52 [INFO] 🔄 Executando pipelines
+2026-04-13 17:02:00 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 17:02:04 [ERROR] {'error': True, 'log_message': "Erro inesperado ao localizar texto 'pokemon' em BotUi_Examples/example_fun_1/output/screenshots/screenshot_page.png: local variable 'final_candidate' referenced before assignment", 'center': None, 'found': False, 'confidence': None, 'debug_image': None, 'debug_image_path': None} | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'pokemon', 'in_text': True, 'optional': True, 'click': True, 'debug': True}
+2026-04-13 17:02:04 [INFO] 🧹 Finalizando driver
+2026-04-13 17:03:19 [INFO] ✅ YAML válido!
+2026-04-13 17:03:19 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 17:03:19 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 17:03:19 [INFO] 🚀 Iniciando BotUI
+2026-04-13 17:03:19 [INFO] 🔄 Executando pipelines
+2026-04-13 17:03:26 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 17:03:31 [ERROR] {'error': False, 'log_message': '', 'center': [np.float64(1071.0), np.float64(732.5)], 'found': True, 'confidence': 0.9922452909605843, 'debug_image': array([[[ 78,  71,  68],
+        [ 78,  72,  68],
+        [ 78,  72,  68],
+        ...,
+        [ 76,  71,  70],
+        [ 76,  71,  70],
+        [ 76,  71,  70]],
+
+       [[ 78,  72,  68],
+        [ 78,  72,  68],
+        [ 78,  71,  68],
+        ...,
+        [ 77,  71,  70],
+        [ 77,  71,  70],
+        [ 76,  71,  70]],
+
+       [[ 78,  71,  68],
+        [ 78,  71,  68],
+        [ 78,  71,  68],
+        ...,
+        [ 76,  71,  70],
+        [ 76,  71,  70],
+        [ 76,  71,  70]],
+
+       ...,
+
+       [[ 24,  21,  15],
+        [ 24,  20,  13],
+        [ 24,  18,   9],
+        ...,
+        [101, 101, 101],
+        [101, 101, 101],
+        [101, 101, 101]],
+
+       [[ 24,  20,  14],
+        [ 23,  19,  12],
+        [ 23,  18,   8],
+        ...,
+        [101, 101, 101],
+        [101, 101, 101],
+        [101, 101, 101]],
+
+       [[ 24,  20,  13],
+        [ 23,  19,  10],
+        [ 23,  17,   7],
+        ...,
+        [101, 101, 101],
+        [101, 101, 101],
+        [101, 101, 101]]], shape=(1080, 1920, 3), dtype=uint8), 'debug_image_path': 'BotUi_Examples/example_fun_1/output/debugs/debug.png'} | Step Info: {'action': 'FIND', 'object_type': 'TEXT', 'text': 'Consent', 'in_text': True, 'optional': True, 'click': True, 'debug': True}
+2026-04-13 17:03:31 [INFO] 🧹 Finalizando driver
+2026-04-13 17:03:45 [INFO] ✅ YAML válido!
+2026-04-13 17:03:45 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 17:03:45 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 17:03:45 [INFO] 🚀 Iniciando BotUI
+2026-04-13 17:03:45 [INFO] 🔄 Executando pipelines
+2026-04-13 17:03:53 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 17:03:57 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 17:04:19 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 17:04:29 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 17:07:59 [INFO] 🧹 Finalizando driver
+2026-04-13 17:08:03 [INFO] ✅ YAML válido!
+2026-04-13 17:08:03 [INFO] Iniciando Pre Processamento do Yaml
+2026-04-13 17:08:03 [INFO] Novo Yaml Gerado Em 'BotUi_Examples/example_fun_1/output/expanded_yaml.yaml'
+2026-04-13 17:08:03 [INFO] 🚀 Iniciando BotUI
+2026-04-13 17:08:03 [INFO] 🔄 Executando pipelines
+2026-04-13 17:08:12 [INFO] 🚀 Pipeline 'google_consent' iniciada na URL: https://play.pokemonshowdown.com
+2026-04-13 17:08:33 [INFO] 🔹 Step: Tentando localizar nome logado!
+2026-04-13 17:08:42 [INFO] Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/
+2026-04-13 17:14:42 [INFO] 🧹 Finalizando driver
