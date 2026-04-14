@@ -22,5 +22,5 @@ dependencies = [
     "uvicorn"
 ]
 
-[tool.setuptools]
-packages = ["BotUi", "BotUi.*"]
+[tool.setuptools.packages.find]
+where = ["."]

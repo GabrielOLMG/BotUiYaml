@@ -58,16 +58,15 @@ RUN playwright install chromium
 # ============================
 
 WORKDIR /app
-COPY ../ /app
-EXPOSE 8000
+COPY . /app
+
 RUN pip install --no-cache-dir -e .
 
 # ============================
 # ⚙️ Entrypoint e Execução
 # ============================
 
-COPY BotUi_Setup_Docker/entrypoint.sh /entrypoint.sh
+COPY BotUi_Setup/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash"]

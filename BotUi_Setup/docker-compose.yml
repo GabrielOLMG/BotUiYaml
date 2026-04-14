@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: BotUi_Setup/Dockerfile.api
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      - BOTUI_ENV=dev
