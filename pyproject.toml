@@ -19,8 +19,12 @@ dependencies = [
     "webdriver-manager",
     "ruamel.yaml",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "typer"
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[project.scripts]
+run-bot = "BotUi.cli.run:app"

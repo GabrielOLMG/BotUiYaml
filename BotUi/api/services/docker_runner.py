@@ -16,8 +16,12 @@ def run_bot_container(
         "docker", "run", "-d", "--rm",
         "--name", container_name,
         "-v", f"{payload.pipeline_dir}:/app/{dir_name}",
-        "botui", 
-        "python", f"{dir_name}/run.py" # TODO: Criar CLI para trocar isto!
+        "botui",
+        # Bot Exec!
+        "run-bot",
+        "--pipeline", f"/app/{dir_name}",
+        "--bot", payload.bot_relative_path,
+        "--bot-variables", payload.globals_relative_path or ""
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)

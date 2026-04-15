@@ -2,7 +2,7 @@ config:
   variables:
     URL: http://automationexercise.com
     NAME: TestUser
-    EMAIL: botui_is_working@example.com
+    EMAIL: bot_ui_gg@example.com
     PASSWORD: test1234
     DOB_DAY: "10"
     DOB_MONTH: "May"
@@ -252,6 +252,12 @@ pipelines:
       - action: FIND
         object_type: IMG
         image_path: "BotUi_Examples/example_automation_exercise/tests/test_1/images/close_add_2.png"
+        optional: True
+        click: True
+      
+      - action: FIND
+        object_type: TEXT
+        text: "Close"
         optional: True
         click: True
       
