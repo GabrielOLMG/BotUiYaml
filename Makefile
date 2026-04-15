@@ -52,7 +52,7 @@ run-api:
 	@echo "======================================"
 	@echo "🚀 Starting BotUI API..."
 	@echo "======================================"
-	docker run --rm \
+	docker run --rm --name botui_api\
 		-p 8000:8000 \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		$(API_IMAGE)
@@ -84,3 +84,17 @@ clean:
 	@echo "======================================"
 	docker system prune -f
 	@echo "✅ Done!"
+
+stop-botui:
+	@echo ""
+	@echo "======================================"
+	@echo "🧹 Stop all botui containers..."
+	@echo "======================================"
+	docker ps -q --filter "name=botui" | xargs -r docker stop
+
+rm-botui:
+	@echo ""
+	@echo "======================================"
+	@echo "🧹 Prune all botui containers..."
+	@echo "======================================"
+	docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
