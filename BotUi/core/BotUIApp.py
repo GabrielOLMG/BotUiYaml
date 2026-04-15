@@ -25,7 +25,8 @@ class BotUIApp:
             global_yaml_path:str=None, 
             screenshot_folder:str=None,
             log_folder:str=None,
-            debug_folder:str=None
+            debug_folder:str=None,
+            debug_mode=False
         ):
         
         # 1) Carrega Yaml Principal 
@@ -56,6 +57,7 @@ class BotUIApp:
         # 4) Others
         self.data_store = {}
         self.bot_driver = self.DEFAULT_DRIVER()
+        self.log_level = logging.DEBUG if debug_mode else logging.INFO 
 
 
 
@@ -104,9 +106,9 @@ class BotUIApp:
     # -----------------------
     # Pipeline
     # -----------------------
-    def setup_logger(self, log_level=logging.INFO):
+    def setup_logger(self):
         logger = logging.getLogger("BotUI")
-        logger.setLevel(log_level)
+        logger.setLevel(self.log_level)
 
         # Formatter com cores no terminal
         formatter = logging.Formatter(

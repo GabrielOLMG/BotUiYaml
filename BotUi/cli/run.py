@@ -10,7 +10,8 @@ app = typer.Typer()
 def run(
     pipeline: str = typer.Option(...),
     bot: str = typer.Option(...),
-    bot_variables: str | None = typer.Option(None)
+    bot_variables: str | None = typer.Option(None),
+    debug: bool = typer.Option(False)
 ):
     pipeline_path = Path(pipeline).resolve()
 
@@ -22,7 +23,7 @@ def run(
     if not yaml_path.is_file():
         raise typer.BadParameter(f"Bot file not found: {bot}")
 
-    output_folder = yaml_path.parent / "output"
+    output_folder = pipeline_path / "outputs"
 
     yaml_variables = None
     if bot_variables:
@@ -36,7 +37,8 @@ def run(
     bot_ui = BotUIApp(
         yaml_path=str(yaml_path),
         output_folder=str(output_folder),
-        global_yaml_path=yaml_variables
+        global_yaml_path=yaml_variables,
+        debug_mode=debug
     )
 
     bot_ui.run()

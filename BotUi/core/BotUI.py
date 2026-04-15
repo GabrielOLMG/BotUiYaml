@@ -33,6 +33,7 @@ class BotUI:
         self.bot_app.logger.info("🔄 Executando pipelines")
 
         for pipeline_name, pipeline_infos in pipelines.items():
+            self.bot_app.logger.info(f"🚀 Starting the Pipeline: {pipeline_name}")
             status = self._process_pipeline(pipeline_name, pipeline_infos)
             if not status:
                 return False
@@ -59,14 +60,12 @@ class BotUI:
 
         if status:
             self.bot_app.logger.info(
-                "🚀 Pipeline '%s' iniciada na URL: %s",
-                pipeline_name,
+                "Opening URL: %s",
                 url,
             )
         else:
             self.bot_app.logger.error(
-                "❌ Falha ao iniciar Pipeline '%s' na URL: %s",
-                pipeline_name,
+                "Error opening URL: %s",
                 url,
             )
 

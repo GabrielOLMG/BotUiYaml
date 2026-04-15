@@ -67,7 +67,7 @@ class BotActionDispatcher:
                     action = res["action"]
                     break
 
-                print("⏸️ Bot pausado... aguardando resume")
+                self.bot_app.logger.debug("Bot pausado... aguardando resume")
                 time.sleep(1)
 
             if action == "stop":

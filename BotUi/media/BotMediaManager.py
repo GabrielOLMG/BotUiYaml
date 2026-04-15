@@ -22,8 +22,8 @@ class BotMediaManager:
                 "hash": hash_from_bytes(data) # Verificar se nao vai deixar lento o processo!
             })
         
-        if label:
-            self.logger.debug(f"📸 Screenshot capturado: {label}")
+        # if label:
+        #     self.logger.debug(f"📸 Screenshot capturado: {label}")
 
         return path, data
 

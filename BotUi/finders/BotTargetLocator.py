@@ -137,7 +137,8 @@ class BotTargetLocator:
             cv2.imwrite(self.debug_path, debug_image)
             return self.debug_path, debug_image
         else:
-            return self.debug_mark_shift()
+            return None, None
+            # return self.debug_mark_shift()
 
 
     # ------------------------------------ #

@@ -26,6 +26,11 @@ class RunBotRequest(BaseModel):
         example="example_1/bot_variables.yaml"
     )
 
+    debug: bool = Field(
+        default=False,
+        description="",
+    )
+
 # =========================
 # Payload Response
 # =========================
