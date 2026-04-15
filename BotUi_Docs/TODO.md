@@ -5,4 +5,4 @@
 # Documentaçao 
 
 - falar do target result na documentaçao
-- falar sobre a chamda a api do debug na documentaçao!
+- falar sobre a api na doccumentaçao
