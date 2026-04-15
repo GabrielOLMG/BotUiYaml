@@ -49,4 +49,3 @@ pipelines:
       - action: FIND
         object_type: TEXT
         text: "Format"
-        debug: True

@@ -1,6 +1,6 @@
 
 
-from BotUi.BotUIApp import BotUIApp
+from BotUi.core.BotUIApp import BotUIApp
 import sys
 import os
 
