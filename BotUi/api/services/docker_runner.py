@@ -1,19 +1,23 @@
 import subprocess
-import uuid
+
+from pathlib import Path
+
+from BotUi.api.models import RunBotRequest
 
 
-def run_bot_container(bot_folder_path: str):
-    job_id = str(uuid.uuid4())
-
+def run_bot_container(
+        job_id,
+        payload: RunBotRequest
+    )-> dict:
     container_name = f"botui_{job_id}"
-    import os
-    print(os.listdir())
+    dir_name = Path(payload.pipeline_dir).name
+     
     cmd = [
         "docker", "run", "-d", "--rm",
         "--name", container_name,
-        "-v", "/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/BotUi_Examples:/app/BotUi_Examples",
+        "-v", f"{payload.pipeline_dir}:/app/{dir_name}",
         "botui", 
-        "python", "BotUi_Examples/run.py"
+        "python", f"{dir_name}/run.py" # TODO: Criar CLI para trocar isto!
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)

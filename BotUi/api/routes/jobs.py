@@ -1,19 +1,28 @@
+import uuid
+
 from fastapi import APIRouter
 
 
-from BotUi.api.models import RunBotRequest
+from BotUi.api.models import RunBotRequest, RunBotResponse
 from BotUi.api.services.docker_runner import run_bot_container
 
 router = APIRouter()
 
 
-@router.post("/jobs/run")
-def run_job(payload: dict):
-    bot_folder_path = payload.get("bot_path", "BotUi_Examples")
-    print("bot_folder_path")
-    result = run_bot_container(bot_folder_path)
+@router.post(
+    path="/jobs/run",
+    response_model=RunBotResponse
+)
+def run_job(payload: RunBotRequest):
+    job_id = str(uuid.uuid4())
 
-    return {
-        "status": "started",
+    result = run_bot_container(
+        job_id =job_id,
+        payload=payload,
+    )
+
+
+    return RunBotResponse(
+        status="STARTED",
         **result
-    }
+    )
