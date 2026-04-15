@@ -77,13 +77,28 @@ run-bot:
 # 🧹 CLEAN
 # ==========================================
 
-clean:
+clean-botui:
 	@echo ""
 	@echo "======================================"
-	@echo "🧹 Cleaning Docker system..."
+	@echo "🧹 Cleaning ALL BotUi Docker resources..."
 	@echo "======================================"
+
+	@echo "Stopping containers..."
+	-docker ps -q --filter "name=botui" | xargs -r docker stop
+
+	@echo "Removing containers..."
+	-docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
+
+	@echo "Removing images..."
+	-docker images -q "botui*" | xargs -r docker rmi -f
+
+	@echo "Removing volumes..."
+	-docker volume ls -q | grep botui | xargs -r docker volume rm
+
+	@echo "System prune..."
 	docker system prune -f
-	@echo "✅ Done!"
+
+	@echo "BotUi cleanup done!"
 
 stop-botui:
 	@echo ""
