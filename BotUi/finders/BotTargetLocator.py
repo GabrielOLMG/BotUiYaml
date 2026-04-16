@@ -144,15 +144,15 @@ class BotTargetLocator:
     # ------------------------------------ #
     # Dealer Functions
     # ------------------------------------ #
-    def dealer(self, detector_type: str, **kwargs)-> 'BotTargetLocator':
+    def dealer(self, detector_type: str, **kwargs)-> 'BotTargetResult':
         if detector_type not in self.DETECTOR_TYPES:
-            return BotTargetLocator(error=True, log_message=f"Invalid detector_type: {detector_type}")
+            return BotTargetResult(error=True, log_message=f"Invalid detector_type: {detector_type}")
         
         config = self.DETECTOR_TYPES[detector_type]
 
         valid, error = self._validate_kwargs(kwargs, config["required"])
         if not valid:
-            return BotTargetLocator(error=True, log_message=error)
+            return BotTargetResult(error=True, log_message=error)
 
         detector_function = getattr(self, config["function"])
         kwargs["debug"]=self.debug
