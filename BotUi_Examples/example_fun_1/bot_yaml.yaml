@@ -22,15 +22,15 @@ pipelines:
         click: True
       - action: WRITE
         text: $USERNAME
-      - action: FIND
-        object_type: TEXT
-        text: "Choose name"
-        click: True
-        position: 1
+        wait: 3
+      - action: KEYS_SELECTIONS
+        keys:
+          - ENTER
       - action: FIND
         object_type: TEXT
         text: "Password"
         y_coord: 2
+        until_find: retry
         click: True
       - action: WRITE
         text: $PASSWORD
@@ -44,45 +44,65 @@ pipelines:
         helper: "Tentando localizar nome logado!"
         
 
-  game_mode:
+  # game_mode:
+  #   steps:
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Format"
+  #       y_coord: 20
+  #       click: true
+      
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Randomized Metas"
+  #       click: true
+  #       x_coord: -10
+
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Challenge Cup 1v1"
+  #       click: true
+
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Battle!"
+  #       click: true
+
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Connecting..."
+  #       optional: true
+      
+  #     - action: FIND
+  #       object_type: TEXT
+  #       text: "Cancel"
+  #       optional: true
+  #       click: true
+  #       debug: true
+
+  leave_game:
     steps:
-      - action: FIND
-        object_type: TEXT
-        text: "Format"
-        y_coord: 20
-        click: true
-      
-      - action: FIND
-        object_type: TEXT
-        text: "Randomized Metas"
-        click: true
-        x_coord: -10
+      - action: WRITE
+        text: "/leave"
+
+      - action: KEYS_SELECTIONS
+        keys:
+          - ENTER
 
       - action: FIND
         object_type: TEXT
-        text: "Challenge Cup 1v1"
+        text: "Forfeit"
+        in_text: False
         click: true
         debug: true
 
-      - action: FIND
-        object_type: TEXT
-        text: "Battle!"
-        click: true
-        wait: 0.2
-
-      - action: FIND
-        object_type: TEXT
-        text: "Connecting..."
-        optional: true
-      
-      - action: FIND
-        object_type: TEXT
-        text: "Cancel"
-        debug: true
-        click: true
 
 
-
-# challenge cup 1 v 1
 
 # Se encontrar "Rematch" -> Acabou!
+
+# COMMANDS: /report, /msg, /reply, /logout, /challenge, /search, /rating, /whois, /user, /join, /leave, /userauth, /roomauth
+# BATTLE ROOM COMMANDS: /savereplay, /hideroom, /inviteonly, /invite, /timer, /forfeit
+# OPTION COMMANDS: /nick, /avatar, /ignore, /status, /away, /busy, /back, /timestamps, /highlight, /showjoins, /hidejoins, /blockchallenges, /blockpms
+# INFORMATIONAL/RESOURCE COMMANDS: /groups, /faq, /rules, /intro, /formatshelp, /othermetas, /analysis, /punishments, /calc, /git, /cap, /roomhelp, /roomfaq (replace / with ! to broadcast. Broadcasting requires: + % @ # ~)
+# DATA COMMANDS: /data, /dexsearch, /movesearch, /itemsearch, /learn, /statcalc, /effectiveness, /weakness, /coverage, /randommove, /randompokemon (replace / with ! to broadcast. Broadcasting requires: + % @ # ~)

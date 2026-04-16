@@ -1,6 +1,7 @@
 - continuar o modo deug, deixar a classe mais complexa. se possivel conseguir fazer com que a pagina do debug abra automaticamente!
 - O retorno do find ainda esta muito confuso, o ideal seria criar um modelo de retorno, que de para separar qunado deu um erro vs qunado nao foi encontrado, atualemnte ele da log de erro msm qunado n encontra, e isso pode gerar problema!
 - transferir endpoint de debug para iamgens para o arquivo FindActions, para que nao ocorra a consequencia depois de encontrar oq foi desejado(?) 
+- transforamr step em uma classe(e talvez a pipeline tb...)
 
 # Documentaçao 
 
