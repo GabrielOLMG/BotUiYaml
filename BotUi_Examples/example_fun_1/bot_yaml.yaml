@@ -49,3 +49,40 @@ pipelines:
       - action: FIND
         object_type: TEXT
         text: "Format"
+        y_coord: 20
+        click: true
+      
+      - action: FIND
+        object_type: TEXT
+        text: "Randomized Metas"
+        click: true
+        x_coord: -10
+
+      - action: FIND
+        object_type: TEXT
+        text: "Challenge Cup 1v1"
+        click: true
+        debug: true
+
+      - action: FIND
+        object_type: TEXT
+        text: "Battle!"
+        click: true
+        wait: 0.2
+
+      - action: FIND
+        object_type: TEXT
+        text: "Connecting..."
+        optional: true
+      
+      - action: FIND
+        object_type: TEXT
+        text: "Cancel"
+        debug: true
+        click: true
+
+
+
+# challenge cup 1 v 1
+
+# Se encontrar "Rematch" -> Acabou!

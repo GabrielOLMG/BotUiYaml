@@ -14,6 +14,17 @@ API_DOCKERFILE = BotUi_Setup/Dockerfile.api
 CONTEXT = .
 
 # ==========================================
+# 🔨 Init All
+# ==========================================
+setup:
+	@echo ""
+	@echo "======================================"
+	@echo "🏗️  Setup "
+	@echo "======================================"
+	make build-bot && make build-api && make run-api
+	@echo "✅ All initialized!"
+
+# ==========================================
 # 🔨 BUILD BOT IMAGE
 # ==========================================
 
