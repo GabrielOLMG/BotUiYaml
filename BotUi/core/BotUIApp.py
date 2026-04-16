@@ -101,6 +101,9 @@ class BotUIApp:
         status = bot_ui.run()
 
         # 7) Cria Midia Final!
+        self.media_manager.create_final_media(output_format="mp4") # endpoint ter formato do output(mp4 ou gif)!
+
+        return status
 
 
     # -----------------------

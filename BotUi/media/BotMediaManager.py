@@ -1,3 +1,12 @@
+
+import cv2
+import numpy as np
+
+from PIL import Image
+from io import BytesIO
+from pathlib import Path
+
+
 from BotUi.utils.utils import hash_from_bytes
 
 class BotMediaManager:
@@ -55,62 +64,53 @@ class BotMediaManager:
 
         return last != prev
 
+    def create_final_media(self, output_format="gif", fps=5):
+        frames = self._normalize_media()
+        output_path = Path(self.output_path).resolve().parent / f"history.{output_format}"
+        if not frames:
+            return
 
+        if output_format == "gif":
+            frames[0].save(
+                output_path,
+                format="GIF",
+                save_all=True,
+                append_images=frames[1:],
+                duration=int(1000 / fps),
+                loop=0
+            )
 
+        elif output_format == "mp4":
+            # PIL -> OpenCV
+            frame_np = np.array(frames[0])
+            height, width, _ = frame_np.shape
 
-    # def _create_final_media(self, output_format="gif", fps=5):
-    #     frames = []
-    #     # 1️⃣ Normaliza tudo para PIL.Image (RGB)
-    #     for screenshot in self.screenshots_history:
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
-    #         if isinstance(screenshot, (bytes, bytearray)):
-    #             img = Image.open(BytesIO(screenshot)).convert("RGB")
+            for frame in frames:
+                video.write(
+                    cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+                )
 
-    #         elif isinstance(screenshot, np.ndarray):
-    #             img = Image.fromarray(
-    #                 cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-    #             )
+            video.release()
 
-    #         else:
-    #             raise TypeError(
-    #                 f"Tipo de screenshot não suportado: {type(screenshot)}"
-    #             )
+        else:
+            raise ValueError("output_format deve ser 'gif' ou 'mp4'")
+        return output_path
 
-    #         frames.append(img)
-
-    #     if not frames:
-    #         return
-
-    #     # 2️⃣ Decide formato de saída
-    #     if output_format == "gif":
-    #         output_path = os.path.join(self.screenshots_path, "media.gif")
-
-    #         frames[0].save(
-    #             output_path,
-    #             format="GIF",
-    #             save_all=True,
-    #             append_images=frames[1:],
-    #             duration=int(1000 / fps),
-    #             loop=0
-    #         )
-
-    #     elif output_format == "mp4":
-    #         output_path = os.path.join(self.screenshots_path, "media.mp4")
-
-    #         # PIL -> OpenCV
-    #         frame_np = np.array(frames[0])
-    #         height, width, _ = frame_np.shape
-
-    #         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    #         video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-    #         for frame in frames:
-    #             video.write(
-    #                 cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
-    #             )
-
-    #         video.release()
-
-    #     else:
-    #         raise ValueError("output_format deve ser 'gif' ou 'mp4'")
-    #     return output_path
+    def _normalize_media(self):
+        frames = []
+        for target in self.history:
+            if isinstance(target["data"], (bytes, bytearray)):
+                img = Image.open(BytesIO(target["data"])).convert("RGB")
+            elif isinstance(target["data"], np.ndarray):
+                img = Image.fromarray(
+                    cv2.cvtColor(target["data"], cv2.COLOR_BGR2RGB)
+                )
+            else:
+                raise TypeError(
+                    f"Tipo de screenshot não suportado: {type(target['data'])}"
+                )
+            frames.append(img)
+        return frames
