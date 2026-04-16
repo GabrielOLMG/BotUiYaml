@@ -1,3 +1,4 @@
+from BotUi.core.components import Step
 from BotUi.utils.utils import resolve_variables
 from BotUi.core.BotActionDispatcher import BotActionDispatcher
 
@@ -42,15 +43,22 @@ class BotUI:
         return True
 
     def _process_pipeline(self, pipeline_name: str, pipeline_infos: dict) -> bool:
-        url = pipeline_infos.get("url")
-        steps = pipeline_infos["steps"]
+        if not hasattr(self, "actions_dispatch"):
+            self._init_actions_dispatch()
 
+        url = pipeline_infos.get("url")
         if url and not self._start_pipeline(pipeline_name, url):
             return False
+        
+        steps = [
+            Step(bot_app=self.bot_app, bot_driver=self.bot_driver, step_raw=step_info) 
+            for step_info in pipeline_infos["steps"]
+        ]
 
         for step in steps:
-            step_completed, _ = self._run_step(step)
-            if not step_completed:
+            step_result = step.run(self.actions_dispatch)
+            
+            if not step_result.success:
                 return False
 
         return True
@@ -72,34 +80,6 @@ class BotUI:
         return status
 
     # -----------------------
-    # Steps
-    # -----------------------
-
-    def _run_step(self, step_info: dict):
-        # Exibe mensagem de ajuda, se houver
-        helper_msg = step_info.get("helper")
-        if helper_msg:
-            self.bot_app.logger.info("🔹 Step: %s", helper_msg)
-
-        # Inicializa dispatcher se ainda não estiver
-        if not hasattr(self, "actions_dispatch"):
-            self._init_actions_dispatch()
-
-        # Resolve variaveis que ainda nao foram carregadas 
-        resolved_step = self._resolve_step_vars(step_info)
-
-        # Executa a ação via dispatcher
-        action_completed, action_log = self.actions_dispatch.dispatch(resolved_step)
-
-        if action_log:
-            self.bot_app.logger.error("%s | Step Info: %s", action_log, resolved_step)
-
-        # Retorna resultado da ação
-        return action_completed, action_log
-
-
-
-    # -----------------------
     # Helpers internos
     # -----------------------
     def _init_actions_dispatch(self):
@@ -107,11 +87,3 @@ class BotUI:
             bot_driver=self.bot_driver,
             bot_app=self.bot_app,
         )
-
-    def _resolve_step_vars(self, step_info):
-        resolved = {}
-
-        for key, value in step_info.items():
-            resolved[key] = resolve_variables(value, self.bot_app.data_store, ignore_miss=False)
-
-        return resolved
