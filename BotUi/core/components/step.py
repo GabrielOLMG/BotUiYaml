@@ -1,3 +1,7 @@
+import time
+import requests
+
+
 from typing import Optional, Any
 from dataclasses import dataclass
 
@@ -19,6 +23,7 @@ class Step:
             bot_app,
             bot_driver,
             step_raw: dict,
+            debug_mode: bool = False
         ):
         # =======================
         # External Classes
@@ -31,7 +36,7 @@ class Step:
         # =======================
         self.status = "INITIALIZED" # TODO: Transformar em uma classe de status!(PAUSED, RUNNING, ...)
         self.step_raw = step_raw
-
+        self.debug_mode = debug_mode
         # =======================
         # Step Info
         # =======================
@@ -54,19 +59,13 @@ class Step:
         actions_dispatch_result = actions_dispatch.dispatch(self.resolved_step)
         
         # 3)
-        self._post_action(actions_dispatch_result)
+        self._post_action(actions_dispatch_result, actions_dispatch)
         
-
-        action_completed, action_log = actions_dispatch_result # TODO: No futuro isso vai ser uma classe, entao irei ter mais controle!
-
-
         self.status = "FINISHED"
         step_result = StepResult(
-            message=f"[Step.run] {action_log}",
-            success=action_completed
+            message=f"[Step.run] {actions_dispatch_result.message}",
+            success=actions_dispatch_result.success
         )
-
-        # TODO: Ideia para o futuro: Ativar modo debug, se endpoint debug for ativado -> Permite pausar esse step e voltar a correr ele(e no futuro alterar tb)!
 
         return step_result
     
@@ -76,13 +75,14 @@ class Step:
         if self.description:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
-    def _post_action(self, actions_dispatch_result):
-        action_completed, action_log = actions_dispatch_result # TODO: No futuro isso vai ser uma classe, entao irei ter mais controle!
-        
-        if action_log: 
-            self.bot_app.logger.error("[ -- ] %s | Step Info: %s", action_log, self.resolved_step)
+    def _post_action(self, actions_dispatch_result, actions_dispatch):
+        # 0) 
+        if self.debug_mode and actions_dispatch_result.failed():
+            return self._debug_mode(actions_dispatch)
 
 
+        if actions_dispatch_result.failed(): 
+            self.bot_app.logger.error("[Step.run._post_action] %s | Step Info: %s", actions_dispatch_result.message, self.resolved_step)
 
     def _resolve_step_vars(self):
         resolved = {}
@@ -91,3 +91,22 @@ class Step:
             resolved[key] = resolve_variables(value, self.bot_app.data_store, ignore_miss=False)
 
         return resolved
+    
+    def _debug_mode(self, actions_dispatch):
+        self.status = "PAUSED"
+        while True:
+            self.bot_app.logger.info("Step pausado...para modificar eloe, basta ir no endpoint de update. e atualizar os devidos parametros")
+
+            response = requests.get(f"http://host.docker.internal:8000/step-update/{self.name}")
+            data = response.json()
+            if data:
+                self.step_raw.update(data["parameters"])
+                self.debug_mode =data.get("debug", True)
+
+                self.bot_app.logger.info(f"Step atualizado via API: {data}")
+
+                break
+
+            time.sleep(1)
+        
+        self.run(actions_dispatch)

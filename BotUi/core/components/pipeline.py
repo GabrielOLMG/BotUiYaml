@@ -19,7 +19,8 @@ class Pipeline:
             name,
             pipeline_raw, 
             bot_app, 
-            bot_driver
+            bot_driver,
+            debug_mode=False
         ):
         # =======================
         # External Classes
@@ -33,7 +34,7 @@ class Pipeline:
         self.name = name
         self.status = "INITIALIZED" # TODO: Transformar em uma classe de status!(PAUSED, RUNNING, ...)
         self.pipeline_raw = pipeline_raw
-
+        self.debug_mode=debug_mode
         # =======================
         # Pipeline Info
         # =======================
@@ -109,7 +110,7 @@ class Pipeline:
         steps = []
 
         for step_info in self.pipeline_raw["steps"]:
-            step = Step(bot_app=self.bot_app, bot_driver=self.bot_driver, step_raw=step_info)
+            step = Step(bot_app=self.bot_app, bot_driver=self.bot_driver, step_raw=step_info, debug_mode=self.debug_mode)
             steps.append(step)
 
         return steps

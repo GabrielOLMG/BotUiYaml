@@ -57,7 +57,8 @@ class BotUIApp:
         # 4) Others
         self.data_store = {}
         self.bot_driver = self.DEFAULT_DRIVER()
-        self.log_level = logging.DEBUG if debug_mode else logging.INFO 
+        self.debug_mode = debug_mode
+        self.log_level = logging.DEBUG if self.debug_mode else logging.INFO 
 
 
 
@@ -97,7 +98,9 @@ class BotUIApp:
         # 6) Run BotUI
         bot_ui = BotUI(
             bot_app=self,
-            bot_driver=self.bot_driver)
+            bot_driver=self.bot_driver,
+            debug_mode=self.debug_mode
+            )
         status = bot_ui.run()
 
         # 7) Cria Midia Final!

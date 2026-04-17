@@ -5,12 +5,14 @@ from BotUi.core.BotActionDispatcher import BotActionDispatcher
 
 class BotUI:
 
-    def __init__(self, bot_app, bot_driver):
+    def __init__(self, bot_app, bot_driver, debug_mode=False):
         # App (config, logger, yaml processado, data_store)
         self.bot_app = bot_app
 
         # Driver
         self.bot_driver = bot_driver
+        self.debug_mode=debug_mode
+
 
     # -----------------------
     # Main
@@ -44,6 +46,7 @@ class BotUI:
                 pipeline_raw=pipeline_infos,
                 bot_app=self.bot_app,
                 bot_driver=self.bot_driver,
+                debug_mode=self.debug_mode
             )
             
             pipeline_result = pipeline.run(self.actions_dispatch)

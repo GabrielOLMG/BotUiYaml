@@ -15,15 +15,6 @@ class DebugState:
 
 state = DebugState()
 
-
-# =========================
-# Health check
-# =========================
-@router.get("/")
-def root():
-    return {"status": "debug server running"}
-
-
 # =========================
 # PAUSE
 # =========================
