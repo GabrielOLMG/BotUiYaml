@@ -1,6 +1,9 @@
 import time
 import requests
 
+from typing import Optional, Any
+from dataclasses import dataclass
+
 from BotUi.actions.WriteAction import WriteAction
 from BotUi.actions.FindAction import FindAction
 from BotUi.actions.KeySelectionsAction import KeySelectionsAction
@@ -10,7 +13,13 @@ from BotUi.actions.StopIfAction import StopIfAction
 from BotUi.actions.UploadAction import UploadAction
 from BotUi.actions.DoWhileAction import DoWhileAction
 
+@dataclass
+class BotActionDispatcherResult:
+    success: bool
+    message: Optional[str] = None
 
+    def failed(self) -> bool:
+        return not self.success
 
 class BotActionDispatcher:
     ACTION_MAP = {
@@ -34,7 +43,10 @@ class BotActionDispatcher:
         action_class = self.ACTION_MAP.get(action_name)
 
         if not action_class:
-            return False, f"Ação não implementada: {action_name}"
+            return BotActionDispatcherResult(
+                success=False,
+                message="[BotActionDispatcher.dispatch] Action not implemented"
+            )
 
 
         # Instancia a classe da ação correta
@@ -48,33 +60,38 @@ class BotActionDispatcher:
         task_completed, log_text =  action_instance.run()
 
         if log_text is not None and not task_completed: # TODO: Garantir que esta funcional com 'and'
-            return False, log_text
+            return BotActionDispatcherResult(
+                success=False,
+                message=f"[BotActionDispatcher.dispatch] {log_text}"
+            )
         
         # Global Actions
         self._apply_global_step_behavior(step_info)
 
         
-        # TODO: Horrivel, melhorar!
-        if step_info.get("debug") is True:
-            self.bot_app.logger.info("Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/") # TODO: Redirecionar para a pagina que mostra a imagem de debug, ou dados de debug!
+        # # TODO: Horrivel, melhorar!
+        # if step_info.get("debug") is True:
+        #     self.bot_app.logger.info("Pipeline Pausada Para Debug, va até http://localhost:8000/docs#/") # TODO: Redirecionar para a pagina que mostra a imagem de debug, ou dados de debug!
 
-            requests.post("http://host.docker.internal:8000/debug/pause")
+        #     requests.post("http://host.docker.internal:8000/debug/pause")
 
-            while True:
-                res = requests.get("http://host.docker.internal:8000/debug/status").json()
+        #     while True:
+        #         res = requests.get("http://host.docker.internal:8000/debug/status").json()
 
-                if not res["paused"]:
-                    action = res["action"]
-                    break
+        #         if not res["paused"]:
+        #             action = res["action"]
+        #             break
 
-                self.bot_app.logger.debug("Bot pausado... aguardando resume")
-                time.sleep(1)
+        #         self.bot_app.logger.debug("Bot pausado... aguardando resume")
+        #         time.sleep(1)
 
-            if action == "stop":
-                return False, "Debug: execução interrompida pelo usuário"
+        #     if action == "stop":
+        #         return False, "Debug: execução interrompida pelo usuário"
 
-
-        return task_completed, log_text
+        return BotActionDispatcherResult(
+                success=task_completed,
+                message=f"[BotActionDispatcher.dispatch] {log_text}"
+            )
     
     def _apply_global_step_behavior(self, step_info):
         if step_info.get("refresh"):
