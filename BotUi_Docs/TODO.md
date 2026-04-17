@@ -9,7 +9,7 @@
 
 - falar do target result na documentaçao
 - falar sobre a api na doccumentaçao
-
+- faalr que agora da para colcaor o campo opcional "name"
 
 
 

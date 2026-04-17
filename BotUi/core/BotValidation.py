@@ -19,6 +19,7 @@ class GlobalConfig(BaseModel):
 
 class Step(BaseModel):
     action: str
+    name: Optional[str] = "" 
 
     model_config = {
         "extra": "allow"  # permite campos dinâmicos

@@ -8,6 +8,9 @@ class StepResult:
     success: bool
     message: Optional[str] = None
 
+    def failed(self) -> bool:
+        return not self.success
+
 
 
 class Step:
@@ -15,7 +18,6 @@ class Step:
             self,
             bot_app,
             bot_driver,
-
             step_raw: dict,
         ):
         # =======================
@@ -33,13 +35,15 @@ class Step:
         # =======================
         # Step Info
         # =======================
-        self.id=self.step_raw.get("id")
+        self.name=self.step_raw.get("name")
         self.description = self.step_raw.get("helper")
 
 
 
 
-    def run(self, actions_dispatch):
+    def run(self, actions_dispatch) -> StepResult:
+        self.status = "RUNNING"
+
         # 0) 
         self.resolved_step = self._resolve_step_vars()
 
@@ -55,23 +59,28 @@ class Step:
 
         action_completed, action_log = actions_dispatch_result # TODO: No futuro isso vai ser uma classe, entao irei ter mais controle!
 
+
+        self.status = "FINISHED"
         step_result = StepResult(
-            message=action_log,
+            message=f"[Step.run] {action_log}",
             success=action_completed
         )
+
+        # TODO: Ideia para o futuro: Ativar modo debug, se endpoint debug for ativado -> Permite pausar esse step e voltar a correr ele(e no futuro alterar tb)!
+
         return step_result
     
     def _pre_action(self):
-        self.bot_app.logger.info(f"[ - ] Starting Step: {self.id if self.id else 'Unnamed'}")
+        self.bot_app.logger.info(f"[ -- ] Starting Step: {self.name if self.name else 'Unnamed'}")
             
         if self.description:
-            self.bot_app.logger.info("[ --- ] Step: %s", self.description)
+            self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
     def _post_action(self, actions_dispatch_result):
         action_completed, action_log = actions_dispatch_result # TODO: No futuro isso vai ser uma classe, entao irei ter mais controle!
         
         if action_log: 
-            self.bot_app.logger.error("%s | Step Info: %s", action_log, self.resolved_step)
+            self.bot_app.logger.error("[ -- ] %s | Step Info: %s", action_log, self.resolved_step)
 
 
 
