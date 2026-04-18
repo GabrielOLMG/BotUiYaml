@@ -56,16 +56,9 @@ class Pipeline:
 
         # 2)
         steps = self._get_steps()
-
+        
         # 3) 
-        success = True
-        message =  None
-        for step in steps:
-            step_result = step.run(actions_dispatch)
-            if step_result.failed():
-                success=False
-                message = step_result.message
-                break
+        message, success = self._run_steps(steps, actions_dispatch)
             
 
 
@@ -87,9 +80,6 @@ class Pipeline:
         return True
         
         
-        
-
-
     def _start_url(self) -> bool:
         status = self.bot_driver.goto(self.url)
 
@@ -114,3 +104,57 @@ class Pipeline:
             steps.append(step)
 
         return steps
+    
+    def _run_steps(self, steps, actions_dispatch):
+        name_map = {}
+        id_map = {}
+        for i, step in enumerate(steps):
+            step._id = f"step_{i}"
+
+            id_map[step._id] = step
+
+            if step.name:
+                name_map[step.name] = step._id
+
+        success = True
+        message =  None
+        
+        current = steps[0]._id if steps else None
+
+        while current:
+            step = id_map[current]
+
+            step_result = step.run(actions_dispatch)
+
+            if step_result.failed():
+                success = False
+                message = step_result.message
+                break
+            
+            # TRANSITION
+            next_step = step_result.next
+            next_step_type = step_result.next_type
+
+            if next_step_type == "continue":
+                current = self._get_next_linear(id_map, current)
+                continue
+            elif next_step_type == "end":
+                break
+            elif next_step_type == "goto":
+                current = name_map.get(next_step, next_step)
+                self.bot_app.logger.info(f"[Pipeline.run._run_steps] Jumping to Step: {current}")
+                continue
+
+            # fallback
+            current = self._get_next_linear(id_map, current)
+
+        return success, message
+    
+    def _get_next_linear(self, id_map, current_id):
+        keys = list(id_map.keys())
+
+        try:
+            idx = keys.index(current_id)
+            return keys[idx + 1] if idx + 1 < len(keys) else None
+        except ValueError:
+            return None

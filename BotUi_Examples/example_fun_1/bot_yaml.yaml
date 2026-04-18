@@ -3,16 +3,15 @@ pipelines:
     url: $URL
     steps:
       - action: FIND
+        name: detect_google 
         object_type: TEXT
         text: "Consent"
         click: True
         next:
           true: init_login_pipeline
           false: init_login_pipeline
-
-  
-  login:
-    steps:
+        
+      # Pipeline aqui
       - action: FIND
         name: init_login_pipeline
         object_type: TEXT
@@ -25,67 +24,76 @@ pipelines:
         click: True
       - action: WRITE
         text: $USERNAME
-        wait: 3
       - action: KEYS_SELECTIONS
         keys:
           - ENTER
       - action: FIND
+        name: find_pass
         object_type: TEXT
         text: "Password"
         y_coord: 2
-        until_find: retry
         click: True
+        next:
+          true: write_pass
+          false: find_pass
       - action: WRITE
+        name: write_pass
         text: $PASSWORD
       - action: KEYS_SELECTIONS
         keys:
           - ENTER
+        wait: 3
+      # - action: FIND
+      #   name: check_logado 
+      #   object_type: TEXT
+      #   text: $USERNAME
+      #   helper: "Tentando localizar nome logado!"
+      #   next:
+      #     true: check_format
+      #     false: check_logado
+        
+      # PIPILINE AQ
+      - action: FIND
+        name: check_if_is_battling
+        object_type: TEXT
+        text: "Turn"
+        in_text: true
+        click: true
+        debug: true
+        next:
+          true: finish_game
+          false: check_format
+
+
+      - action: FIND
+        name: check_format
+        object_type: TEXT
+        text: "Format"
+        y_coord: 20
+        click: true
+      
+      - action: FIND
+        name: selec_gamemode
+        object_type: TEXT
+        text: "Randomized Metas"
+        click: true
+        x_coord: -10
+
       - action: FIND
         object_type: TEXT
-        text: $USERNAME
-        until_find: retry
-        helper: "Tentando localizar nome logado!"
-        
+        text: "Challenge Cup 1v1"
+        click: true
 
-  # game_mode:
-  #   steps:
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Format"
-  #       y_coord: 20
-  #       click: true
-      
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Randomized Metas"
-  #       click: true
-  #       x_coord: -10
+      - action: FIND
+        object_type: TEXT
+        text: "Battle!"
+        click: true
+        wait: 5 # TODO: fazer um next automatico aq
 
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Challenge Cup 1v1"
-  #       click: true
 
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Battle!"
-  #       click: true
-
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Connecting..."
-  #       optional: true
-      
-  #     - action: FIND
-  #       object_type: TEXT
-  #       text: "Cancel"
-  #       optional: true
-  #       click: true
-  #       debug: true
-
-  leave_game:
-    steps:
+      # PIPILINE AQ
       - action: WRITE
+        name: finish_game
         text: "/leave"
 
       - action: KEYS_SELECTIONS

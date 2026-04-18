@@ -10,7 +10,10 @@ from BotUi.utils.utils import resolve_variables
 @dataclass
 class StepResult:
     success: bool
+    next: str
+    next_type: str
     message: Optional[str] = None
+
 
     def failed(self) -> bool:
         return not self.success
@@ -46,6 +49,7 @@ class Step:
 
 
 
+
     def run(self, actions_dispatch) -> StepResult:
         self.status = "RUNNING"
 
@@ -59,12 +63,15 @@ class Step:
         actions_dispatch_result = actions_dispatch.dispatch(self.resolved_step)
         
         # 3)
-        self._post_action(actions_dispatch_result, actions_dispatch)
+        post_action_result = self._post_action(actions_dispatch_result, actions_dispatch)
         
         self.status = "FINISHED"
         step_result = StepResult(
             message=f"[Step.run] {actions_dispatch_result.message}",
-            success=actions_dispatch_result.success
+            success=actions_dispatch_result.success,
+            next=post_action_result["target"],
+            next_type=post_action_result["type"]
+
         )
 
         return step_result
@@ -76,13 +83,44 @@ class Step:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
     def _post_action(self, actions_dispatch_result, actions_dispatch):
+        next = None 
         # 0) 
         if self.debug_mode and actions_dispatch_result.failed():
             return self._debug_mode(actions_dispatch)
 
+        # 1)
+        next_config = self.resolved_step.get("next")
 
-        if actions_dispatch_result.failed(): 
-            self.bot_app.logger.error("[Step.run._post_action] %s | Step Info: %s", actions_dispatch_result.message, self.resolved_step)
+        if actions_dispatch_result.failed():
+            if next_config and False in next_config:
+                return {
+                    "type": "goto",
+                    "target": next_config[False]
+                }
+
+            self.bot_app.logger.error(
+                "[Step.run._post_action] %s | Step Info: %s",
+                actions_dispatch_result.message,
+                self.resolved_step
+            )
+
+            return {
+                "type": "end",
+                "target": None
+            }
+
+        if next_config and True in next_config:
+            return {
+                "type": "goto",
+                "target": next_config[True]
+            }
+
+        return {
+            "type": "continue",
+            "target": None
+        }
+
+
 
     def _resolve_step_vars(self):
         resolved = {}
