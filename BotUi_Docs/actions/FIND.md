@@ -75,9 +75,6 @@ Used when ``object_type: IMG``
 | Field      | Type | Description                               |
 | ---------- | ---- | ----------------------------------------- |
 | scroll     | bool | Enables scrolling if element is not found |
-| until_find | str  | Retry until found (`retry`)               |
-| if_find    | str  | Behavior after success (e.g. `retry`)     |
-| optional   | bool | If true, failure does not stop execution  |
 | debug      | bool | Saves debug image output                  |
 
 ---
@@ -96,7 +93,6 @@ Used when ``object_type: IMG``
 6. If not found:
     - Scroll or retry logic may be applied
     - Or step fails depending on configuration
-    - Or continues if the `optional` option is true.
 
 ---
 
@@ -161,16 +157,6 @@ Useful when the clickable area is not exactly centered.
   y_coord: -5
 ```
 
-### 6. Retry until element appears
-
-```yaml
-- action: FIND
-  object_type: TEXT
-  text: "Processed"
-  until_find: retry
-```
-
-In this example, instead of using a "wait" statement, we can simply wait for a specific field to appear. In this case, I used text, but it could be an image.
 
 ### 7. Scroll until element is found
 
@@ -181,15 +167,7 @@ In this example, instead of using a "wait" statement, we can simply wait for a s
   scroll: true
 ```
 
-### 8. Optional element (does not break pipeline)
 
-```yaml
-- action: FIND
-  object_type: TEXT
-  text: "Accept cookies"
-  click: true
-  optional: true
-```
 
 ### 9. Debug mode (visual inspection)
 
@@ -303,6 +281,4 @@ A FIND action can fail due to:
 
 In these cases, behavior depends on configuration:
 
-- `optional`
 - `scroll`
-- `until_find`

@@ -1,6 +1,6 @@
 from BotUi.actions.abstracts.BaseAction import BaseAction
 from BotUi.finders.BotTargetLocator import BotTargetLocator
-from BotUi.config.BotConstants import ScrollConstants, RetryConstants
+from BotUi.config.BotConstants import ScrollConstants
 
 
 
@@ -11,15 +11,27 @@ class FindAction(BaseAction):
         self.find_retry_attempts = 0
 
     def run(self):
-        # --- (1) Captura configurações principais ---
+        # 1)
         object_type = self.step_info.get("object_type")
 
-        # --- (2) Screenshot ---
-        screenshot_path, screenshot_image = self.capture()
+        # 2) 
+        target_result = self._execute_find(object_type)
+        if target_result.error:
+            return False, f"[FindAction.run] {target_result.log_message}"
 
-        # --- (3) Escolhe função de busca ---
+        # 3)    
+        executed, error = self._evaluate(target_result)
+        
+        return executed, error
+    
+
+    def _execute_find(self, object_type):
+        # 1)
+        screenshot_path, _ = self.capture()
+
+        # 2)
         bot_target_detector = BotTargetLocator(
-            image_source_path=screenshot_path, # DA ERRADO, NAO TEM AQUI O PRINT!
+            image_source_path=screenshot_path,
             debug=self.step_info.get("debug", False),
             debug_path = self.bot_app.debug_path,
             offset_x = self.step_info.get("x_coord", 0),
@@ -27,6 +39,7 @@ class FindAction(BaseAction):
             logger = self.get_logger()
         )
 
+        # 3) 
         detector_args_map = {
             "IMG": {
                 "template_path": self.step_info.get("image_path"),
@@ -39,14 +52,15 @@ class FindAction(BaseAction):
 
             },
         }
-
-        # --- (4) Tenta localizar o objeto ---
         args = detector_args_map.get(object_type, {})
 
+        # 4)
         target_result = bot_target_detector.dealer(
             detector_type=object_type,
             **args
         )
+
+        # 5) 
         if target_result.debug_image_path:
             self.bot_app.media_manager.record({
                 "type": "image",
@@ -55,53 +69,41 @@ class FindAction(BaseAction):
                 "path": target_result.debug_image_path,
                 "hash": None
             })
-
-        # --- (5) Check se achou e aplica devida regra ---
-        if target_result.error:
-           executed = False
-           error = target_result.log_message
-        if not target_result.found:
-            executed, error = self._not_find_consequence(self.step_info)
-        else:
-            executed, error = self._find_consequence(self.step_info, object_coord=target_result.center)
-        
-        return executed, error
+        return target_result
     
+    
+
     # ----------------------
     # Consequências
     # ----------------------
-    def _find_consequence(self, step, object_coord):
-        click_enabled = step.get("click", False)
-        if_find = step.get("if_find", None)
+    def _evaluate(self, target_result):
+        # TODO: Aqui vou poder fazer os operadores , se count eq/gt... ou exit
+
+        if target_result.found: # step_info.get('operator').get('type') == exist $ PADRAO!
+            executed, error = self._if_find(self.step_info, object_coord=target_result.center)
+        elif not target_result.found: # step_info.get('operator').get('type') == not_exist
+            executed, error = self.if_not_find(self.step_info)
+
+        return executed, error
+
+    def _if_find(self, step, object_coord):
+        # 1)
         save_as = step.get("save_as")
-
-
-        # --- (2) Save coord---
         if save_as:
             self.set_var(save_as, [float(object_coord[0]), float(object_coord[1])])
 
-        # --- (4) Clique final ---
+        # 2)
+        click_enabled = step.get("click", False)
         if click_enabled and object_coord:
             success, log_result = self.bot_driver.click(object_coord)
             if not success:
                 return False, f"[FIND] Falha ao clicar no objeto: {log_result}"
-
-        # --- (5)  Acoes de Encontrar---
-        if if_find=="retry":
-            return self.run()
         
         return True, None
 
-    def _not_find_consequence(self, step):
+    def if_not_find(self, step):
         scroll_enabled = step.get("scroll", False)
         scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
-        until_find = step.get("until_find", None)
-        optional = step.get("optional", False)
-
-        # TODO : Remover esse chek, por hora vai ter que ser assim pq n acho uma solucao que funciione
-        if scroll_enabled and until_find:
-            return False, "[FIND] Não é permitido usar 'scroll' e 'until_find' ao mesmo tempo"
-
 
         # Scroll?
         if scroll_enabled and self.scroll_attempt < ScrollConstants.MAX_ATTEMPTS:
@@ -112,17 +114,7 @@ class FindAction(BaseAction):
                 self.scroll_attempt = ScrollConstants.MAX_ATTEMPTS + 1
 
             return self.run()
-        
-
-        # Retry Por Until Find
-        if until_find=="retry" and self.find_retry_attempts <= RetryConstants.FIND_RETRY_MAX_ATTEMPTS:
-            self.find_retry_attempts+=1
-            return self.run() 
-        
-        # Find opcionais
-        if optional:
-            return True, "[FIND] Objeto não encontrado, mas optional=True"
-
+                
         return False, "[FIND] Objeto não encontrado"
 
     # ----------------------

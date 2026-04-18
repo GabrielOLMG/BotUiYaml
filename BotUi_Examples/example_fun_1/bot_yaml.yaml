@@ -5,13 +5,16 @@ pipelines:
       - action: FIND
         object_type: TEXT
         text: "Consent"
-        optional: True
         click: True
+        next:
+          true: init_login_pipeline
+          false: init_login_pipeline
 
   
   login:
     steps:
       - action: FIND
+        name: init_login_pipeline
         object_type: TEXT
         text: "Choose name"
         click: True

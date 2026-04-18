@@ -3,10 +3,6 @@ class ScrollConstants:
     DISTANCE = 500
     DEFAULT_DIRECTION = "DOWN"
 
-
-class RetryConstants:
-    FIND_RETRY_MAX_ATTEMPTS = 50
-
 # --------------------------------------- #
 
 # TODO: Melhorar se possivel
@@ -25,22 +21,30 @@ ACTION_SCHEMA = {
         "required": {
             "object_type": str,
         },
-        "optional": {
-            "in_text": bool,
+        "required_one_of": {
             "text": str,
             "image_path": str,
+
+        },
+        "optional": {
+            "in_text": bool, # TODO: Pode fazer parte do operator!
+
+            # TODO: Transformar em um dicionario relacionado ao scrol?
             "scroll": bool,
-            "scroll_image_path": str,
             "scroll_direction": str,
-            "click": bool,
+            # ---------------
+
+            "next": dict, # Como validar melhor?
+
             "y_coord": int,
             "x_coord": int,
-            "until_find": str,
             "save_as": str,
-            "optional": bool,
-            "if_find": str,
+            "click": bool,
+
+            # TODO: Transformar em um diconario q englobe os 2?
             "position": int,
             "side": str,
+            # ---------------
             **GLOBAL_FIELDS
         },
     },
