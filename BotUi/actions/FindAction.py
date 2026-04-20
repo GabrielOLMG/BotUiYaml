@@ -61,7 +61,7 @@ class FindAction(BaseAction):
            executed = False
            error = target_result.log_message
         if not target_result.found:
-            executed, error = self._not_find_consequence(self.step_info)
+            executed, error = self._not_find_consequence(self.step_info, target_result.log_message)
         else:
             executed, error = self._find_consequence(self.step_info, object_coord=target_result.center)
         
@@ -92,7 +92,7 @@ class FindAction(BaseAction):
         
         return True, None
 
-    def _not_find_consequence(self, step):
+    def _not_find_consequence(self, step, log):
         scroll_enabled = step.get("scroll", False)
         scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
         until_find = step.get("until_find", None)
@@ -123,7 +123,7 @@ class FindAction(BaseAction):
         if optional:
             return True, "[FIND] Objeto não encontrado, mas optional=True"
 
-        return False, "[FIND] Objeto não encontrado"
+        return False, f"[FIND] Objeto não encontrado: {log}"
 
     # ----------------------
     # Scroll Actions # TODO: Criar um manager para scroll(?)
