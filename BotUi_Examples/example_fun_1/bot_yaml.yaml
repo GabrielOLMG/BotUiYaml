@@ -3,17 +3,17 @@ pipelines:
     url: $URL
     steps:
       - action: FIND
-        name: detect_google 
+        name: 1 
         object_type: TEXT
         text: "Consent"
         click: True
         next:
-          true: init_login_pipeline
-          false: init_login_pipeline
+          true: 2
+          false: 2
         
       # Pipeline aqui
       - action: FIND
-        name: init_login_pipeline
+        name: 2
         object_type: TEXT
         text: "Choose name"
         click: True
@@ -28,16 +28,16 @@ pipelines:
         keys:
           - ENTER
       - action: FIND
-        name: find_pass
+        name: 6
         object_type: TEXT
         text: "Password"
         y_coord: 2
         click: True
         next:
-          true: write_pass
-          false: find_pass
+          true: 7
+          false: 6
       - action: WRITE
-        name: write_pass
+        name: 7
         text: $PASSWORD
       - action: KEYS_SELECTIONS
         keys:
@@ -54,19 +54,19 @@ pipelines:
         
       # PIPILINE AQ
       - action: FIND
-        name: check_if_is_battling
+        name: 9
         object_type: TEXT
         text: "Turn"
         in_text: true
         click: true
         debug: true
         next:
-          true: finish_game
-          false: check_format
+          true: end
+          false: 10
 
 
       - action: FIND
-        name: check_format
+        name: 10
         object_type: TEXT
         text: "Format"
         y_coord: 20
@@ -93,7 +93,7 @@ pipelines:
 
       # PIPILINE AQ
       - action: WRITE
-        name: finish_game
+        name: end
         text: "/leave"
 
       - action: KEYS_SELECTIONS

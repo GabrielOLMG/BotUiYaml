@@ -142,7 +142,7 @@ class Pipeline:
                 break
             elif next_step_type == "goto":
                 current = name_map.get(next_step, next_step)
-                self.bot_app.logger.info(f"[Pipeline.run._run_steps] Jumping to Step: {current}")
+                self.bot_app.logger.info(f"[Pipeline.run._run_steps] Jumping to Step: {next_step}")
                 continue
 
             # fallback

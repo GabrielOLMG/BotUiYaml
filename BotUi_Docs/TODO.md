@@ -2,7 +2,7 @@
 - O retorno do find ainda esta muito confuso, o ideal seria criar um modelo de retorno, que de para separar qunado deu um erro vs qunado nao foi encontrado, atualemnte ele da log de erro msm qunado n encontra, e isso pode gerar problema!
 - transferir endpoint de debug para iamgens para o arquivo FindActions, para que nao ocorra a consequencia depois de encontrar oq foi desejado(?) 
 - ATAULMENTE O NEXT SO FUNCIONA  SE FOR TUDO DA MSM PIPELINE, ENTRE PIPELINES N FIUNCONA!
-
+- fazer um check se existe nomes de step duplicados
 # Documentaçao 
 
 - falar do target result na documentaçao
