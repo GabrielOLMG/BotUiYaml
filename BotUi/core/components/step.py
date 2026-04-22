@@ -83,9 +83,16 @@ class Step:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
     def _post_action(self, actions_dispatch_result, actions_dispatch):
-        # 0) 
-        if self.debug_mode and actions_dispatch_result.failed():
-            return self._debug_mode(actions_dispatch)
+        if actions_dispatch_result.failed():
+            self.bot_app.logger.error(
+                    "[Step.run._post_action] %s | Step Info: %s",
+                    actions_dispatch_result.message,
+                    self.resolved_step
+                )
+        
+        # # 0) 
+        # if self.debug_mode and actions_dispatch_result.failed():
+        #     return self._debug_mode(actions_dispatch)
 
         # 1)
         next_config = self.resolved_step.get("next")
@@ -96,13 +103,7 @@ class Step:
                     "type": "goto",
                     "target": next_config[False]
                 }
-
-            self.bot_app.logger.error(
-                "[Step.run._post_action] %s | Step Info: %s",
-                actions_dispatch_result.message,
-                self.resolved_step
-            )
-
+            
             return {
                 "type": "end",
                 "target": None
