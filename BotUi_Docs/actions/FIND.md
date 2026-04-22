@@ -75,10 +75,9 @@ Used when ``object_type: IMG``
 | Field      | Type | Description                               |
 | ---------- | ---- | ----------------------------------------- |
 | scroll     | bool | Enables scrolling if element is not found |
-| until_find | str  | Retry until found (`retry`)               |
-| if_find    | str  | Behavior after success (e.g. `retry`)     |
-| optional   | bool | If true, failure does not stop execution  |
 | debug      | bool | Saves debug image output                  |
+| next       | dict | A dictionary with True and False keys determines the desired next step. Without this, it follows a linear path.                 |
+
 
 ---
 
@@ -96,8 +95,8 @@ Used when ``object_type: IMG``
 6. If not found:
     - Scroll or retry logic may be applied
     - Or step fails depending on configuration
-    - Or continues if the `optional` option is true.
-
+7. If next
+  - Checks if the object was found and proceeds to the True step; otherwise, proceeds to the False step.
 ---
 
 ## Examples
@@ -161,16 +160,25 @@ Useful when the clickable area is not exactly centered.
   y_coord: -5
 ```
 
-### 6. Retry until element appears
+### 6. Next Condition
 
 ```yaml
 - action: FIND
   object_type: TEXT
-  text: "Processed"
-  until_find: retry
-```
+  text: "success"
+  next: 
+    True: case_true
+    False: case_false
 
-In this example, instead of using a "wait" statement, we can simply wait for a specific field to appear. In this case, I used text, but it could be an image.
+- action: WRITE
+  name: case_true
+  text: "NICE" 
+
+- action: WRITE
+  name: case_false
+  text: "WRONG" 
+```
+In this example, we are checking if an object has been found. If it has, it goes to the step in the True branch(``True: case_true``); otherwise, it goes to the step in the False branch(``False: case_false``).
 
 ### 7. Scroll until element is found
 
@@ -181,15 +189,22 @@ In this example, instead of using a "wait" statement, we can simply wait for a s
   scroll: true
 ```
 
-### 8. Optional element (does not break pipeline)
+### 8. Optional Find
 
 ```yaml
 - action: FIND
   object_type: TEXT
-  text: "Accept cookies"
-  click: true
-  optional: true
+  text: "Success"
+  next: 
+    True: write
+    False: write
+
+- action: WRITE
+  name: write
+  text: "Ok"
 ```
+
+This is a case where we have a step that, regardless of whether or not it successfully finds the object, will proceed to the next step, simulating what would be an optional step.
 
 ### 9. Debug mode (visual inspection)
 
@@ -200,35 +215,22 @@ In this example, instead of using a "wait" statement, we can simply wait for a s
   debug: true
 ```
 
-### 10. Complex interaction (real-world flow)
+### 10. Until Find object
 
 ```yaml
 - action: FIND
+  name: check_loaded_file
   object_type: TEXT
-  text: "Username"
-  click: true
+  text: "Loaded"
+  next: 
+    True: write
+    False: check_loaded_file
 
 - action: WRITE
-  text: $USERNAME
-
-- action: FIND
-  object_type: TEXT
-  text: "Password"
-  click: true
-
-- action: WRITE
-  text: $PASSWORD
-
-- action: FIND
-  object_type: TEXT
-  text: "Login"
-  click: true
-
-- action: FIND
-  object_type: TEXT
-  text: "Welcome $USERNAME"
-  until_find: retry
+  name: write
+  text: "Ok"
 ```
+This is a case where we are repeating the same find until we find the desired object; it will only continue when available.
 
 ---
 
@@ -303,6 +305,4 @@ A FIND action can fail due to:
 
 In these cases, behavior depends on configuration:
 
-- `optional`
 - `scroll`
-- `until_find`

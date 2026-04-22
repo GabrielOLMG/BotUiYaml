@@ -12,5 +12,4 @@ app.include_router(jobs_router)
 app.include_router(step_router)
 
 
-app.include_router(debug_router, prefix="/debug")
-
+# app.include_router(debug_router, prefix="/debug")

@@ -1,5 +1,5 @@
 from BotUi.utils.utils import evaluate_condition
-from BotUi.actions.abstracts.BaseAction import BaseAction
+from BotUi.actions.abstracts import BaseAction, BaseActionResult
 
 
 
@@ -9,11 +9,14 @@ class StopIfAction(BaseAction):
 
         # Se a condição retornar True, queremos parar o pipeline
         if not error and output:
-            return False, f"[STOP_IF] Condição para parar satisfeita: {self.step_info['condition']} == {output}"
+            return BaseActionResult(
+                finished=False,
+                success=True,
+                message=f"[StopIfAction.run] Condição para parar satisfeita: {self.step_info['condition']} == {output}"
+            )
 
-        # Retorna sucesso ou log do erro
-        result_log = None
-        if error:
-            result_log = f"[STOP_IF] Erro ao avaliar condição: {error}"
-
-        return executed, result_log
+        return BaseActionResult(
+                finished=not error,
+                success=executed,
+                message=f"[StopIfAction.run] Erro ao avaliar condição: {error}" if error else None
+            )

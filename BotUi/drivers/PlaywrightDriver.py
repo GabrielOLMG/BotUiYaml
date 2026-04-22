@@ -52,7 +52,7 @@ class PlaywrightDriver(BotDriver):
                 x, y = coord
 
             if x is None or y is None:
-                raise ValueError("Coordenadas inválidas")
+                raise ValueError("[PlaywrightDriver.click] Coordenadas inválidas")
 
             # Garante que a página tem foco
             self.page.mouse.move(x, y)
@@ -60,18 +60,18 @@ class PlaywrightDriver(BotDriver):
             self.page.mouse.click(x, y)
             return True, None
         except Exception as e:
-            return False, f"[CLICK] Falha ao clicar na coord {coord}: {e}"
+            return False, f"[PlaywrightDriver.click] Falha ao clicar na coord {coord}: {e}"
         
     def upload_file(self, file_path: str, coord: tuple):
         try: 
             file_path = str(Path(file_path).resolve())
         except Exception as e:
-            return False, f"[UPLOAD] Erro ao resolver path do arquivo '{file_path}': {e}"
+            return False, f"[PlaywrightDriver.upload_file] Erro ao resolver path do arquivo '{file_path}': {e}"
 
         try:
             x, y = coord
         except Exception as e:
-            return False, f"[UPLOAD] Coord inválida {coord}: {e}"
+            return False, f"[PlaywrightDriver.upload_file] Coord inválida {coord}: {e}"
 
         try:
             with self.page.expect_file_chooser() as fc_info:
@@ -79,12 +79,12 @@ class PlaywrightDriver(BotDriver):
 
             file_chooser = fc_info.value
         except Exception as e:
-            return False, f"[UPLOAD] Falha ao abrir file chooser: {e}"
+            return False, f"[PlaywrightDriver.upload_file] Falha ao abrir file chooser: {e}"
 
         try:
             file_chooser.set_files(file_path)
         except Exception as e:
-            return False, f"[UPLOAD] Falha ao setar arquivo '{file_path}' no file chooser: {e}"
+            return False, f"[PlaywrightDriver.upload_file] Falha ao setar arquivo '{file_path}' no file chooser: {e}"
 
         return True, None
 
@@ -93,7 +93,7 @@ class PlaywrightDriver(BotDriver):
             self.page.keyboard.insert_text(text)
             return True, None
         except Exception as e:
-            return False, f"[WRITE] {e}"
+            return False, f"[PlaywrightDriver.write] {e}"
             
     def scroll(self, direction: str, delta_x: int=0, delta_y: int=100, coord: tuple=None):
         if coord is not None:
@@ -161,7 +161,7 @@ class PlaywrightDriver(BotDriver):
             return True, None
 
         except Exception as e:
-            return False, f"[DRIVER] Falha ao executar key_sequence: {e}"
+            return False, f"[PlaywrightDriver.key_sequence] Falha ao executar key_sequence: {e}"
 
         
     # ---------------------- #

@@ -1,4 +1,6 @@
+import os
 import cv2
+import json
 
 from BotUi.finders.BotTargetResult import BotTargetResult
 
@@ -8,16 +10,26 @@ class BotTargetLocator:
             "TEXT": {"required": {"target_text"}, "function": "text_target_center"}
         }
     
-    def __init__(self, image_source_path:str, debug_path:str, logger, debug: bool = False, offset_x:float=0, offset_y:float=0):
+    def __init__(
+            self,
+            image_source_path:str, 
+            debug_folder:str, 
+            logger, 
+            debug: bool = False, 
+            offset_x:float=0, 
+            offset_y:float=0
+        ):
         self.image_source_path = image_source_path
         self.debug = debug
         self.logger = logger
-        self.debug_path = debug_path # Mudar depois para ser algo mais unico, uma pasta com prints de debug,
+        self.debug_folder = debug_folder # Mudar depois para ser algo mais unico, uma pasta com prints de debug,
         self.target_original_center = None
         self.target_shif_center = None
 
         self.offset_x = offset_x
         self.offset_y = offset_y
+
+        self.shifted = False
 
 
 
@@ -78,13 +90,10 @@ class BotTargetLocator:
     
     def debug_mark_shift(
         self,
+        img,
         marker_size: int = 20,
-        thickness: int = 2
+        thickness: int = 2,
     ):
-
-        # Abre a imagem
-        img = cv2.imread(self.image_source_path)
-
         x_orig, y_orig = map(int, self.target_original_center)
         x_shift, y_shift = map(int, self.target_shif_center)
 
@@ -119,26 +128,35 @@ class BotTargetLocator:
             1
         )
 
-        # Salva e retorna
-        cv2.imwrite(self.debug_path, img)
-        return self.debug_path, img
+        return img
 
     def shift_coord(self):
         if self.target_original_center and (self.offset_x or self.offset_y):
+            self.shifted = True
             return (self.target_original_center[0] + self.offset_x, self.target_original_center[1] + self.offset_y)
         else:
             return self.target_original_center
 
-    def _debug(self, debug_image = None):
-        #TODO:  Deixar esta funcao mais complexa
+    # def _debug(self, debug_image = None):
+    def _debug(self, target_result):
         if not self.debug:
-            return None, None
-        elif debug_image is not None:
-            cv2.imwrite(self.debug_path, debug_image)
-            return self.debug_path, debug_image
-        else:
-            return None, None
-            # return self.debug_mark_shift()
+            return target_result 
+        
+        if target_result.debug_json is not None:
+            target_result.debug_json_path = os.path.join(self.debug_folder, "debug.json")
+            
+            # Save Json Here
+            with open(target_result.debug_json_path, "w", encoding="utf-8") as f:
+                json.dump(target_result.debug_json, f, indent=4, ensure_ascii=False)
+        
+        if target_result.debug_image is not None:
+            if self.shift_coord:
+                target_result.debug_image = self.debug_mark_shift(target_result.debug_image)
+            target_result.debug_image_path = os.path.join(self.debug_folder, "debug.png")
+
+            cv2.imwrite(target_result.debug_image_path, target_result.debug_image)
+            
+        return target_result
 
 
     # ------------------------------------ #
@@ -164,9 +182,7 @@ class BotTargetLocator:
         target_result.center = self.target_shif_center
 
         if not target_result.error:
-            image_result_path, image_result = self._debug(target_result.debug_image)
-            target_result.debug_image = image_result
-            target_result.debug_image_path = image_result_path
+            target_result = self._debug(target_result)
 
         
         return target_result

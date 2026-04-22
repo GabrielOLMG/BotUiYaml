@@ -1,5 +1,6 @@
 from BotUi.utils.utils import open_file
-from BotUi.actions.abstracts.BaseAction import BaseAction
+from BotUi.actions.abstracts import BaseAction, BaseActionResult
+
 
 
 
@@ -9,27 +10,35 @@ class WriteAction(BaseAction):
 
         self.allowed_fields = ["text", "file_path"]
 
-    def run(self):
+    def run(self) -> BaseActionResult:
         validated, log_text, field = self._validate()
 
         if not validated:
-            return False, log_text
+            return BaseActionResult(
+                finished=False,
+                success=False,
+                message=log_text
+            )
 
         value = self.step_info[field]
         if field == "file_path":
             value = open_file(value)
             
-        success, result_log = self.bot_driver.write(value)
+        success, log_text = self.bot_driver.write(value)
 
-        return success, result_log
+        return BaseActionResult(
+                finished=True,
+                success=success,
+                message=f"[WriteAction.run] {log_text}" if log_text else None
+            )
 
     def _validate(self):
         present_fields = set(self.allowed_fields) & self.step_info.keys()
 
         if not present_fields:
-            return False, f"[WRITE] Acao Requer {' ou '.join(self.allowed_fields)}", None
+            return False, f"[WriteAction._validate] Acao Requer {' ou '.join(self.allowed_fields)}", None
 
         if len(present_fields) > 1:
-            return False, f"[WRITE] Acao não pode ter {' e '.join(self.allowed_fields)} ao mesmo tempo", None
+            return False, f"[WriteAction._validate] Acao não pode ter {' e '.join(self.allowed_fields)} ao mesmo tempo", None
         
         return True, None, present_fields.pop()
