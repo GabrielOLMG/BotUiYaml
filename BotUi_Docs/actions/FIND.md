@@ -245,15 +245,9 @@ Prefer:
 
 ---
 
-## Retry & Scroll Behavior
+## Scroll Behavior
 
 When an element is not found, the `FIND` action can recover using different strategies.
-
-### Retry behavior (`until_find: retry`)
-
-- Re-executes the FIND action immediately
-- Limited by internal retry counter
-- Does not perform page interaction
 
 
 ### Scroll behavior (`scroll: true`)
