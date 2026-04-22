@@ -83,7 +83,6 @@ class Step:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
     def _post_action(self, actions_dispatch_result, actions_dispatch):
-        next = None 
         # 0) 
         if self.debug_mode and actions_dispatch_result.failed():
             return self._debug_mode(actions_dispatch)

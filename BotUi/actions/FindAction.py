@@ -33,7 +33,7 @@ class FindAction(BaseAction):
         bot_target_detector = BotTargetLocator(
             image_source_path=screenshot_path,
             debug=self.step_info.get("debug", False),
-            debug_path = self.bot_app.debug_path,
+            debug_folder = self.bot_app.debug_folder,
             offset_x = self.step_info.get("x_coord", 0),
             offset_y = self.step_info.get("y_coord", 0),
             logger = self.get_logger()

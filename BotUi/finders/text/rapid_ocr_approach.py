@@ -112,9 +112,15 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
             images_parts["FULL"] = original_image
 
         texts = {}
+        dict_debug = {}
         for side_name, image in images_parts.items():
             try:
                 texts_extracted_data = extract_base_text_info(image)
+                clean_data = [
+                    {k: v for k, v in d.items() if k != "box"}
+                    for d in texts_extracted_data
+                ]
+                dict_debug[side_name] = clean_data
             except Exception as e:
                 return BotTargetResult(error=True, log_message=f"Erro ao extrair texto da imagem ({side_name}): {e}")
 
@@ -179,13 +185,13 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
                 )
 
         if len(final_candidates) == 0:
-            return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado")
+            return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado", debug_json=dict_debug)
         elif position > len(final_candidates):
-            return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida")
+            return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida", debug_json=dict_debug)
 
 
         final_candidate = final_candidates[position]
-        return BotTargetResult(error=False, found=True, center=final_candidate["center"], debug_image=debug_image, confidence=final_candidate["confidence_extracted"])
+        return BotTargetResult(error=False, found=True, center=final_candidate["center"], debug_image=debug_image, confidence=final_candidate["confidence_extracted"], debug_json=dict_debug)
 
     except Exception as e:
         # catch geral com log completo
