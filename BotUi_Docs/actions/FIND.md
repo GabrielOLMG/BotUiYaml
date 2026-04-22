@@ -245,24 +245,6 @@ Prefer:
 
 ---
 
-## Constraints & Invalid Configurations
-
-The following combinations are not allowed:
-
-### scroll + until_find
-
-These two mechanisms conflict because both control retry behavior in different ways.
-
-```yaml
-- action: FIND
-  object_type: TEXT
-  text: "Login"
-  scroll: true
-  until_find: retry  # Invalid
-```
-
----
-
 ## Retry & Scroll Behavior
 
 When an element is not found, the `FIND` action can recover using different strategies.
