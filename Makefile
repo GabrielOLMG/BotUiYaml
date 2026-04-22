@@ -106,8 +106,8 @@ clean-botui:
 	@echo "Removing volumes..."
 	-docker volume ls -q | grep botui | xargs -r docker volume rm
 
-	@echo "System prune..."
-	docker system prune -f
+# 	@echo "System prune..."
+# 	docker system prune -f
 
 	@echo "BotUi cleanup done!"
 
