@@ -112,7 +112,6 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
             images_parts["FULL"] = original_image
 
         texts = {}
-        all_texts = []
         for side_name, image in images_parts.items():
             try:
                 texts_extracted_data = extract_base_text_info(image)
@@ -122,7 +121,6 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
             possibles = []
             for text_extracted_data in texts_extracted_data:
                 text_extracted = text_extracted_data["text"].strip()
-                all_texts.append(text_extracted)
                 confidence_extracted = text_extracted_data["score"]
                 center_extracted = text_extracted_data["center"]
 
@@ -181,9 +179,9 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
                 )
 
         if len(final_candidates) == 0:
-            return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado: {all_texts}")
+            return BotTargetResult(error=False, log_message=f"Nao foi possivel encontrar o texto desejado")
         elif position > len(final_candidates):
-            return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida: {all_texts}")
+            return BotTargetResult(error=True, log_message=f"Existem {len(final_candidates)} candidatos, mas foi passado position={position}, posiçao invalida")
 
 
         final_candidate = final_candidates[position]
