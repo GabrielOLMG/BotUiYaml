@@ -62,7 +62,11 @@ class Step:
         
         # 3)
         post_action_result = self._post_action(actions_dispatch_result, actions_dispatch)
-        
+
+        if post_action_result["type"] == "debug":
+            return self._debug_mode(actions_dispatch)
+
+
         self.status = "FINISHED"
         step_result = StepResult(
             finished=actions_dispatch_result.finished,
@@ -89,9 +93,8 @@ class Step:
                     self.resolved_step
                 )
         
-        # # 0) 
-        # if self.debug_mode and actions_dispatch_result.failed():
-        #     return self._debug_mode(actions_dispatch)
+        # 0) 
+        
 
         # 1)
         next_config = self.resolved_step.get("next")
@@ -101,6 +104,12 @@ class Step:
                 return {
                     "type": "goto",
                     "target": next_config[False]
+                }
+            
+            if self.debug_mode and not actions_dispatch_result.success:
+                return {
+                    "type": "debug",
+                    "target": None
                 }
             
             return {
@@ -134,7 +143,7 @@ class Step:
         while True:
             self.bot_app.logger.info("Step pausado...para modificar eloe, basta ir no endpoint de update. e atualizar os devidos parametros")
 
-            response = requests.get(f"http://host.docker.internal:8000/step-update/{self.name}")
+            response = requests.get(f"http://botui_api:8000/step-update/{self.name}")
             data = response.json()
             if data:
                 self.step_raw.update(data["parameters"])
@@ -146,4 +155,4 @@ class Step:
 
             time.sleep(1)
         
-        self.run(actions_dispatch)
+        return self.run(actions_dispatch)

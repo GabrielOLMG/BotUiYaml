@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from pathlib import Path
@@ -13,8 +14,11 @@ def run_bot_container(
     dir_name = Path(payload.pipeline_dir).name
     debug_flag = "--debug" if payload.debug else ""
 
-    init_cmd = ["docker", "run", "-d"]
-    if not debug_flag:
+
+    network = os.getenv("DOCKER_NETWORK", "botui_network")
+
+    init_cmd = ["docker", "run", "-d", "--network", network]
+    if not payload.debug:
         init_cmd.append("--rm")
     final_cmd = [
         "--name", container_name,
@@ -32,6 +36,8 @@ def run_bot_container(
         )
     ]
     cmd = init_cmd + final_cmd
+    print(cmd)
+    
 
     result = subprocess.run(cmd, capture_output=True, text=True)
 

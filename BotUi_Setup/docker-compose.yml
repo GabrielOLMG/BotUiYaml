@@ -1,16 +1,17 @@
-version: "3.9"
-
 services:
   api:
-    build:
-      context: ..
-      dockerfile: BotUi_Setup/Dockerfile.api
-
+    image: botui-api  
+    container_name: botui_api
     ports:
       - "8000:8000"
-
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
+    networks:
+      - botui_network
     environment:
       - BOTUI_ENV=dev
+      - DOCKER_NETWORK=botui_network
+    
+networks:
+  botui_network:
+    name: botui_network

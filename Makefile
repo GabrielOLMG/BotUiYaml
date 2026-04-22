@@ -63,10 +63,7 @@ run-api:
 	@echo "======================================"
 	@echo "🚀 Starting BotUI API..."
 	@echo "======================================"
-	docker run --rm --name botui_api\
-		-p 8000:8000 \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		$(API_IMAGE)
+	docker compose -f BotUi_Setup/docker-compose.yml up -d
 
 # ==========================================
 # 🧪 RUN BOT (manual debug)
@@ -101,13 +98,13 @@ clean-botui:
 	-docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
 
 	@echo "Removing images..."
-	-docker images -q "botui*" | xargs -r docker rmi -f
+	-docker images | grep botui | awk '{print $$3}' | xargs -r docker rmi -f
 
 	@echo "Removing volumes..."
 	-docker volume ls -q | grep botui | xargs -r docker volume rm
 
-# 	@echo "System prune..."
-# 	docker system prune -f
+	@echo "Removing network (if exists)..."
+	-docker network ls -q --filter "name=botui" | xargs -r docker network rm
 
 	@echo "BotUi cleanup done!"
 
