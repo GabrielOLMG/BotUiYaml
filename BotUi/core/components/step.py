@@ -9,14 +9,12 @@ from BotUi.utils.utils import resolve_variables
 
 @dataclass
 class StepResult:
+    finished: bool
     success: bool
     next: str
     next_type: str
     message: Optional[str] = None
 
-
-    def failed(self) -> bool:
-        return not self.success
 
 
 
@@ -67,8 +65,9 @@ class Step:
         
         self.status = "FINISHED"
         step_result = StepResult(
-            message=f"[Step.run] {actions_dispatch_result.message}",
+            finished=actions_dispatch_result.finished,
             success=actions_dispatch_result.success,
+            message=f"[Step.run] {actions_dispatch_result.message}",
             next=post_action_result["target"],
             next_type=post_action_result["type"]
 
@@ -83,7 +82,7 @@ class Step:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
     def _post_action(self, actions_dispatch_result, actions_dispatch):
-        if actions_dispatch_result.failed():
+        if not actions_dispatch_result.success or not actions_dispatch_result.finished:
             self.bot_app.logger.error(
                     "[Step.run._post_action] %s | Step Info: %s",
                     actions_dispatch_result.message,
@@ -97,7 +96,7 @@ class Step:
         # 1)
         next_config = self.resolved_step.get("next")
 
-        if actions_dispatch_result.failed():
+        if not actions_dispatch_result.success:
             if next_config and False in next_config:
                 return {
                     "type": "goto",

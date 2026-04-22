@@ -1,13 +1,20 @@
-from BotUi.actions.abstracts.BaseAction import BaseAction
+from BotUi.actions.abstracts import BaseAction, BaseActionResult
 
 
 class KeySelectionsAction(BaseAction):
     def run(self):
         keys = self.step_info.get("keys")
         if not keys:
-            return False, "[KEYS_SELECTIONS] Nenhuma tecla fornecida"
+            return BaseActionResult(
+                        finished=False,
+                        success=False,
+                        message="[KeySelectionsAction.run] Nenhuma tecla fornecida"
+                    )
 
         executed, error = self.bot_driver.key_sequence(keys)
 
-        log_text = f"[KEYS_SELECTIONS] Erro na execução da sequência: {error}" if error else None
-        return executed, log_text
+        return BaseActionResult(
+                        finished=not error,
+                        success=executed,
+                        message=f"[KeySelectionsAction.run] Erro na execução da sequência: {error}" if error else None
+                    )

@@ -15,11 +15,9 @@ from BotUi.actions.DoWhileAction import DoWhileAction
 
 @dataclass
 class BotActionDispatcherResult:
+    finished: bool
     success: bool
     message: Optional[str] = None
-
-    def failed(self) -> bool:
-        return not self.success
 
 class BotActionDispatcher:
     ACTION_MAP = {
@@ -44,6 +42,7 @@ class BotActionDispatcher:
 
         if not action_class:
             return BotActionDispatcherResult(
+                finished=False,
                 success=False,
                 message="[BotActionDispatcher.dispatch] Action not implemented"
             )
@@ -57,21 +56,24 @@ class BotActionDispatcher:
         )
 
         # Executa a ação
-        task_completed, log_text =  action_instance.run()
+        action_result =  action_instance.run()
 
-        if log_text is not None and not task_completed: # TODO: Garantir que esta funcional com 'and'
+        if not action_result.finished:
             return BotActionDispatcherResult(
+                finished=False,
                 success=False,
-                message=f"[BotActionDispatcher.dispatch] {log_text}"
+                message=f"[BotActionDispatcher.dispatch] {action_result.message}"
             )
         
         # Global Actions
         self._apply_global_step_behavior(step_info)
 
         return BotActionDispatcherResult(
-                success=task_completed,
-                message=f"[BotActionDispatcher.dispatch] {log_text}"
+                finished=True,
+                success=action_result.success,
+                message=f"[BotActionDispatcher.dispatch] {action_result.message}" if action_result.message else None
             )
+    
     
     def _apply_global_step_behavior(self, step_info):
         if step_info.get("refresh"):

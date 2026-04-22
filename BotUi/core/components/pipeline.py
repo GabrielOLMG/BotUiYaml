@@ -126,7 +126,7 @@ class Pipeline:
 
             step_result = step.run(actions_dispatch)
 
-            if step_result.failed():
+            if not step_result.finished:
                 success = False
                 message = step_result.message
                 break
