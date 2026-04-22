@@ -140,7 +140,7 @@ class BotTargetLocator:
     # def _debug(self, debug_image = None):
     def _debug(self, target_result):
         if not self.debug:
-            return None 
+            return target_result 
         
         if target_result.debug_json is not None:
             target_result.debug_json_path = os.path.join(self.debug_folder, "debug.json")
