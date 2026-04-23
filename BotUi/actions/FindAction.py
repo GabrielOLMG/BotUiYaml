@@ -1,39 +1,74 @@
 from BotUi.actions.abstracts import BaseAction, BaseActionResult
 from BotUi.finders.BotTargetLocator import BotTargetLocator
-from BotUi.config.BotConstants import ScrollConstants
+from BotUi.config.BotConstants import ScrollConstants, FindConstants
 
 
 
 class FindAction(BaseAction):
     def __init__(self, bot_driver, bot_app, step_info):
         super().__init__(bot_driver, bot_app, step_info)
-        self.scroll_attempt = 0
-        self.find_retry_attempts = 0
+        self.attempts_to_find = 0
 
     def run(self):
         # 1)
         object_type = self.step_info.get("object_type")
+        scroll_enabled = self.step_info.get("scroll", False)
 
-        # 2) 
-        target_result = self._execute_find(object_type)
-        if target_result.error:
-            return BaseActionResult(
+        # 2)
+        attempts = 0
+        max_attempts = FindConstants.MAX_ATTEMPTS if scroll_enabled else 1
+
+        while attempts < max_attempts:
+
+            target_result = self._find_target(object_type)
+            if target_result.error:
+                return BaseActionResult(
+                        finished=False,
+                        success=False,
+                        message=f"[FindAction.run] {target_result.log_message}"
+                    )
+
+            success = self._evaluate_target_result(target_result)
+
+            # -------- FOUND -----------
+            if success:
+                error = self._apply_on_found(target_result)
+                if error:
+                    return BaseActionResult(
+                            finished=False,
+                            success=False,
+                            message=f"[FindAction.run] {error}"
+                        )
+                return BaseActionResult(
+                            finished=True,
+                            success=True,
+                            message=None
+                        )
+            
+            # -------- NOT FOUND --------
+            if not scroll_enabled:
+                break
+            
+            scrolled, error = self._scroll_page(self.step_info)
+            if not scrolled:
+                return BaseActionResult(
                     finished=False,
                     success=False,
-                    message=f"[FindAction.run] {target_result.log_message}"
+                    message=f"[FindAction.run] {error}"
                 )
 
-        # 3)    
-        result, log, error = self._evaluate(target_result)
-        
+            if not self._check_if_scrolled():
+                break
+
+            self.attempts_to_find += 1
+
         return BaseActionResult(
-                    finished=not error,
-                    success=result,
-                    message=f"[FindAction.run] {log}" if log else None
-                )
+            finished=True,
+            success=False,
+            message="[FindAction.run] Object not found"
+        )
     
-
-    def _execute_find(self, object_type):
+    def _find_target(self, object_type):
         # 1)
         screenshot_path, _ = self.capture()
 
@@ -79,84 +114,73 @@ class FindAction(BaseAction):
             })
         return target_result
     
-    
-    # ----------------------
-    # Consequências
-    # ----------------------
-    def _evaluate(self, target_result):
-        # TODO: Aqui vou poder fazer os operadores , se count eq/gt... ou exit
+    def _evaluate_target_result(self, target_result):
+        # {"type": "count", "op": "gt","value": 2}
+        # {"type": "exists", "value": True} # Default!!
+        operator = self.step_info.get("operator", {"type": "exists", "value": True}) # Ainda nao existe, mas preparando para quando existir!
+        op_type = operator.get("type")
 
-        if target_result.found: # step_info.get('operator').get('type') == exist $ PADRAO!
-            result, log, error = self._if_find(self.step_info, object_coord=target_result.center)
-        elif not target_result.found: # step_info.get('operator').get('type') == not_exist
-            result, log, error = self.if_not_find(self.step_info)
+        if op_type == "exists":
+            return target_result.found == operator.get("value", True)
+        elif op_type == "count":
+            count = len(target_result.matches)
+            op = operator.get("op", "eq")
+            value = operator.get("value", 1)
 
-        return result, log, error
+            if op == "gt":
+                return count > value
+            if op == "eq":
+                return count == value
+        else:
+            raise ValueError("Operator Type does not exist.")
+        
+    def _apply_on_found(self, target_result):
+        object_coord = target_result.center
+        save_as = self.step_info.get("save_as")
 
-    def _if_find(self, step, object_coord):
-        # 1)
-        save_as = step.get("save_as")
-        if save_as:
+
+        # 1. save
+        if save_as and object_coord:
             self.set_var(save_as, [float(object_coord[0]), float(object_coord[1])])
 
-        # 2)
-        click_enabled = step.get("click", False)
-        if click_enabled and object_coord:
-            success, log_result = self.bot_driver.click(object_coord)
+        # 2. click
+        if self.step_info.get("click", False) and object_coord:
+            success, error = self.bot_driver.click(object_coord)
             if not success:
-                return False, f"[FindAction._if_find] Falha ao clicar no objeto: {log_result}", True
-        
-        return True, None, False
+                return f"[FindAction._apply_on_found] Failed to execute the drive click action: {error}"
 
-    def if_not_find(self, step):
-        scroll_enabled = step.get("scroll", False)
-        scroll_direction = step.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
+        return None
+    
+    def _scroll_page(self, step_info):
+        scroll_direction = step_info.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
 
-        # Scroll?
-        if scroll_enabled and self.scroll_attempt < ScrollConstants.MAX_ATTEMPTS:
-            scrolled, error = self._scroll_page(step, scroll_direction)
-            if not scrolled:
-                return False, f"[FindAction.if_not_find] Erro no scroll: {error}", True
-            if not self._check_if_scrolled():
-                self.scroll_attempt = ScrollConstants.MAX_ATTEMPTS + 1
+        # --- Aplica Log ---
+        self.get_logger().debug(
+            f"[FindAction._scroll_page] Using scroll(Direction: {scroll_direction}) to locate the object "
+            f"({self.attempts_to_find}/{ScrollConstants.MAX_ATTEMPTS})..."
+        )
 
-            return self.run()
-                
-        return False, "[FindAction.if_not_find] Objeto não encontrado", False
+        scroll_coord = [500, 500] # TODO: ajustar se for dinâmico
 
-    # ----------------------
-    # Scroll Actions # TODO: Criar um manager para scroll(?)
-    # ----------------------
-    def _scroll_page(self, step, scroll_direction): # TODO: ESTA FIXO O VALOR, ALTERAR!
-        try: 
-            # --- Aplica Log ---
-            self.get_logger().debug(
-                f"🔄 Scrolling para localizar o objeto "
-                f"({self.scroll_attempt}/{ScrollConstants.MAX_ATTEMPTS})..."
-            )
-            # --- Atualiza A Tentativa ---
-            self.scroll_attempt += 1
-            
-            scroll_coord = [500, 500] # TODO: ajustar se for dinâmico
+        # --- Aplica o Scroll ---
+        success, error = self.bot_driver.scroll(
+            direction=scroll_direction,
+            delta_y=ScrollConstants.DISTANCE,
+            coord=scroll_coord,
+        )
+        if not success:
+                return f"[FindAction._scroll_page] Failed to execute the drive scroll action: {error}"
 
-            
-            # --- Aplica o Scroll ---
-            self.bot_driver.scroll(
-                direction=scroll_direction,
-                delta_y=ScrollConstants.DISTANCE,
-                coord=scroll_coord,
-            )
-            return True, None
-        except Exception as err:
-            return False, f"[FindAction._scroll_page] Erro ao fazer scroll: {err}"
+        return True, None
 
-        
     def _check_if_scrolled(self):
         try:
             self.capture()
             if not self.bot_app.media_manager.has_page_changed():
-                self.get_logger().warning("[FindAction._check_if_scrolled] Tela não mudou após scroll")
+                self.get_logger().warning("[FindAction._check_if_scrolled] The screen did not change when scrolling was applied; scrolling action ended.")
                 return False
             return True
         except Exception as e:
             return False
+
+

@@ -96,14 +96,20 @@ class PlaywrightDriver(BotDriver):
             return False, f"[PlaywrightDriver.write] {e}"
             
     def scroll(self, direction: str, delta_x: int=0, delta_y: int=100, coord: tuple=None):
-        if coord is not None:
-            x, y = coord
-            self.page.mouse.move(x, y)
+        try:
+            if coord is not None:
+                x, y = coord
+                self.page.mouse.move(x, y)
 
-        if direction == "UP":
-            delta_y *= -1
+            if direction == "UP":
+                delta_y *= -1
 
-        self.page.mouse.wheel(delta_x, delta_y)
+            self.page.mouse.wheel(delta_x, delta_y)
+            
+            return True, None
+        except Exception as e:
+            return False, f"[PlaywrightDriver.scroll] {e}"
+        
 
     def close(self):
         # 1️⃣ Tenta fechar o browser, se existir

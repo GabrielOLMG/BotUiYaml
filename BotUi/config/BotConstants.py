@@ -1,3 +1,6 @@
+class FindConstants:
+    MAX_ATTEMPTS = 20
+
 class ScrollConstants:
     MAX_ATTEMPTS = 20
     DISTANCE = 500

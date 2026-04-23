@@ -44,6 +44,8 @@ class Step:
         self.name=self.step_raw.get("name")
         self.description = self.step_raw.get("helper")
 
+        self._id = None
+
 
 
 
@@ -61,8 +63,9 @@ class Step:
         actions_dispatch_result = actions_dispatch.dispatch(self.resolved_step)
         
         # 3)
-        post_action_result = self._post_action(actions_dispatch_result, actions_dispatch)
+        post_action_result = self._post_action(actions_dispatch_result)
 
+        # 4)
         if post_action_result["type"] == "debug":
             return self._debug_mode(actions_dispatch)
 
@@ -80,24 +83,25 @@ class Step:
         return step_result
     
     def _pre_action(self):
-        self.bot_app.logger.info(f"[ -- ] Starting Step: {self.name if self.name else 'Unnamed'}")
+        if self.name:
+            self.bot_app.logger.info(f"[ -- ] Initializing step with name: {self.name} - internal ID: {self._id}")
+        else:
+            self.bot_app.logger.info(f"[ -- ] Initializing a step without a name, but with an internal ID: {self._id}")
+
             
         if self.description:
             self.bot_app.logger.info("[ -- ] Step: %s", self.description)
 
-    def _post_action(self, actions_dispatch_result, actions_dispatch):
-        if not actions_dispatch_result.success or not actions_dispatch_result.finished:
-            self.bot_app.logger.error(
-                    "[Step.run._post_action] %s | Step Info: %s",
-                    actions_dispatch_result.message,
-                    self.resolved_step
-                )
-        
-        # 0) 
-        
+    def _post_action(self, actions_dispatch_result):
+        next_config = self.resolved_step.get("next")
+        text = f"[Step.run._post_action] {actions_dispatch_result.message} | Step Info: {self.resolved_step}"
+
+        if not (actions_dispatch_result.finished or next_config or self.debug_mode):
+            self.bot_app.logger.error(text)
+        elif not actions_dispatch_result.success:
+            self.bot_app.logger.warning(text)
 
         # 1)
-        next_config = self.resolved_step.get("next")
 
         if not actions_dispatch_result.success:
             if next_config and False in next_config:
