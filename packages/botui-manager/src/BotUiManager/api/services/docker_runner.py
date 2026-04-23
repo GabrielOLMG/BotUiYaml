@@ -3,7 +3,7 @@ import subprocess
 
 from pathlib import Path
 
-from BotUi.api.models import RunBotRequest
+from BotUiManager.api.models import RunBotRequest
 
 
 def run_bot_container(

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "BotUi"
 version = "0.1.0"
-description = "Bot UI Automation Framework"
+description = "Core automation engine"
 requires-python = ">=3.10"
 
 dependencies = [
@@ -18,13 +18,12 @@ dependencies = [
     "rapidocr-onnxruntime",
     "webdriver-manager",
     "ruamel.yaml",
-    "fastapi",
-    "uvicorn",
     "typer"
 ]
 
+
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 
 [project.scripts]
 run-bot = "BotUi.cli.run:app"

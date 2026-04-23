@@ -53,14 +53,14 @@ RUN apt-get update -y && apt-get install -y \
 RUN pip install --no-cache-dir playwright
 RUN playwright install chromium
 
-# ============================
-# Configuração da Aplicação
-# ============================
-
+# ================================
+# BotUi (ENGINE ONLY)
+# ================================
 WORKDIR /app
-COPY . /app
 
-RUN pip install --no-cache-dir -e .
+COPY packages/botui /app/packages/botui
+
+RUN pip install --no-cache-dir -e /app/packages/botui
 
 # ============================
 # Entrypoint e Execução

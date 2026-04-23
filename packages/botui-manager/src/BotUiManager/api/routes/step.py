@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from BotUi.api.models import StepPayload
+from BotUiManager.api.models import StepPayload
 
 router = APIRouter()
 
