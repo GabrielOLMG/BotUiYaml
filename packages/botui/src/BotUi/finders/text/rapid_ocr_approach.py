@@ -23,26 +23,32 @@ class OCRService:
 
 
 def extract_base_text_info(image):
-    results, _ = OCRService().get()(image)
+    ocr = OCRService().get()
+    ocr_output = ocr(image)
+
+    if not ocr_output:
+        return []
+
+    results, _ = ocr_output
+
+    if results is None:
+        return []
 
     final_results = []
 
     for box, text, score in results:
-        # Converte para numpy array
         pts = np.array(box, dtype=np.int32)
         x_min, y_min = pts[:, 0].min(), pts[:, 1].min()
         x_max, y_max = pts[:, 0].max(), pts[:, 1].max()
 
-        # Calcula o centro da bbox
         center_x = (x_min + x_max) / 2
         center_y = (y_min + y_max) / 2
-        center = [center_x, center_y]
 
         final_results.append({
             "text": text,
             "score": float(score),
             "box": box,
-            "center": center
+            "center": [center_x, center_y]
         })
 
     return final_results
@@ -124,13 +130,21 @@ def find_text_in_image_rapidocr(image_path, text_target, in_text=True, side=None
         for side_name, image in images_parts.items():
             try:
                 texts_extracted_data = extract_base_text_info(image)
+                
+                if not texts_extracted_data:
+                    continue
                 clean_data = [
                     {k: v for k, v in d.items() if k != "box"}
                     for d in texts_extracted_data
                 ]
                 dict_debug[side_name] = clean_data
             except Exception as e:
-                return BotTargetResult(error=True, log_message=f"Erro ao extrair texto da imagem ({side_name}): {e}")
+                import traceback
+                tb = traceback.format_exc()
+                return BotTargetResult(
+                    error=True,
+                    log_message=f"Erro ao extrair texto da imagem ({side_name}):\n{tb}"
+                )
 
             possibles = []
             for text_extracted_data in texts_extracted_data:
