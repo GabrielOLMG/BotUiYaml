@@ -1,33 +1,32 @@
 # ==========================================
-# 🧠 BotUI — Root Makefile
+# BotUI — Root Makefile (Monorepo)
 # ==========================================
 
 # Images
 BOT_IMAGE = botui
 API_IMAGE = botui-api
 
-# Dockerfiles (AGORA dentro de BotUi_Setup)
+# Dockerfiles
 BOT_DOCKERFILE = BotUi_Setup/Dockerfile.bot
 API_DOCKERFILE = BotUi_Setup/Dockerfile.api
 
-# Context (raiz do projeto)
+# Context (raiz do monorepo)
 CONTEXT = .
 
 # ==========================================
-# 🔨 Init All
+# SETUP (FULL START)
 # ==========================================
 setup:
 	@echo ""
 	@echo "======================================"
-	@echo "🏗️  Setup "
+	@echo "🏗️  Setup BotUI Monorepo"
 	@echo "======================================"
 	make build-bot && make build-api && make run-api
-	@echo "✅ All initialized!"
+	@echo "✅ System ready!"
 
 # ==========================================
-# 🔨 BUILD BOT IMAGE
+# BUILDs
 # ==========================================
-
 build-bot:
 	@echo ""
 	@echo "======================================"
@@ -38,10 +37,6 @@ build-bot:
 		-f $(BOT_DOCKERFILE) \
 		$(CONTEXT)
 	@echo "✅ Bot image built!"
-
-# ==========================================
-# 🔨 BUILD API IMAGE
-# ==========================================
 
 build-api:
 	@echo ""
@@ -55,69 +50,70 @@ build-api:
 	@echo "✅ API image built!"
 
 # ==========================================
-# 🚀 RUN API
+# 🚀 RUNs
 # ==========================================
-
 run-api:
 	@echo ""
 	@echo "======================================"
 	@echo "🚀 Starting BotUI API..."
 	@echo "======================================"
-	docker compose -f BotUi_Setup/docker-compose.yml up -d
+	docker compose up -d
+	@echo "✅ API running at http://localhost:8000"
+
 
 # ==========================================
-# 🧪 RUN BOT (manual debug)
+# CLEAN
 # ==========================================
-
-PATH_RUN = BotUi_Examples/run.py
-
-run-bot:
-	@echo ""
-	@echo "======================================"
-	@echo "🚀 Running BOT container (manual test)"
-	@echo "======================================"
-	docker run --rm \
-		-v $(PWD)/BotUi_Examples:/app/BotUi_Examples \
-		$(BOT_IMAGE) \
-		python $(PATH_RUN)
-
-# ==========================================
-# 🧹 CLEAN
-# ==========================================
-
 clean-botui:
 	@echo ""
 	@echo "======================================"
-	@echo "🧹 Cleaning ALL BotUi Docker resources..."
+	@echo "🧹 Cleaning BotUI system..."
 	@echo "======================================"
 
-	@echo "Stopping containers..."
 	-docker ps -q --filter "name=botui" | xargs -r docker stop
-
-	@echo "Removing containers..."
 	-docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
-
-	@echo "Removing images..."
 	-docker images | grep botui | awk '{print $$3}' | xargs -r docker rmi -f
-
-	@echo "Removing volumes..."
 	-docker volume ls -q | grep botui | xargs -r docker volume rm
-
-	@echo "Removing network (if exists)..."
 	-docker network ls -q --filter "name=botui" | xargs -r docker network rm
 
-	@echo "BotUi cleanup done!"
+	@echo "✅ Clean complete!"
 
 stop-botui:
-	@echo ""
-	@echo "======================================"
-	@echo "🧹 Stop all botui containers..."
-	@echo "======================================"
+	@echo "🛑 Stopping all BotUI containers..."
 	docker ps -q --filter "name=botui" | xargs -r docker stop
+	@echo "✅ Stopped."
 
-rm-botui:
+kill-botui:
+	@echo "💀 Killing all BotUI containers..."
+	docker ps -q --filter "name=botui" | xargs -r docker kill
+	@echo "✅ Killed."
+
+# ==========================================
+# JOBs
+# ==========================================
+# make spawn-job \
+#   PIPELINE_DIR=/tmp/teste \
+#   BOT_RELATIVE_PATH=bot.yaml \
+#   GLOBALS_RELATIVE_PATH=vars.yaml \
+#   DEBUG=true
+
+PIPELINE_DIR ?= /Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_teste
+BOT_RELATIVE_PATH ?= bot_yaml.yaml
+GLOBALS_RELATIVE_PATH ?= bot_variables.yaml
+DEBUG ?= false
+
+spawn-job:
 	@echo ""
 	@echo "======================================"
-	@echo "🧹 Prune all botui containers..."
+	@echo "🚀 Spawning BotUI job..."
 	@echo "======================================"
-	docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
+	@echo "Pipeline: $(PIPELINE_DIR)"
+	@echo "Bot: $(BOT_RELATIVE_PATH)"
+	@echo "Globals: $(GLOBALS_RELATIVE_PATH)"
+	@echo "Debug: $(DEBUG)"
+	@echo "======================================"
+
+	curl -X POST http://localhost:8000/jobs/run \
+		-H "accept: application/json" \
+		-H "Content-Type: application/json" \
+		-d "{\"pipeline_dir\": \"$(PIPELINE_DIR)\", \"bot_relative_path\": \"$(BOT_RELATIVE_PATH)\", \"globals_relative_path\": \"$(GLOBALS_RELATIVE_PATH)\", \"debug\": $(DEBUG)}"
