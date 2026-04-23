@@ -7,6 +7,10 @@ class BotDriver(ABC):
     # Actions
     # ---------------------- #
     @abstractmethod
+    def init(self):
+        pass
+
+    @abstractmethod
     def goto(self, url: str, wait_time: float):
         pass
 

@@ -1,21 +1,29 @@
 import numpy as np
 import cv2 
 
-from rapidocr_onnxruntime import RapidOCR
 from BotUi.finders.BotTargetResult import BotTargetResult
 
-rapid_ocr = RapidOCR(
-    det_limit_side_len=960,  # mais parecido com o Spaces
-    box_thresh=0.6,
-    unclip_ratio=1.6,
-    text_score=0.5,
-    use_dilation=True,       # MUITO IMPORTANTE p/ colar caixas pequenas
-    #rec_img_shape=[3, 48, 320]
-)
+class OCRService:
+    def __init__(self):
+        self._ocr = None
+
+    def get(self):
+        if self._ocr is None:
+            from rapidocr_onnxruntime import RapidOCR
+
+            self._ocr = RapidOCR(
+                det_limit_side_len=960, # mais parecido com o Spaces
+                box_thresh=0.6,
+                unclip_ratio=1.6,
+                text_score=0.5,
+                use_dilation=True, # MUITO IMPORTANTE p/ colar caixas pequenas
+            )
+        return self._ocr
+
 
 
 def extract_base_text_info(image):
-    results, _ = rapid_ocr(image)
+    results, _ = OCRService().get()(image)
 
     final_results = []
 

@@ -14,8 +14,22 @@ from BotUi.config.BotConstants import MODIFIER_KEYS, PW_KEYS
 class PlaywrightDriver(BotDriver):
 
     def __init__(self, viewport=(1920, 1080), headless=False):
+        # config básica
+        self.viewport = viewport
         self.headless = headless
+
+        # lazy state (NÃO inicia nada aqui)
+        self.pw = None
+        self.browser = None
+        self.context = None
+        self.page = None
+
+    def init(self):
+        if self.browser is not None:
+            return  # já iniciado
+
         self.pw = sync_playwright().start()
+
         self.browser = self.pw.chromium.launch(
             headless=self.headless,
             args=[
@@ -24,15 +38,20 @@ class PlaywrightDriver(BotDriver):
                 "--disable-dev-shm-usage",
             ]
         )
+
         self.context = self.browser.new_context(
-            viewport={"width": viewport[0], "height": viewport[1]}
+            viewport={
+                "width": self.viewport[0],
+                "height": self.viewport[1]
+            }
         )
+
         self.page = self.context.new_page()
-    
+
     # ---------------------- #
     # Actions
     # ---------------------- #
-    def goto(self, url: str, wait_time: float = 5.0):
+    def goto(self, url: str, wait_time: float = 3.0):
         try:
             self.page.goto(url, wait_until="networkidle")
             time.sleep(wait_time)

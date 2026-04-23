@@ -73,6 +73,9 @@ class Pipeline:
     def _pre_step(self):
         self.bot_app.logger.info(f"[ - ] Starting Pipeline: {self.name}")
         
+        # 0) 
+        self.bot_driver.init()
+
         # 1)
         if self.url and not self._start_url():
             return False
