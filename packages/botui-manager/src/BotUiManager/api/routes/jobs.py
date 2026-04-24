@@ -11,7 +11,8 @@ router = APIRouter()
 
 @router.post(
     path="/jobs/run",
-    response_model=RunBotResponse
+    response_model=RunBotResponse,
+    tags=["jobs"]
 )
 def run_job(payload: RunBotRequest):
     job_id = str(uuid.uuid4())

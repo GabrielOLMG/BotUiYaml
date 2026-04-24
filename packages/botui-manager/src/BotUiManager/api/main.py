@@ -1,7 +1,11 @@
 from fastapi import FastAPI
-from BotUiManager.api.routes.debug import router as debug_router
+
+
 from BotUiManager.api.routes.jobs import router as jobs_router
 from BotUiManager.api.routes.step import router as step_router
+from BotUiManager.api.routes.vision import router as vision_router
+from BotUiManager.api.routes.actions.find import router as find_router
+
 
 app = FastAPI(
     title="FastApi BotUi",
@@ -10,6 +14,9 @@ app = FastAPI(
 
 app.include_router(jobs_router)
 app.include_router(step_router)
+app.include_router(find_router)
+app.include_router(vision_router)
 
 
-# app.include_router(debug_router, prefix="/debug")
+
+
