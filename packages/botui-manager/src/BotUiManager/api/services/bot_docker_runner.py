@@ -27,7 +27,7 @@ def run_bot_container(
         "sh", "-c",
         (   
             f"mkdir -p /app/{dir_name}/outputs/logs && "
-            f"run-bot "
+            f"run-bot start-bot "
             f"--pipeline /app/{dir_name} "
             f"--bot {payload.bot_relative_path} "
             f"--bot-variables {payload.globals_relative_path or ''} "

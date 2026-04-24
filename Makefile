@@ -62,6 +62,18 @@ run-api:
 
 
 # ==========================================
+# DEBUG
+# ==========================================
+MOUNT_DEBUG ?= "/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_debug"
+
+debug-botui-container:
+	@echo ""
+	@echo "======================================"
+	@echo "🚀 Creating debug container for botui"
+	@echo "======================================"
+	docker run -it --rm -v $(MOUNT_DEBUG):/app/debug --name debug $(BOT_IMAGE) bash
+
+# ==========================================
 # CLEAN
 # ==========================================
 clean-botui:

@@ -1,10 +1,23 @@
 from pydantic import BaseModel, Field, model_validator
 
 class OCRPayload(BaseModel):
-    debug: bool = Field(
-        default=False,
+    image_path: str = Field(
+        ...,
+        description="absolute path to image"
     )
+
+    # text_target: str = Field(
+    #     description="Text to try to locate in the image"
+    # )
+
+    # side: str = Field(
+    #     description=""
+    # )
     
+    # position: str = Field(
+    #     defult=0,
+    #     description=""
+    # )
 class OCRResult(BaseModel):
     name: str = Field(
         ...,
@@ -13,8 +26,10 @@ class OCRResult(BaseModel):
 
 
 class TemplateMatchPayload(BaseModel):
-    debug: bool = Field(
-        default=False,
+    image_path: bool = Field(
+        ...,
+        description="absolute path to image"
+
     )
     
 class TemplateMatchResult(BaseModel):

@@ -1,3 +1,4 @@
+import json
 import typer
 from pathlib import Path
 
@@ -7,7 +8,7 @@ app = typer.Typer()
 
 
 @app.command()
-def run(
+def start_bot(
     pipeline: str = typer.Option(...),
     bot: str = typer.Option(...),
     bot_variables: str | None = typer.Option(None),
@@ -42,6 +43,27 @@ def run(
     )
 
     bot_ui.run()
+
+@app.command()
+def ocr_test(image_path: str):
+    try: 
+        from BotUi.finders.text.rapid_ocr_approach import extract_base_text_info
+        import cv2
+        original_image = cv2.imread(image_path)
+        data = extract_base_text_info(original_image)
+        output = {
+            "success": True,
+            "result": data,
+            "error": None
+        }
+    except Exception as err:
+        output = {
+            "success": False,
+            "result": None,
+            "error": str(err)
+        }
+
+    typer.echo(json.dumps(output))
 
 
 if __name__ == "__main__":

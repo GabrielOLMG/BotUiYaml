@@ -16,6 +16,7 @@ services:
     environment:
       - BOTUI_ENV=dev
       - DOCKER_NETWORK=botui_network
+      - BOTUI_IMAGE=botui
 
 networks:
   botui_network:
