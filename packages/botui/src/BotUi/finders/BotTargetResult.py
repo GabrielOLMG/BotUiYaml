@@ -3,6 +3,7 @@ class BotTargetResult:
         self,
         error: bool,
         
+        target_type: str= None,
         found: bool=False,
         center=None,
 
@@ -11,11 +12,13 @@ class BotTargetResult:
         debug_image_path=None,
         debug_json:dict=None,
         debug_json_path:dict=None,
-
+        
         log_message: str = "",
     ):
         self.error = error
         self.log_message = log_message
+        self.target_type = target_type
+
 
 
         self.center = center
