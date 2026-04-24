@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 
 from BotUiManager.api.models import RunBotRequest, RunBotResponse
-from BotUiManager.api.services.docker_runner import run_bot_container
+from BotUiManager.api.services.bot_docker_runner import run_bot_container
 
 router = APIRouter()
 
