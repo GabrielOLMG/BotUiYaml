@@ -71,7 +71,7 @@ debug-botui-container:
 	@echo "======================================"
 	@echo "🚀 Creating debug container for botui"
 	@echo "======================================"
-	docker run -it --rm -v $(MOUNT_DEBUG):/app/debug --name debug $(BOT_IMAGE) bash
+	docker run -it --rm -v $(MOUNT_DEBUG):/app/data --name debug $(BOT_IMAGE) bash -c "cd /app/data && exec bash"
 
 # ==========================================
 # CLEAN

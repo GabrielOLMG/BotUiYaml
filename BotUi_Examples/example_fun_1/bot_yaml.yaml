@@ -7,6 +7,7 @@ pipelines:
         object_type: TEXT
         text: "Consent"
         click: True
+        # debug: True
         next:
           true: 2
           false: 2
@@ -20,19 +21,25 @@ pipelines:
       - action: FIND
         object_type: TEXT
         text: "Username"
+        helper: Procura user
         y_coord: 2
         click: True
       - action: WRITE
         text: $USERNAME
+        helper: Escreve user
+
       - action: KEYS_SELECTIONS
         keys:
           - ENTER
+        helper: Enter
+        
       - action: FIND
         name: 6
         object_type: TEXT
         text: "Password"
         y_coord: 2
         click: True
+        helper: Procura Pass
         next:
           true: 7
           false: 6
@@ -59,7 +66,6 @@ pipelines:
         text: "Turn"
         in_text: true
         click: true
-        debug: true
         next:
           true: end
           false: 10
@@ -88,7 +94,7 @@ pipelines:
         object_type: TEXT
         text: "Battle!"
         click: true
-        wait: 5 # TODO: fazer um next automatico aq
+        
 
 
       # PIPILINE AQ
@@ -105,7 +111,6 @@ pipelines:
         text: "Forfeit"
         in_text: False
         click: true
-        debug: true
 
 
 

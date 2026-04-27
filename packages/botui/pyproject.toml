@@ -18,7 +18,10 @@ dependencies = [
     "rapidocr-onnxruntime",
     "webdriver-manager",
     "ruamel.yaml",
-    "typer"
+    "typer",
+    # Teste,
+    "paddleocr",
+    "paddlepaddle"
 ]
 
 
