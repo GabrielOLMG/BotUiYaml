@@ -7,6 +7,22 @@ from BotUiManager.api.models import OCRPayload, TemplateMatchPayload, OCRResult
 
 router = APIRouter()
 
+def remove_box_from_output(data: dict) -> dict:
+    import copy
+    data = copy.deepcopy(data)
+
+    debug_json = data.get("result", {}).get("debug_json", {})
+
+    for region, items in debug_json.items():
+        for item in items:
+            item.pop("box", None)  # remove "box" se existir
+            item.pop("score", None)  # remove "box" se existir
+            item.pop("center", None)  # remove "box" se existir
+
+
+    return data
+
+
 @router.post("/vision/ocr", tags=["vision"])
 def ocr_simulate(payload: OCRPayload):
     job_id = str(uuid.uuid4())
@@ -15,13 +31,8 @@ def ocr_simulate(payload: OCRPayload):
     if not result["success"]:
         return result
     
-    data = result["result"]
-    clean_data = [
-        {k: v for k, v in d.items() if k not in ['box', 'score']}
-        for d in data
-    ]
-    result["result"] = clean_data
-
+    result = remove_box_from_output(result)
+    
     return result
 
 

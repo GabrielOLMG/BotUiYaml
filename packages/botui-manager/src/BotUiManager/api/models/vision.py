@@ -6,9 +6,10 @@ class OCRPayload(BaseModel):
         description="absolute path to image"
     )
 
-    # text_target: str = Field(
-    #     description="Text to try to locate in the image"
-    # )
+    text_target: str = Field(
+        default= None, 
+        description="Text to try to locate in the image"
+    )
 
     # side: str = Field(
     #     description=""

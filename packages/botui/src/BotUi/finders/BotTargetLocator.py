@@ -68,14 +68,20 @@ class BotTargetLocator:
             position:int=0,
             side:str=None
         ):
-        from BotUi.finders.text import find_text_in_image_rapidocr
-        approaches_functions = [find_text_in_image_rapidocr]
+        from BotUi.finders.text.TextExtractor import TextExtractor
 
-        for approach_function in approaches_functions:
-            target_result  = approach_function(image_path=self.image_source_path, text_target=target_text, in_text=in_text, debug=debug, position=position, side=side)
+        models = ["rapid_ocr"]
+
+        external_settings = {
+            "position": position,
+            "in_text": in_text,
+        }
+        for model in models:
+            text_extractor = TextExtractor(model_type=model, **external_settings)
+            target_result = text_extractor.run(image_path=self.image_source_path, text_target=target_text)
             if target_result.found:
                 break
-        
+
         return target_result
     
     # ------------------------------------ #

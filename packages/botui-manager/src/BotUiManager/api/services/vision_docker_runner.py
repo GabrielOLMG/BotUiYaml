@@ -23,10 +23,11 @@ def run_bot_container_vision(
         "docker", "run", "--rm",
         "--network", network,
         "--name", container_name,
-        "-v", f"{parent}:/app/data/",
-        botui_image, # mudar para var global!
-        "run-bot", "ocr-test", f"/app/data/{Path(image_path).name}"
-
+        "-v", f"{parent}:/app/data/", # Mudar para Var Global!
+        botui_image, # Mudar para Var Global!
+        "run-bot", "ocr-test",
+        "--image-path", f"/app/data/{Path(image_path).name}",
+        "--text-target", payload.text_target
     ]
 
 

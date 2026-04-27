@@ -45,22 +45,29 @@ def start_bot(
     bot_ui.run()
 
 @app.command()
-def ocr_test(image_path: str):
+def ocr_test(
+    image_path: str = typer.Option(...),
+    text_target: str | None = typer.Option(None),
+):
     try: 
-        from BotUi.finders.text.rapid_ocr_approach import extract_base_text_info
-        import cv2
-        original_image = cv2.imread(image_path)
-        data = extract_base_text_info(original_image)
+        from BotUi.finders.text.TextExtractor import TextExtractor
+        
+        extractor = TextExtractor(save_debug_internal=False, columns_split=2, rows_split=2)
+
+        data = extractor.run(image_path, text_target)
+
         output = {
             "success": True,
-            "result": data,
+            "result": data.to_dict(),
             "error": None
         }
     except Exception as err:
+        import traceback
+        tb = traceback.format_exc()
         output = {
             "success": False,
             "result": None,
-            "error": str(err)
+            "error": f"{str(err)} -> {tb}"
         }
 
     typer.echo(json.dumps(output))

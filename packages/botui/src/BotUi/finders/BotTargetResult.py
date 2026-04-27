@@ -31,3 +31,15 @@ class BotTargetResult:
         self.debug_json_path = debug_json_path
 
 
+    def to_dict(self):
+        return {
+            "error": self.error,
+            "log_message": self.log_message,
+            "target_type": self.target_type,
+            "center": self.center,
+            "found": self.found,
+            "confidence": self.confidence,
+            "debug_image_path": self.debug_image_path,
+            "debug_json": self.debug_json,
+            "debug_json_path": self.debug_json_path,
+        }
