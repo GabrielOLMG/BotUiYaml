@@ -7,16 +7,18 @@ class RapidOCRService:
             from rapidocr_onnxruntime import RapidOCR
 
             cls._ocr = RapidOCR(
-                det_limit_side_len=960,
-                box_thresh=0.5,
-                unclip_ratio=1,      
+                det_limit_side_len=1500,
+                box_thresh=0.6,
+                unclip_ratio=1.6,      
                 use_dilation=False,    
+                det_db_score_mode="fast"
             )
         return cls._ocr
 
     @classmethod
     def run(cls, image):
         model = cls._get_model()
+
         output = model(image)
 
         if not output:
