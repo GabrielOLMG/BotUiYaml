@@ -156,7 +156,7 @@ class BotTargetLocator:
                 json.dump(target_result.debug_json, f, indent=4, ensure_ascii=False)
         
         if target_result.debug_image is not None:
-            if self.shift_coord:
+            if self.shift_coord and target_result.found:
                 target_result.debug_image = self.debug_mark_shift(target_result.debug_image)
             target_result.debug_image_path = os.path.join(self.debug_folder, "debug.png")
 

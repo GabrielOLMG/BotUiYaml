@@ -18,8 +18,8 @@ dependencies = [
     "rapidocr-onnxruntime",
     "webdriver-manager",
     "ruamel.yaml",
-    "typer"
-]
+    "typer",
+    ]
 
 
 [tool.setuptools.packages.find]

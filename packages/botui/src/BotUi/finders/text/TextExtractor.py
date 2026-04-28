@@ -2,7 +2,10 @@ import cv2
 import numpy as np
 
 from BotUi.finders.BotTargetResult import BotTargetResult
-from BotUi.finders.text.models.rapid_ocr import RapidOCRService
+
+
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 RED = (0, 0, 255)
 GREEN = (0, 255, 0)
@@ -24,6 +27,7 @@ class TextExtractor:
         self.target_result = BotTargetResult(found=False, error=False, target_type="TEXT")
 
         # -- Internal Settings -- #
+        self.overlap = 100
         self.save_debug_internal=save_debug_internal
         self.log_text = f"[TextExtractor.run [Text Model: {model_type}]"
 
@@ -46,7 +50,7 @@ class TextExtractor:
             tb = traceback.format_exc()
             self.target_result.error = True
             self.target_result.log_message = f"{str(err)} -> {tb}"
-            raise self.target_result
+            return self.target_result
 
     def _run(self, image_path, text_target):
         image = cv2.imread(image_path)
@@ -57,30 +61,29 @@ class TextExtractor:
  
 
         images_parts = self._process_image_parts(image)
-        self.target_result.debug_json = images_parts
+        self.target_result.debug_json = images_parts 
 
         if not text_target: # Crair uma image de debug aqui?
             self.target_result.text_target = f"No text to detect"
             return self.target_result
 
+        all_raw_results = []
+        for part_results in images_parts.values():
+            all_raw_results.extend(part_results)
 
-        parts_checked = {}
-        for part_name, results in images_parts.items(): 
-            checked = []
-            for result in results:
-                text_result = result["text"]
-                if (self.in_text and text_target in text_result) or (not self.in_text and text_target == text_result):
-                    checked.append(result)
-            parts_checked[part_name] = checked
-        
-        merged = self._merge_all_parts_results(parts_checked)
+        merged_results = self._deduplicate_results(all_raw_results)
+
+
+        final_candidates = []
+        for res in merged_results:
+            text_res = res["text"]
+            if (self.in_text and text_target in text_res) or (not self.in_text and text_target == text_res):
+                final_candidates.append(res)
+
+
         merged_sorted = sorted(
-            merged,
-            key=lambda c: (
-                c["center"][1],            # top → bottom
-                c["center"][0],            # left → right
-                -c.get("score", 0)         # segurança (evita crash)
-            )
+            final_candidates,
+            key=lambda c: (c["center"][1], c["center"][0])
         )
 
         # TODO: Poder mais de um tipo de debug?
@@ -110,32 +113,42 @@ class TextExtractor:
         """
             # Return: {FULL_IMAGE: [{'box':..., 'center':..., 'score':..., 'text':...}]...}
         """
-        image_parts = {}
-        if self.split_images:
-            image_parts = self._split_image(image)
-        image_parts["FULL_IMAGE"] = {
-            "image": image,
-            "offset": (0,0)
-        } 
-
+        image_parts = self._split_image(image) if self.split_images else {"FULL": {"image": image, "offset": (0,0)}} # TODO: Mudar split para ter uma sobreposicaos
         results = {}
-        for part_name, part_info in image_parts.items():
-            image = part_info["image"]
-            offset = part_info["offset"]
-            image_part_result = self._extract_single_image(image, offset)
-            results[part_name] = image_part_result
-        
+
+        self._init_model()
+        with ThreadPoolExecutor(max_workers=None) as executor:
+            # Mapeamos a tarefa para cada parte
+            future_to_part = {
+                executor.submit(self._extract_single_image, info["image"], info["offset"]): name 
+                for name, info in image_parts.items()
+            }
+            
+            for future in as_completed(future_to_part):
+                part_name = future_to_part[future]
+                try:
+                    results[part_name] = future.result()
+                except Exception as exc:
+                    print(f"Parte {part_name} gerou uma exceção: {exc}")
+                    results[part_name] = []
+
+
         return results
 
     def _extract_single_image(self, image, offset):
         """
             # Return: [{'box':..., 'center':..., 'score':..., 'text':...}, ...] 
         """
+
+        # h, w = image.shape[:2]
+        # image = cv2.resize(image, (w*2, h*2), interpolation=cv2.INTER_CUBIC)
+
         # 1) 
-        model_result = self._get_model_run(image)
+        model_result = self._run_model(image)
         if not model_result:
             return []
-        
+        # for item in model_result:
+        #     item["box"] = [[x / 2, y / 2] for x, y in item["box"]]
         # 1.5)
         self._check_model_result(model_result)
 
@@ -158,6 +171,35 @@ class TextExtractor:
 
         return model_result
     
+    # -----------------------
+    # Models functions
+    # -----------------------
+    def _init_model(self):
+        if self.model_type == "rapid_ocr":
+            from BotUi.finders.text.models.rapid_ocr import RapidOCRService
+            return RapidOCRService._get_model()
+        # elif self.model_type == "pp_ocrv4":
+        #     from BotUi.finders.text.models.pp_ocrv4 import PaddleOCRV4
+        #     return PaddleOCRV4._get_model()
+        # elif self.model_type == "easy_ocr":
+        #     from BotUi.finders.text.models.easy_ocr import EasyOCRService
+        #     return EasyOCRService._get_model()
+        else:
+            raise ValueError(f"Non-existent text model: {self.model_type}")
+    
+    def _run_model(self, image):
+        if self.model_type == "rapid_ocr":
+            from BotUi.finders.text.models.rapid_ocr import RapidOCRService
+            return RapidOCRService.run(image)
+        # elif self.model_type == "pp_ocrv4":
+        #     from BotUi.finders.text.models.pp_ocrv4 import PaddleOCRV4
+        #     return PaddleOCRV4.run(image)
+        # elif self.model_type == "easy_ocr":
+        #     from BotUi.finders.text.models.easy_ocr import EasyOCRService
+        #     return EasyOCRService.run(image)
+        else:
+            raise ValueError(f"Non-existent text model: {self.model_type}")
+
     # -----------------------
     # Helpers functions
     # -----------------------
@@ -184,12 +226,6 @@ class TextExtractor:
 
         return results_with_centers
     
-    def _get_model_run(self, image):
-        if self.model_type == "rapid_ocr":
-            return RapidOCRService().run(image)
-        else:
-            raise ValueError(f"Non-existent text model: {self.model_type}")
-    
     def _check_model_result(self, results):
         if not isinstance(results, list):
             raise TypeError(f"Expected list, got {type(results)}")
@@ -207,7 +243,8 @@ class TextExtractor:
 
             if not isinstance(item["score"], (int, float)):
                 raise TypeError(f"Item {i} has invalid score: {item}")
-    
+
+
     def _split_image(self, image):
         h, w = image.shape[:2]
         rows = self.rows_split
@@ -222,17 +259,26 @@ class TextExtractor:
             for c in range(cols):
                 y_start = r * h_step
                 y_end = (r + 1) * h_step if r < rows - 1 else h
-
                 x_start = c * w_step
                 x_end = (c + 1) * w_step if c < cols - 1 else w
 
+                y_start_ov = max(0, y_start - self.overlap)
+                y_end_ov = min(h, y_end + self.overlap)
+                x_start_ov = max(0, x_start - self.overlap)
+                x_end_ov = min(w, x_end + self.overlap)
+
                 parts[f"R{r}_C{c}"] = {
-                    "image": image[y_start:y_end, x_start:x_end],
-                    "offset": (x_start, y_start)
+                    "image": image[y_start_ov:y_end_ov, x_start_ov:x_end_ov],
+                    "offset": (x_start_ov, y_start_ov)
                 }
 
         return parts
     
+
+    # -----------------------
+    # Merge functions
+    # -----------------------
+
     def _merge_all_parts_results(self, result):
         all_results = []
 
@@ -241,39 +287,56 @@ class TextExtractor:
 
         return self._deduplicate_results(all_results)
 
+
+    def _calculate_iou(self, boxA, boxB):
+        # Transforma listas de pontos [[x,y], ...] em coordenadas x1, y1, x2, y2
+        boxA = np.array(boxA)
+        boxB = np.array(boxB)
+        
+        xA = max(boxA[:, 0].min(), boxB[:, 0].min())
+        yA = max(boxA[:, 1].min(), boxB[:, 1].min())
+        xB = min(boxA[:, 0].max(), boxB[:, 0].max())
+        yB = min(boxA[:, 1].max(), boxB[:, 1].max())
+
+        interArea = max(0, xB - xA) * max(0, yB - yA)
+        
+        boxAArea = (boxA[:, 0].max() - boxA[:, 0].min()) * (boxA[:, 1].max() - boxA[:, 1].min())
+        boxBArea = (boxB[:, 0].max() - boxB[:, 0].min()) * (boxB[:, 1].max() - boxB[:, 1].min())
+        
+        iou = interArea / float(boxAArea + boxBArea - interArea + 1e-6)
+        return iou
+
+    def _same_detection(self, a, b, iou_threshold=0.4):
+        # Se o texto for idêntico e as caixas se sobrepõem muito
+        if a["text"] == b["text"]:
+            return self._calculate_iou(a["box"], b["box"]) > iou_threshold
+        return False
+
     def _deduplicate_results(self, results):
+        if not results: return []
+        
+        # Ordena por score para garantir que manteremos o de maior confiança
+        results = sorted(results, key=lambda x: x["score"], reverse=True)
         merged = []
 
         for r in results:
-            found = False
-
-            for i, m in enumerate(merged):
+            is_duplicate = False
+            for m in merged:
                 if self._same_detection(r, m):
-                    if r["score"] > m["score"]:
-                        merged[i] = r
-                    found = True
+                    is_duplicate = True
                     break
-
-            if not found:
+            if not is_duplicate:
                 merged.append(r)
-
         return merged
-
-    def _same_detection(self, a, b, dist=10): # TODO: Substituir por IOU da bbox!
-        return (
-            a["text"] == b["text"] and
-            abs(a["center"][0] - b["center"][0]) < dist and
-            abs(a["center"][1] - b["center"][1]) < dist
-        )
     
     # -----------------------
     # Debug functions
     # -----------------------
 
     def debug(self, image, texts_info):
-        image_cp = image.copy()
+        image_debug = image.copy()
 
-        image_debug = self._draw_grid(image_cp)
+        image_debug = self._draw_grid(image_debug)
 
         image_debug = self._get_bbox_texts(image_debug, texts_info)
 
@@ -284,43 +347,48 @@ class TextExtractor:
 
         return image_debug
 
-
-    def _draw_grid(self, image, thickness=2):
+    def _draw_grid(self, image, thickness=1):
         h, w = image.shape[:2]
         rows = self.rows_split
         cols = self.columns_split
 
-        row_height = h / rows
-        col_width = w / cols
+        h_step = h // rows
+        w_step = w // cols
 
         for i in range(1, rows):
-            y = int(i * row_height)
+            y = int(i * h_step)
             cv2.line(image, (0, y), (w, y), RED, thickness)
-
         for j in range(1, cols):
-            x = int(j * col_width)
+            x = int(j * w_step)
             cv2.line(image, (x, 0), (x, h), RED, thickness)
 
-        for i in range(rows):
-            for j in range(cols):
-                x = int(j * col_width + 10) 
-                y = int(i * row_height + 30)
+        for r in range(rows):
+            for c in range(cols):
+                y_start = r * h_step
+                y_end = (r + 1) * h_step if r < rows - 1 else h
+                x_start = c * w_step
+                x_end = (c + 1) * w_step if c < cols - 1 else w
 
-                label = f"R{i}_C{j}"
+                y_start_ov = max(0, y_start - self.overlap)
+                y_end_ov = min(h, y_end + self.overlap)
+                x_start_ov = max(0, x_start - self.overlap)
+                x_end_ov = min(w, x_end + self.overlap)
 
+                cv2.rectangle(
+                    image, 
+                    (x_start_ov, y_start_ov), 
+                    (x_end_ov, y_end_ov), 
+                    BLUE, 
+                    1
+                )
+                
+                label = f"R{r}_C{c}"
                 cv2.putText(
-                    image,
-                    label,
-                    (x, y),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,
-                    RED,
-                    2,
-                    cv2.LINE_AA
+                    image, label, (x_start + 10, y_start + 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, RED, 1, cv2.LINE_AA
                 )
 
         return image
-
 
     def _get_bbox_texts(self, image, texts_info):
         for index, text_info in enumerate(texts_info):

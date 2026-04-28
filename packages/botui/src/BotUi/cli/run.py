@@ -52,7 +52,7 @@ def ocr_test(
     try: 
         from BotUi.finders.text.TextExtractor import TextExtractor
         
-        extractor = TextExtractor(save_debug_internal=False, columns_split=2, rows_split=2)
+        extractor = TextExtractor(model_type="rapid_ocr", save_debug_internal=False)
 
         data = extractor.run(image_path, text_target)
 
