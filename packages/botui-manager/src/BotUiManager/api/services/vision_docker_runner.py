@@ -23,12 +23,14 @@ def run_bot_container_vision(
         "docker", "run", "--rm",
         "--network", network,
         "--name", container_name,
-        "-v", f"{parent}:/app/data/", # Mudar para Var Global!
-        botui_image, # Mudar para Var Global!
+        "-v", f"{parent}:/app/data/",
+        botui_image,
         "run-bot", "ocr-test",
-        "--image-path", f"/app/data/{Path(image_path).name}",
-        "--text-target", payload.text_target
+        "--image-path", f"/app/data/{Path(image_path).name}"
     ]
+
+    if payload.text_target:
+        cmd.extend(["--text-target", payload.text_target])
 
 
     result_process = subprocess.run(cmd, capture_output=True, text=True)

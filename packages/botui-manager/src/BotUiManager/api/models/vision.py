@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
 class OCRPayload(BaseModel):
@@ -6,8 +7,8 @@ class OCRPayload(BaseModel):
         description="absolute path to image"
     )
 
-    text_target: str = Field(
-        default= None, 
+    text_target: Optional[str] = Field(
+        None, 
         description="Text to try to locate in the image"
     )
 

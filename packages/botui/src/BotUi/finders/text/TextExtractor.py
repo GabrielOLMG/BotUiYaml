@@ -57,57 +57,47 @@ class TextExtractor:
             return self.target_result
 
     def _run(self, image_path, text_target):
+        # 0) Init
         image = cv2.imread(image_path)
         if image is None:
             self.target_result.error = True
             self.target_result.log_message = f"{self.log_text} Failed to open image: cv2.imread('{image_path}')"
             return self.target_result
  
-
+        # 1) Detect Text for each image part
         images_parts = self._process_image_parts(image)
         self.target_result.debug_json = images_parts 
 
-        if not text_target: # Crair uma image de debug aqui?
-            self.target_result.text_target = f"No text to detect"
-            return self.target_result
-
+        # 3) Flat parts
         all_raw_results = []
         for part_results in images_parts.values():
             all_raw_results.extend(part_results)
 
-        merged_results = self._deduplicate_results(all_raw_results)
-
-
-        final_candidates = []
-        for res in merged_results:
-            text_res = res["text"]
-            if (self.in_text and text_target in text_res) or (not self.in_text and text_target == text_res):
-                final_candidates.append(res)
-
-
-        merged_sorted = sorted(
-            final_candidates,
-            key=lambda c: (c["center"][1], c["center"][0], -c["score"])
-        )
-
-        # TODO: Poder mais de um tipo de debug?
-        image_debug = self.debug(image, merged_sorted)
-        self.target_result.debug_image = image_debug
+        # 4) join possible duplicate texts
+        all_texts = self._deduplicate_results(all_raw_results)
         
-        total_found = len(merged_sorted)
-        if total_found == 0:
+        # 5) Filter target text
+        targets_info = self._filter_result_and_sort(all_texts, text_target)
+
+        # 6) Create Debug image
+        self.create_debug(image, all_texts, targets_info)
+        self.target_result.debug_json = {"result": all_texts} 
+
+        # 7) Final Filter
+        total_found = len(targets_info)
+        if not text_target:
+            self.target_result.text_target = f"No text to detect"
+        elif total_found == 0:
             self.target_result.log_message = f"{self.log_text} Object Not Found"
         elif self.position > total_found:
             self.target_result.error = True # Talvez remover para a pesosa poder alterar no debug?
             self.target_result.log_message = f"{self.log_text} A total of {total_found} texts were found, but the desired position was {self.position}. (OBS: The position starts at 0)"
-            return self.target_result
         else:
-            target_info = merged_sorted[self.position]
+            target_info = targets_info[self.position]
             self.target_result.center = target_info["center"]
             self.target_result.found = True
 
         return self.target_result
-
 
     # -----------------------
     # Secondary functions
@@ -124,7 +114,7 @@ class TextExtractor:
         with ThreadPoolExecutor(max_workers=None) as executor:
             # Mapeamos a tarefa para cada parte
             future_to_part = {
-                executor.submit(self._extract_single_image, info["image"], info["offset"]): name 
+                executor.submit(self._extract_single_image, info["image"], info["offset"], name): name 
                 for name, info in image_parts.items()
             }
             
@@ -139,7 +129,7 @@ class TextExtractor:
 
         return results
 
-    def _extract_single_image(self, image, offset):
+    def _extract_single_image(self, image, offset, part_name):
         """
             # Return: [{'box':..., 'center':..., 'score':..., 'text':...}, ...] 
         """
@@ -172,6 +162,7 @@ class TextExtractor:
 
             cx, cy = item["center"]
             item["center"] = [cx + x_off, cy + y_off]
+            item["R_C"] = part_name
 
         return model_result
     
@@ -254,7 +245,6 @@ class TextExtractor:
             if not isinstance(item["score"], (int, float)):
                 raise TypeError(f"Item {i} has invalid score: {item}")
 
-
     def _split_image(self, image):
         h, w = image.shape[:2]
         rows = self.rows_split
@@ -288,20 +278,26 @@ class TextExtractor:
 
         return parts
     
-
+    def _filter_result_and_sort(self, result, text_target):
+        final_candidates = []
+        if not text_target:
+            final_candidates = result
+        else:
+            for res in result: #TODO: Deixar melhor!
+                text_res = res["text"]
+                if (self.in_text and text_target in text_res) or (not self.in_text and text_target == text_res):
+                    final_candidates.append(res)
+        
+        merged_sorted = sorted(
+            final_candidates,
+            key=lambda c: (c["center"][1], c["center"][0], -c["score"])
+        )
+        
+        return merged_sorted
+    
     # -----------------------
     # Merge functions
     # -----------------------
-
-    def _merge_all_parts_results(self, result):
-        all_results = []
-
-        for part_results in result.values():
-            all_results.extend(part_results)
-
-        return self._deduplicate_results(all_results)
-
-
     def _calculate_iou(self, boxA, boxB):
         # Transforma listas de pontos [[x,y], ...] em coordenadas x1, y1, x2, y2
         boxA = np.array(boxA)
@@ -346,17 +342,20 @@ class TextExtractor:
     # Debug functions
     # -----------------------
 
-    def debug(self, image, texts_info):
+    def create_debug(self, image, all_texts, texts_filtered):
         image_debug = image.copy()
-
+ 
         image_debug = self._draw_grid(image_debug)
 
-        image_debug = self._get_bbox_texts(image_debug, texts_info)
-
-
+        if len(texts_filtered) < len(all_texts):
+            image_debug = self._get_bbox_texts(image_debug, texts_filtered)
+        else:
+            image_debug = self._get_bbox_texts(image_debug, all_texts, show_part=True)
 
         if self.save_debug_internal:
             cv2.imwrite("/app/data/bbox_texts_debug.png", image_debug)
+
+        self.target_result.debug_image = image_debug
 
         return image_debug
 
@@ -403,25 +402,68 @@ class TextExtractor:
 
         return image
 
-    def _get_bbox_texts(self, image, texts_info):
+    def _get_bbox_texts(self, image, texts_info, show_part=False):
+        overlay = image.copy()
+        
         for index, text_info in enumerate(texts_info):
             box = np.array(text_info["box"], dtype=np.int32)
-            cx, cy = map(int, text_info["center"])
+            
+            # Cores para o desenho
+            GREEN = (0, 255, 0)
+            BLUE = (255, 0, 0)
+            RED = (0, 0, 255)
+            WHITE = (255, 255, 255)
 
-            if index == self.position:
-                cv2.polylines(image, [box], True, GREEN, 2)
+            if not show_part:
+                # --- COMPORTAMENTO ORIGINAL (MANTER EXATAMENTE COMO ESTAVA) ---
+                cx, cy = map(int, text_info["center"])
+                color = GREEN if index == self.position else BLUE
+                
+                cv2.polylines(image, [box], True, color, 2)
+                cv2.putText(
+                    image,
+                    f"[{index}] {text_info['score']*100:.2f}%",
+                    (cx, cy - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    RED,
+                    2
+                )
             else:
+                # --- COMPORTAMENTO NOVO (PARA DEBUG DE POSIÇÃO R_C) ---
+                tl_x, tl_y = text_info["box"][0] # Canto Superior Esquerdo
+                
+                # Desenha a BBox e preenche o overlay
                 cv2.polylines(image, [box], True, BLUE, 2)
-            cv2.putText(
-                image,
-                f"[{index}] {text_info['score']*100:.2f}%",
-                (cx, cy - 20),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                RED,
-                2
-            )
-        
+                cv2.fillPoly(overlay, [box], BLUE)
+                
+                label = f" {text_info['R_C']} "
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                scale = 0.4
+                thickness = 1
+                
+                # Calcula tamanho para o fundo vermelho
+                (tw, th), _ = cv2.getTextSize(label, font, scale, thickness)
+                
+                # Retângulo de fundo saindo do Top-Left para cima
+                cv2.rectangle(image, (int(tl_x), int(tl_y - th - 5)), (int(tl_x + tw), int(tl_y)), RED, -1)
+                
+                # Texto branco sobre o fundo vermelho
+                cv2.putText(
+                    image, 
+                    label, 
+                    (int(tl_x), int(tl_y - 5)), 
+                    font, 
+                    scale, 
+                    WHITE, 
+                    thickness, 
+                    lineType=cv2.LINE_AA
+                )
+
+        if show_part:
+            # Aplica transparência apenas no modo show_part
+            image = cv2.addWeighted(overlay, 0.15, image, 0.85, 0)
+            
         return image
 
 
