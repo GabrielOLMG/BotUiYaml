@@ -66,7 +66,10 @@ class BotTargetLocator:
             in_text: bool = True,
             debug:bool=False,
             position:int=0,
-            side:str=None
+            side:str=None,
+            column_target:str=None,
+            row_target:str=None,
+
         ):
         from BotUi.finders.text.TextExtractor import TextExtractor
 
@@ -75,6 +78,8 @@ class BotTargetLocator:
         external_settings = {
             "position": position,
             "in_text": in_text,
+            "column_target": column_target,
+            "row_target": row_target,
         }
         for model in models:
             text_extractor = TextExtractor(model_type=model, **external_settings)

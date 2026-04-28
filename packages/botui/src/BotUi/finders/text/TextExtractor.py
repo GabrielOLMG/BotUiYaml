@@ -20,7 +20,9 @@ class TextExtractor:
             rows_split = 3,
             in_text = True,
             position = 0,
-            save_debug_internal=False
+            save_debug_internal=False,
+            columns_target = None,
+            rows_target = None,
         ):
         self.model_type = model_type
         self.split_images = split_images
@@ -36,6 +38,8 @@ class TextExtractor:
         self.columns_split = columns_split
         self.rows_split = rows_split
         self.position = position
+        self.columns_target = columns_target,
+        self.rows_target = rows_target 
 
 
     # -----------------------
@@ -262,7 +266,11 @@ class TextExtractor:
         parts = {}
 
         for r in range(rows):
+            if self.rows_target and r != self.rows_target:
+                continue
             for c in range(cols):
+                if self.columns_target and r != self.columns_target:
+                    continue
                 y_start = r * h_step
                 y_end = (r + 1) * h_step if r < rows - 1 else h
                 x_start = c * w_step

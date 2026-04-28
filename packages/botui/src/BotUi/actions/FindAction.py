@@ -92,7 +92,8 @@ class FindAction(BaseAction):
                 "in_text": self.step_info.get("in_text", True),
                 "position": self.step_info.get("position", 0),
                 "side": self.step_info.get("side", None),
-
+                "row_target": self.step_info.get("row_target", None),
+                "column_target": self.step_info.get("column_target", None)
             },
         }
         args = detector_args_map.get(object_type, {})

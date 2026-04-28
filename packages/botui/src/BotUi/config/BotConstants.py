@@ -38,7 +38,9 @@ ACTION_SCHEMA = {
             # ---------------
 
             "next": dict, # Como validar melhor?
-
+            
+            "row_target": int, # TODO: MELHORAR!
+            "column_target": int, # TODO: MELHORAR!
             "y_coord": int,
             "x_coord": int,
             "save_as": str,
