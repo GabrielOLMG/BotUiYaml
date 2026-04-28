@@ -4,6 +4,7 @@
 # Documentaçao 
 
 - falar do target result na documentaçao
+- Falar do row_target e column_target na docuemtnacao
 - falar sobre a api na doccumentaçao
 - faalr que agora da para colcaor o campo opcional "name"
 
