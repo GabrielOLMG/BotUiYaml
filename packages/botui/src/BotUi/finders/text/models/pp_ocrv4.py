@@ -7,7 +7,15 @@ class PaddleOCRV4:
             from paddleocr import PaddleOCR
 
             PaddleOCRV4._ocr = PaddleOCR(
-                ocr_version='PP-OCRv3', lang='en', use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False,  text_det_limit_side_len=768, text_det_thresh=0.5, text_det_box_thresh=0.8, text_det_unclip_ratio=1.0
+                ocr_version='PP-OCRv4',
+                lang='en', 
+                use_doc_orientation_classify=False, 
+                use_doc_unwarping=False, 
+                use_textline_orientation=False,  
+                text_det_limit_side_len=768, 
+                text_det_thresh=0.5, 
+                text_det_box_thresh=0.8, 
+                text_det_unclip_ratio=1.0
                 )
 
         return PaddleOCRV4._ocr

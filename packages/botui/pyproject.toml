@@ -19,10 +19,7 @@ dependencies = [
     "webdriver-manager",
     "ruamel.yaml",
     "typer",
-    # Teste,
-    "paddleocr",
-    "paddlepaddle"
-]
+    ]
 
 
 [tool.setuptools.packages.find]

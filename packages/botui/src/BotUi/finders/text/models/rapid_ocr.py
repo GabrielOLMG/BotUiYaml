@@ -1,22 +1,22 @@
 class RapidOCRService:
-    def __init__(self):
-        self._ocr = None
+    _ocr = None
 
-    def _get_model(self):
-        if self._ocr is None:
+    @classmethod
+    def _get_model(cls):
+        if cls._ocr is None:
             from rapidocr_onnxruntime import RapidOCR
 
-            self._ocr = RapidOCR(
-                det_limit_side_len=300,
-                box_thresh=0.6,
-                unclip_ratio=1.6,
-                text_score=0.5,
-                use_dilation=True,
+            cls._ocr = RapidOCR(
+                det_limit_side_len=960,
+                box_thresh=0.5,
+                unclip_ratio=1,      
+                use_dilation=False,    
             )
-        return self._ocr
+        return cls._ocr
 
-    def run(self, image):
-        model = self._get_model()
+    @classmethod
+    def run(cls, image):
+        model = cls._get_model()
         output = model(image)
 
         if not output:
