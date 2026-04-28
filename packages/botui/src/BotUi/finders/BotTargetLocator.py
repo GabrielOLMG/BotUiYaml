@@ -70,7 +70,7 @@ class BotTargetLocator:
         ):
         from BotUi.finders.text.TextExtractor import TextExtractor
 
-        models = ["rapid_ocr"]
+        models = ["rapid_ocr"]#, "doc_ocr"]
 
         external_settings = {
             "position": position,

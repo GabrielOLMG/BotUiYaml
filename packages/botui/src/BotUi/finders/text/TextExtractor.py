@@ -83,7 +83,7 @@ class TextExtractor:
 
         merged_sorted = sorted(
             final_candidates,
-            key=lambda c: (c["center"][1], c["center"][0])
+            key=lambda c: (c["center"][1], c["center"][0], -c["score"])
         )
 
         # TODO: Poder mais de um tipo de debug?
@@ -140,15 +140,15 @@ class TextExtractor:
             # Return: [{'box':..., 'center':..., 'score':..., 'text':...}, ...] 
         """
 
-        # h, w = image.shape[:2]
-        # image = cv2.resize(image, (w*2, h*2), interpolation=cv2.INTER_CUBIC)
+        h, w = image.shape[:2]
+        image = cv2.resize(image, (w*2, h*2), interpolation=cv2.INTER_CUBIC)
 
         # 1) 
         model_result = self._run_model(image)
         if not model_result:
             return []
-        # for item in model_result:
-        #     item["box"] = [[x / 2, y / 2] for x, y in item["box"]]
+        for item in model_result:
+            item["box"] = [[x / 2, y / 2] for x, y in item["box"]]
         # 1.5)
         self._check_model_result(model_result)
 
@@ -178,6 +178,9 @@ class TextExtractor:
         if self.model_type == "rapid_ocr":
             from BotUi.finders.text.models.rapid_ocr import RapidOCRService
             return RapidOCRService._get_model()
+        elif self.model_type == "doc_ocr":
+            from BotUi.finders.text.models.doctr import DoctrService
+            return DoctrService._get_model()
         # elif self.model_type == "pp_ocrv4":
         #     from BotUi.finders.text.models.pp_ocrv4 import PaddleOCRV4
         #     return PaddleOCRV4._get_model()
@@ -191,6 +194,9 @@ class TextExtractor:
         if self.model_type == "rapid_ocr":
             from BotUi.finders.text.models.rapid_ocr import RapidOCRService
             return RapidOCRService.run(image)
+        elif self.model_type == "doc_ocr":
+            from BotUi.finders.text.models.doctr import DoctrService
+            return DoctrService.run(image)
         # elif self.model_type == "pp_ocrv4":
         #     from BotUi.finders.text.models.pp_ocrv4 import PaddleOCRV4
         #     return PaddleOCRV4.run(image)
@@ -316,7 +322,6 @@ class TextExtractor:
         if not results: return []
         
         # Ordena por score para garantir que manteremos o de maior confiança
-        results = sorted(results, key=lambda x: x["score"], reverse=True)
         merged = []
 
         for r in results:

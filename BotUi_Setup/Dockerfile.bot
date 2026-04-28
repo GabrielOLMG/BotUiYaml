@@ -53,7 +53,16 @@ RUN apt-get update -y && apt-get install -y \
 RUN pip install --no-cache-dir playwright
 RUN playwright install chromium
 
+# ================================
+# Models
+# ================================
+# # Instala as dependências do docTR
+# RUN pip install "python-doctr[torch]" torch torchvision
 
+# # Script para baixar os modelos durante o BUILD
+# RUN python -c "from doctr.models import ocr_predictor; ocr_predictor(det_arch='db_mobilenet_v3_large', reco_arch='crnn_mobilenet_v3_small', pretrained=True)"
+# ENV OMP_NUM_THREADS=1
+# ENV MKL_NUM_THREADS=1
 # ================================
 # BotUi (ENGINE ONLY)
 # ================================

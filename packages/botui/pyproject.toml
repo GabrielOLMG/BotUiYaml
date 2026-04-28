@@ -19,6 +19,9 @@ dependencies = [
     "webdriver-manager",
     "ruamel.yaml",
     "typer",
+    "python-doctr[torch]",  
+    "torch",                
+    "torchvision",
     ]
 
 
