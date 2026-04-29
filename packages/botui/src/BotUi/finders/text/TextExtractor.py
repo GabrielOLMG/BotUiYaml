@@ -27,7 +27,7 @@ class TextExtractor:
         self.target_result = BotTargetResult(found=False, error=False, target_type="TEXT")
 
         # -- Internal Settings -- #
-        self.overlap = 50
+        self.overlap_prop = 0.2
         self.save_debug_internal=save_debug_internal
         self.log_text = f"[TextExtractor.run [Text Model: {model_type}]"
 
@@ -253,9 +253,13 @@ class TextExtractor:
         h_step = h // rows
         w_step = w // cols
 
+        ov_h = max(20, int(h_step * self.overlap_prop))
+        ov_w = max(20, int(w_step * self.overlap_prop))
+
         parts = {}
         row_range = [self.row_target] if self.row_target is not None else range(rows)
         col_range = [self.column_target] if self.column_target is not None else range(cols)
+        
         for r in row_range:
             for c in col_range:
                 y_start = r * h_step
@@ -263,10 +267,10 @@ class TextExtractor:
                 x_start = c * w_step
                 x_end = (c + 1) * w_step if c < cols - 1 else w
 
-                y_start_ov = max(0, y_start - self.overlap)
-                y_end_ov = min(h, y_end + self.overlap)
-                x_start_ov = max(0, x_start - self.overlap)
-                x_end_ov = min(w, x_end + self.overlap)
+                y_start_ov = max(0, y_start - ov_h)
+                y_end_ov = min(h, y_end + ov_h)
+                x_start_ov = max(0, x_start - ov_w)
+                x_end_ov = min(w, x_end + ov_w)
 
                 parts[f"R{r}_C{c}"] = {
                     "image": image[y_start_ov:y_end_ov, x_start_ov:x_end_ov],
@@ -364,6 +368,9 @@ class TextExtractor:
         h_step = h // rows
         w_step = w // cols
 
+        ov_h = max(20, int(h_step * self.overlap_prop))
+        ov_w = max(20, int(w_step * self.overlap_prop))
+
         for i in range(1, rows):
             y = int(i * h_step)
             cv2.line(image, (0, y), (w, y), RED, thickness)
@@ -374,14 +381,15 @@ class TextExtractor:
         for r in range(rows):
             for c in range(cols):
                 y_start = r * h_step
-                y_end = (r + 1) * h_step if r < rows - 1 else h
                 x_start = c * w_step
+                
+                y_end = (r + 1) * h_step if r < rows - 1 else h
                 x_end = (c + 1) * w_step if c < cols - 1 else w
 
-                y_start_ov = max(0, y_start - self.overlap)
-                y_end_ov = min(h, y_end + self.overlap)
-                x_start_ov = max(0, x_start - self.overlap)
-                x_end_ov = min(w, x_end + self.overlap)
+                y_start_ov = max(0, y_start - ov_h)
+                y_end_ov = min(h, y_end + ov_h)
+                x_start_ov = max(0, x_start - ov_w)
+                x_end_ov = min(w, x_end + ov_w)
 
                 cv2.rectangle(
                     image, 
