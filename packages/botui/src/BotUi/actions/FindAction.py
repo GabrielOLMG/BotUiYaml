@@ -157,6 +157,7 @@ class FindAction(BaseAction):
             success, error = self.bot_driver.click(object_coord)
             if not success:
                 return f"[FindAction._apply_on_found.click]{error}"
+            
         elif interaction_type == "UPLOAD":
             file_path = interaction.get("file_path", None)
             if not file_path:
@@ -164,6 +165,8 @@ class FindAction(BaseAction):
             success, error = self.bot_driver.upload_file(file_path, object_coord)
             if not success:
                 return f"[FindAction._apply_on_found.upload] {error}"
+        else:
+            return f"[FindAction._apply_on_found.click] The 'type' used in the 'interaction' does not exist.: {interaction}"
 
         return None
     
