@@ -146,11 +146,24 @@ class FindAction(BaseAction):
         if save_as and object_coord:
             self.set_var(save_as, [float(object_coord[0]), float(object_coord[1])])
 
-        # 2. click
-        if self.step_info.get("click", False) and object_coord:
+        # 2. Early return
+        if not interaction or not interaction.get("type"):
+            return None
+        
+        interaction_type = interaction["type"]
+
+        # 3. Interaction Type Check
+        if interaction_type == "CLICK":
             success, error = self.bot_driver.click(object_coord)
             if not success:
-                return f"[FindAction._apply_on_found] Failed to execute the drive click action: {error}"
+                return f"[FindAction._apply_on_found.click]{error}"
+        elif interaction_type == "UPLOAD":
+            file_path = interaction.get("file_path", None)
+            if not file_path:
+                return f"[FindAction._apply_on_found.upload] To upload a file, you need to have the 'file_path' field in 'interaction'." 
+            success, error = self.bot_driver.upload_file(file_path, object_coord)
+            if not success:
+                return f"[FindAction._apply_on_found.upload] {error}"
 
         return None
     

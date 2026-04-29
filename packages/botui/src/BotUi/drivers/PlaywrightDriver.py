@@ -64,6 +64,9 @@ class PlaywrightDriver(BotDriver):
     
     def click(self, coord: tuple, delay_ms:int=100):
         try:
+            if coord is None:
+                return False, f"[PlaywrightDriver.click] Invalid or missing coordinates: coord='{coord}'"
+
             if isinstance(coord, dict):
                 x = coord.get("x")
                 y = coord.get("y")
@@ -71,7 +74,7 @@ class PlaywrightDriver(BotDriver):
                 x, y = coord
 
             if x is None or y is None:
-                raise ValueError("[PlaywrightDriver.click] Coordenadas inválidas")
+                return False, f"[PlaywrightDriver.click] Invalid coordinates: {coord}"
 
             # Garante que a página tem foco
             self.page.mouse.move(x, y)
@@ -81,7 +84,15 @@ class PlaywrightDriver(BotDriver):
         except Exception as e:
             return False, f"[PlaywrightDriver.click] Falha ao clicar na coord {coord}: {e}"
         
-    def upload_file(self, file_path: str, coord: tuple):
+    def upload_file(self, file_path: str, coord):
+        from BotUi.utils.utils import parse_coord, check_path
+        coord = parse_coord(coord)
+        if coord is None:
+            return False, f"[PlaywrightDriver.upload_file] Invalid or missing coordinates: coord='{coord}'"
+        
+        if not check_path(file_path):
+            return False, f"[PlaywrightDriver.upload_file] File does not exist: {file_path}"
+        
         try: 
             file_path = str(Path(file_path).resolve())
         except Exception as e:
@@ -94,7 +105,9 @@ class PlaywrightDriver(BotDriver):
 
         try:
             with self.page.expect_file_chooser() as fc_info:
-                self.click(coord=(x, y))
+                success, error = self.click(coord=(x, y))
+                if not success:
+                    return False, f"[PlaywrightDriver.upload_file] {error}"
 
             file_chooser = fc_info.value
         except Exception as e:
