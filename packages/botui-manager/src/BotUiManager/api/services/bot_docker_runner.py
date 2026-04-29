@@ -18,21 +18,21 @@ def run_bot_container(
     network = os.getenv("DOCKER_NETWORK", "botui_network")
 
     init_cmd = ["docker", "run", "-d", "--network", network]
-    if not payload.debug:
+    if False and not payload.debug:
         init_cmd.append("--rm")
     final_cmd = [
         "--name", container_name,
-        "-v", f"{payload.pipeline_dir}:/app/{dir_name}",
+        "-v", f"{payload.pipeline_dir}:/app/bots/{dir_name}",
         "botui",
         "sh", "-c",
         (   
-            f"mkdir -p /app/{dir_name}/outputs/logs && "
+            f"mkdir -p /app/bots/{dir_name}/outputs/logs && "
             f"run-bot start-bot "
-            f"--pipeline /app/{dir_name} "
+            f"--pipeline /app/bots/{dir_name} "
             f"--bot {payload.bot_relative_path} "
             f"--bot-variables {payload.globals_relative_path or ''} "
             f"{debug_flag} "
-            f"> /app/{dir_name}/outputs/logs/bot_docker.log 2>&1"
+            f"2>&1 | tee /app/bots/{dir_name}/outputs/logs/bot_docker.log"
         )
     ]
     cmd = init_cmd + final_cmd
@@ -49,3 +49,15 @@ def run_bot_container(
         "container_name": container_name,
         "container_id": result.stdout.strip()
     }
+
+def get_container_logs(container_name: str):
+    try:
+        cmd = ["docker", "logs", "--tail", "50", container_name]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            return f"Container {container_name} não encontrado ou já finalizado."
+            
+        return result.stdout
+    except Exception as e:
+        return f"Erro ao acessar Docker: {str(e)}"
