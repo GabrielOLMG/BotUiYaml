@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import base64
 
 # URL base da API (centralizada para facilitar manutenção)
 API_BASE_URL = "http://botui_api:8000"
@@ -40,70 +41,75 @@ def inject_auto_scroll_js():
         </script>
     """, height=0)
 
+
 @st.dialog("Visual Debug & OCR Toolkit", width="large")
 def open_visual_debug_toolkit(pipeline_dir):
-    """Abre a janela flutuante para testes de OCR e busca visual."""
-    st.write(f"**Pipeline Ativo:** `{pipeline_dir}`")
-    st.write("Configure os parâmetros para testar o reconhecimento visual no projeto.")
     
-    # --- FORMULÁRIO DE DEBUG ---
     with st.container(border=True):
         col1, col2 = st.columns(2)
         
         with col1:
-            img_path = st.text_input(
-                "Caminho da Imagem (image_path)", 
-                value="outputs/screenshots/last_screenshot.png",
-                help="Caminho relativo à raiz do seu pipeline"
-            )
-            text_target = st.text_input(
-                "Texto Alvo (text_target)", 
-                placeholder="Ex: Login, Confirmar, Salvar..."
-            )
+            img_path = st.text_input("Caminho da Imagem", value="outputs/screenshots/last_screenshot.png")
+            text_target = st.text_input("Texto Alvo", placeholder="Ex: Login")
         
         with col2:
-            st.caption("Área de Busca (search_area)")
+            st.caption("Área de Busca (Deixe vazio para None)")
             g_row1, g_row2 = st.columns(2)
-            row = g_row1.number_input("Linha (row)", min_value=0, value=0)
-            column = g_row2.number_input("Coluna (column)", min_value=0, value=0)
-            grid_rows = g_row1.number_input("Grid Rows", min_value=1, value=3)
-            grid_cols = g_row2.number_input("Grid Cols", min_value=1, value=3)
+            
+            # Usamos text_input para permitir que o campo fique vazio (None)
+            r_val = g_row1.text_input("Row", value="", placeholder="None")
+            c_val = g_row2.text_input("Column", value="", placeholder="None")
+            gr_val = g_row1.text_input("Grid Rows", value=1, placeholder="None")
+            gc_val = g_row2.text_input("Grid Cols", value=1, placeholder="None")
 
-    # --- EXECUÇÃO ---
+            # Função auxiliar interna para converter string vazia em None
+            def to_int_or_none(val):
+                try:
+                    return int(val) if val.strip() != "" else None
+                except ValueError:
+                    return None
+
+            search_area = {
+                "row": to_int_or_none(r_val),
+                "column": to_int_or_none(c_val),
+                "grid_rows": to_int_or_none(gr_val),
+                "grid_cols": to_int_or_none(gc_val)
+            }
+
+    debug_canvas = st.empty()
+
     if st.button("Analisar Imagem", use_container_width=True, type="primary"):
-        # Montagem do payload conforme sua especificação
+        # Removemos chaves que são None se você quiser um JSON limpo, 
+        # ou enviamos o dicionário completo com nulls conforme sua API preferir.
+        # Aqui, filtramos para enviar apenas o que foi preenchido:
+        filtered_search_area = {k: v for k, v in search_area.items() if v is not None}
+        
+        # Se todos forem None, search_area vira None
+        final_search_area = filtered_search_area if filtered_search_area else None
+
         payload = {
             "image_path": img_path,
-            "text_target": text_target,
-            "search_area": {
-                "row": row,
-                "column": column,
-                "grid_rows": grid_rows,
-                "grid_cols": grid_cols
-            }
+            "text_target": text_target if text_target else None,
+            "search_area": final_search_area
         }
-        
+
         with st.spinner("Processando OCR..."):
             try:
-                # Faz a chamada para o endpoint de debug
-                response = requests.post(
-                    f"{API_BASE_URL}/debug/ocr", 
-                    json=payload, 
-                    timeout=15
-                )
+                from api_client import API_BASE_URL 
+                response = requests.post(f"{API_BASE_URL}/vision/ocr", json=payload, timeout=60)
                 
                 if response.status_code == 200:
-                    st.success("Análise finalizada com sucesso!")
-                    # Aqui você pode exibir o JSON de retorno ou a imagem processada
-                    st.json(response.json())
-                else:
-                    st.error(f"Erro na API ({response.status_code}): {response.text}")
+                    data = response.json()
+                    st.success("Análise finalizada!")
                     
+                    with st.expander("Ver JSON de Retorno"):
+                        st.json(data.get("result"))
+                    
+                    if data.get("debug_image"):
+                        import base64
+                        img_bytes = base64.b64decode(data["debug_image"])
+                        debug_canvas.image(img_bytes, use_container_width=True)
+                else:
+                    st.error(f"Erro na API: {response.text}")
             except Exception as e:
-                st.error(f"Falha na comunicação com a API: {str(e)}")
-
-    st.divider()
-    
-    # Placeholder para visualização futura do Canvas de Debug
-    debug_canvas = st.empty()
-    debug_canvas.info("O resultado visual (imagem com marcações) aparecerá aqui.")
+                st.error(f"Erro: {str(e)}")

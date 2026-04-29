@@ -62,3 +62,4 @@ def get_job_screenshot(job_id: str, pipeline_dir: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    

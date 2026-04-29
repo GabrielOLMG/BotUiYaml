@@ -5,10 +5,14 @@
 # Images
 BOT_IMAGE = botui
 API_IMAGE = botui-api
+APP_IMAGE = botui-app
+
 
 # Dockerfiles
 BOT_DOCKERFILE = BotUi_Setup/Dockerfile.bot
 API_DOCKERFILE = BotUi_Setup/Dockerfile.api
+APP_DOCKERFILE = BotUi_Setup/Dockerfile.app
+
 
 # Context (raiz do monorepo)
 CONTEXT = .
@@ -21,7 +25,7 @@ setup:
 	@echo "======================================"
 	@echo "🏗️  Setup BotUI Monorepo"
 	@echo "======================================"
-	make build-bot && make build-api && make run-api
+	make build-bot && make build-api && make build-app && make run-api && make run-app
 	@echo "✅ System ready!"
 
 # ==========================================
@@ -49,6 +53,17 @@ build-api:
 		$(CONTEXT)
 	@echo "✅ API image built!"
 
+build-app:
+	@echo ""
+	@echo "======================================"
+	@echo "🏗️  Building APP image: $(APP_IMAGE)"
+	@echo "======================================"
+	docker build \
+		-t $(APP_IMAGE) \
+		-f $(APP_DOCKERFILE) \
+		$(CONTEXT)
+	@echo "✅ API image built!"
+
 # ==========================================
 # 🚀 RUNs
 # ==========================================
@@ -57,7 +72,15 @@ run-api:
 	@echo "======================================"
 	@echo "🚀 Starting BotUI API..."
 	@echo "======================================"
-	docker compose up -d
+	docker compose up api -d
+	@echo "✅ API running at http://localhost:8000"
+
+run-app:
+	@echo ""
+	@echo "======================================"
+	@echo "🚀 Starting BotUI FRONT-END..."
+	@echo "======================================"
+	docker compose up dashboard -d
 	@echo "✅ API running at http://localhost:8000"
 
 
