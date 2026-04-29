@@ -40,7 +40,7 @@ def inject_auto_scroll_js():
         </script>
     """, height=0)
 
-@st.dialog("🔍 Visual Debug & OCR Toolkit", width="large")
+@st.dialog("Visual Debug & OCR Toolkit", width="large")
 def open_visual_debug_toolkit(pipeline_dir):
     """Abre a janela flutuante para testes de OCR e busca visual."""
     st.write(f"**Pipeline Ativo:** `{pipeline_dir}`")
@@ -70,7 +70,7 @@ def open_visual_debug_toolkit(pipeline_dir):
             grid_cols = g_row2.number_input("Grid Cols", min_value=1, value=3)
 
     # --- EXECUÇÃO ---
-    if st.button("🔬 Analisar Imagem", use_container_width=True, type="primary"):
+    if st.button("Analisar Imagem", use_container_width=True, type="primary"):
         # Montagem do payload conforme sua especificação
         payload = {
             "image_path": img_path,
