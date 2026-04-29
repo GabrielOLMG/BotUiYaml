@@ -16,13 +16,11 @@ class TextExtractor:
             self,
             model_type = "rapid_ocr",
             split_images = True,
-            columns_split = 3,
-            rows_split = 3,
             in_text = True,
             position = 0,
-            save_debug_internal=False,
-            column_target = None,
-            row_target = None,
+            search_area:dict={},
+            *,
+            save_debug_internal=False
         ):
         self.model_type = model_type
         self.split_images = split_images
@@ -35,11 +33,13 @@ class TextExtractor:
 
         # -- External Settings -- #
         self.in_text = in_text
-        self.columns_split = columns_split
-        self.rows_split = rows_split
         self.position = position
-        self.column_target = column_target
-        self.row_target = row_target 
+
+        # -- Init Search Area Fields-- #
+        self.column_target = search_area.get("row", None)
+        self.row_target = search_area.get("column", None)
+        self.grid_cols = search_area.get("grid_cols", 3)
+        self.grid_rows = search_area.get("grid_rows", 3)
 
 
     # -----------------------
@@ -247,8 +247,8 @@ class TextExtractor:
 
     def _split_image(self, image):
         h, w = image.shape[:2]
-        rows = self.rows_split
-        cols = self.columns_split
+        rows = self.grid_rows
+        cols = self.grid_cols
 
         h_step = h // rows
         w_step = w // cols
@@ -358,8 +358,8 @@ class TextExtractor:
 
     def _draw_grid(self, image, thickness=1):
         h, w = image.shape[:2]
-        rows = self.rows_split
-        cols = self.columns_split
+        rows = self.grid_rows
+        cols = self.grid_cols
 
         h_step = h // rows
         w_step = w // cols

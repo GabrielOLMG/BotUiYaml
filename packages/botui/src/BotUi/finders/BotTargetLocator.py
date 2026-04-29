@@ -16,20 +16,28 @@ class BotTargetLocator:
             debug_folder:str, 
             logger, 
             debug: bool = False, 
-            offset_x:float=0, 
-            offset_y:float=0
+            offset: dict = {},
         ):
         self.image_source_path = image_source_path
         self.debug = debug
         self.logger = logger
         self.debug_folder = debug_folder # Mudar depois para ser algo mais unico, uma pasta com prints de debug,
+
+        
+        # -------- External Info: Offset
+        self.offset_x = offset.get("x", 0) 
+        self.offset_y = offset.get("y", 0) 
+        self.shifted = False
+        # --------
+
+        # -------- Internal Info
         self.target_original_center = None
         self.target_shif_center = None
+        # --------
 
-        self.offset_x = offset_x
-        self.offset_y = offset_y
 
-        self.shifted = False
+
+
 
 
 
@@ -41,6 +49,7 @@ class BotTargetLocator:
     def image_target_center(
             self, 
             template_path: str, 
+            search_area: dict={},
             debug:bool=False,
         ):
         from BotUi.finders.image import find_image_center_match_template, find_image_center_sift
@@ -64,12 +73,9 @@ class BotTargetLocator:
             self,
             target_text: str,
             in_text: bool = True,
-            debug:bool=False,
             position:int=0,
-            side:str=None,
-            column_target:str=None,
-            row_target:str=None,
-
+            search_area: dict={},
+            debug:bool=False,
         ):
         from BotUi.finders.text.TextExtractor import TextExtractor
 
@@ -78,8 +84,7 @@ class BotTargetLocator:
         external_settings = {
             "position": position,
             "in_text": in_text,
-            "column_target": column_target,
-            "row_target": row_target,
+            "search_area": search_area
         }
         for model in models:
             text_extractor = TextExtractor(model_type=model, **external_settings)

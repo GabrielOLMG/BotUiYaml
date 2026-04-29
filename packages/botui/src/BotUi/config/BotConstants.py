@@ -35,8 +35,8 @@ ACTION_SCHEMA = {
             "save_as": str,
             # --------------- # TODO: Achar melhor forma de validar esta parte!
             "next": dict, # Como validar melhor?
-            "search_area": dict, # row_target, column_target, row_total, columns_total
-            "interaction": dict, # y_coord, x_coord, click, type(Click, Upload,...), offset(dict)(x,y), file_path, write(?)
+            "search_area": dict, # DONE!
+            "interaction": dict, # click, type(Click, Upload,...), offset(dict)(y_coord,x_coord), file_path, write(?)
             "search_strategy": dict # scroll, scroll_direction
             # ---------------
             **GLOBAL_FIELDS
