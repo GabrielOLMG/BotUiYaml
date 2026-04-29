@@ -1,5 +1,13 @@
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BaseModel, Field, model_validator
+
+
+class SearchAreaPayload(BaseModel):
+    row: Union[int, None] = Field(None, description="The specific grid row to search within")
+    column: Union[int, None] = Field(None, description="The specific grid column to search within")
+    grid_rows: int = Field(3, description="How many horizontal slices the screen is divided into")
+    grid_cols: int = Field(3, description="How many vertical slices the screen is divided into")
+
 
 class OCRPayload(BaseModel):
     image_path: str = Field(
@@ -12,14 +20,11 @@ class OCRPayload(BaseModel):
         description="Text to try to locate in the image"
     )
 
-    # side: str = Field(
-    #     description=""
-    # )
-    
-    # position: str = Field(
-    #     defult=0,
-    #     description=""
-    # )
+    search_area: SearchAreaPayload = Field(
+        default_factory=SearchAreaPayload,
+        description="Grid-based search area configuration"
+    )
+
 class OCRResult(BaseModel):
     name: str = Field(
         ...,

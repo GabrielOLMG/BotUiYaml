@@ -12,15 +12,19 @@ class FindAction(BaseAction):
     def run(self):
         # 1)
         object_type = self.step_info.get("object_type")
-        scroll_enabled = self.step_info.get("scroll", False)
+
+        interaction = self.step_info.get("interaction", {})
+
+        search_strategy = self.step_info.get("search_strategy", {})
+        scroll_enabled = search_strategy.get("scroll", False)
+
 
         # 2)
         attempts = 0
         max_attempts = FindConstants.MAX_ATTEMPTS if scroll_enabled else 1
 
         while attempts < max_attempts:
-
-            target_result = self._find_target(object_type)
+            target_result = self._find_target(object_type, offset=interaction.get("offset", {}))
             if target_result.error:
                 return BaseActionResult(
                         finished=False,
@@ -32,7 +36,7 @@ class FindAction(BaseAction):
 
             # -------- FOUND -----------
             if success:
-                error = self._apply_on_found(target_result)
+                error = self._apply_on_found(target_result, interaction)
                 if error:
                     return BaseActionResult(
                             finished=False,
@@ -49,7 +53,7 @@ class FindAction(BaseAction):
             if not scroll_enabled:
                 break
             
-            scrolled, error = self._scroll_page(self.step_info)
+            scrolled, error = self._scroll_page(self.step_info, search_strategy)
             if not scrolled:
                 return BaseActionResult(
                     finished=False,
@@ -68,7 +72,7 @@ class FindAction(BaseAction):
             message="[FindAction.run] Object not found"
         )
     
-    def _find_target(self, object_type):
+    def _find_target(self, object_type, offset):
         # 1)
         screenshot_path, _ = self.capture()
 
@@ -77,8 +81,7 @@ class FindAction(BaseAction):
             image_source_path=screenshot_path,
             debug=self.step_info.get("debug", False),
             debug_folder = self.bot_app.debug_folder,
-            offset_x = self.step_info.get("x_coord", 0),
-            offset_y = self.step_info.get("y_coord", 0),
+            offset = offset,
             logger = self.get_logger()
         )
 
@@ -86,14 +89,13 @@ class FindAction(BaseAction):
         detector_args_map = {
             "IMG": {
                 "template_path": self.step_info.get("image_path"),
+                "search_area": self.step_info.get("search_area", {})
             },
             "TEXT": {
                 "target_text": self.step_info.get("text"),
                 "in_text": self.step_info.get("in_text", True),
                 "position": self.step_info.get("position", 0),
-                "side": self.step_info.get("side", None),
-                "row_target": self.step_info.get("row_target", None),
-                "column_target": self.step_info.get("column_target", None)
+                "search_area": self.step_info.get("search_area", {})
             },
         }
         args = detector_args_map.get(object_type, {})
@@ -135,7 +137,7 @@ class FindAction(BaseAction):
         else:
             raise ValueError("Operator Type does not exist.")
         
-    def _apply_on_found(self, target_result):
+    def _apply_on_found(self, target_result, interaction):
         object_coord = target_result.center
         save_as = self.step_info.get("save_as")
 
@@ -144,16 +146,32 @@ class FindAction(BaseAction):
         if save_as and object_coord:
             self.set_var(save_as, [float(object_coord[0]), float(object_coord[1])])
 
-        # 2. click
-        if self.step_info.get("click", False) and object_coord:
+        # 2. Early return
+        if not interaction or not interaction.get("type"):
+            return None
+        
+        interaction_type = interaction["type"]
+
+        # 3. Interaction Type Check
+        if interaction_type == "CLICK":
             success, error = self.bot_driver.click(object_coord)
             if not success:
-                return f"[FindAction._apply_on_found] Failed to execute the drive click action: {error}"
+                return f"[FindAction._apply_on_found.click]{error}"
+            
+        elif interaction_type == "UPLOAD":
+            file_path = interaction.get("file_path", None)
+            if not file_path:
+                return f"[FindAction._apply_on_found.upload] To upload a file, you need to have the 'file_path' field in 'interaction'." 
+            success, error = self.bot_driver.upload_file(file_path, object_coord)
+            if not success:
+                return f"[FindAction._apply_on_found.upload] {error}"
+        else:
+            return f"[FindAction._apply_on_found.click] The 'type' used in the 'interaction' does not exist.: {interaction}"
 
         return None
     
-    def _scroll_page(self, step_info):
-        scroll_direction = step_info.get("scroll_direction", ScrollConstants.DEFAULT_DIRECTION)
+    def _scroll_page(self, step_info, search_strategy):
+        scroll_direction = search_strategy.get("direction", ScrollConstants.DEFAULT_DIRECTION)
 
         # --- Aplica Log ---
         self.get_logger().debug(

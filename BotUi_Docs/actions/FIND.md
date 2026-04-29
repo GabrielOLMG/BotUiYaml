@@ -2,14 +2,9 @@
 
 ## Overview
 
-The `FIND` action is responsible for locating elements on the screen using visual or text-based detection.
+The FIND action is the core of BotUi. It is responsible for locating elements on the screen using Computer Vision or OCR, enabling precise interactions, conditional flow control, and dynamic navigation.
 
-It is the core interaction mechanism of BotUi, as it enables the system to:
-
-- Locate UI elements
-- Retrieve coordinates
-- Trigger clicks
-- Drive conditional flows (retry, scroll, optional logic)
+The new structure clearly separates **what** to look for, **where** to focus the search, **how** to persist if not immediately found, and **which** action to execute upon success.
 
 ---
 
@@ -29,74 +24,82 @@ Internally, all detection methods are delegated to the `BotTargetLocator`, which
 ```yaml
 - action: FIND
   object_type: TEXT | IMG
+  text: "Target" # If TEXT
+  image_path: "path/to/img.png" # If IMG
+  name: str # Default: None
+  
+  search_area:      # Performance optimization
+    row: int # Default: None
+    column: int # Default: None
+    grid_rows: int # Default: 3
+    grid_cols: int # Default: 3
+  
+  search_strategy:  # Persistence & Navigation
+    scroll: bool # Default: False
+    direction: str # Default: DOWN
+  
+  interaction:      # Consequence If Find
+    type: CLICK | UPLOAD
 ```
 
 ---
 
 ## Fields
 
-### Required Fields
+### 1. Core Target Fields (The "What")
 
-| Field       | Type | Description                      |
-| ----------- | ---- | -------------------------------- |
-| action      | str  | Must be `FIND`                   |
-| object_type | str  | Detection mode (`TEXT` or `IMG`) |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **action** | str | Must be `FIND`. |
+| **object_type** | str | Detection mode: `TEXT` or `IMG`. |
+| **text** | str | Target text (Required if `object_type: TEXT`). |
+| **in_text** | bool | If `true`, allows partial text matching. |
+| **position** | int | Index of the occurrence if multiple identical results exist (Default: `0`). |
+| **image_path** | str | Path to the template image (Required if `object_type: IMG`). |
 
-### TEXT Mode Fields
+### 2. Search Area (The "Where")
+Defines a grid over the image to process only a specific crop, increasing speed and accuracy.
 
-Used when ``object_type: TEXT``
+| Field | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **row** | int | `None` | The specific grid row to search within. |
+| **column** | int | `None` | The specific grid column to search within. |
+| **grid_rows** | int | `3` | How many horizontal slices the screen is divided into. |
+| **grid_cols** | int | `3` | How many vertical slices the screen is divided into. |
 
-| Field    | Type | Description                                  |
-| -------- | ---- | -------------------------------------------- |
-| text     | str  | Target text to locate                        |
-| in_text  | bool | If true, allows partial match                |
-| position | int  | Occurrence index when multiple matches exist |
-| side     | str  | Optional directional constraint              |
+### 3. Search Strategy (The "How to find")
+Defines the bot's behavior if the element is not found in the current view.
 
-### IMG Mode Fields
+| Field | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **scroll** | bool | `false` | Whether to scroll the page to find the element. |
+| **direction** | str | `DOWN` | Scroll direction (`UP`, `DOWN`). |
 
-Used when ``object_type: IMG``
+### 4. Interaction (The "Consequence")
+Actions executed immediately after a successful localization.
 
-| Field      | Type | Description                              |
-| ---------- | ---- | ---------------------------------------- |
-| image_path | str  | Path to template image used for matching |
-
-### Optional Interaction Fields
-
-| Field   | Type | Description                                 |
-| ------- | ---- | ------------------------------------------- |
-| click   | bool | Click on the detected element               |
-| save_as | str  | Stores detected coordinates into a variable |
-| x_coord | int  | X offset applied to detected center         |
-| y_coord | int  | Y offset applied to detected center         |
-
-### Optional Flow Control Fields
-
-| Field      | Type | Description                               |
-| ---------- | ---- | ----------------------------------------- |
-| scroll     | bool | Enables scrolling if element is not found |
-| debug      | bool | Saves debug image output                  |
-| next       | dict | A dictionary with True and False keys determines the desired next step. Without this, it follows a linear path.                 |
-
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **type** | str | Interaction type: `CLICK` or `UPLOAD`. |
+| **file_path** | str | Path of the file to send (Required if `type: UPLOAD`). |
+| **offset** | dict | Pixel fine-tuning from the detected center (`x`, `y`). |
 
 ---
 
 ## Execution Flow
 
-1. A screenshot is captured
-2. ``BotTargetLocator`` is initialized
-3. Detection method is selected based on object_type
-4. Target is searched using:
-    - TEXT → OCR-based detection
-    - IMG → template matching / SIFT
-5. If found:
-    - Coordinates are returned
-    - Optional click or save is executed
-6. If not found:
-    - Scroll or retry logic may be applied
-    - Or step fails depending on configuration
-7. If next
-  - Checks if the object was found and proceeds to the True step; otherwise, proceeds to the False step.
+1. **Area Cropping:** If ``search_area`` is defined, it will take the screenshot and divide it into grids using ``grid_rows`` or ``grid_cols``. If a ``row`` or ``column`` is defined, the find will ``only be applied to those positions``.
+
+2. **Localization:** ``BotTargetLocator`` attempts to find the target (Text or Image).
+
+3. **Strategy:** If not found and ``scroll: true``, the bot scrolls in the specified ``direction`` and repeats step 2.
+
+4. **Interaction:** Upon success, the bot applies the ``offset`` (if any) and executes the interaction ``type``.
+
+5. **Finalization:**
+    - Saves coordinates if ``save_as`` is present.
+    - Proceeds to the ``next`` step ``(True/False)`` if defined.
+
 ---
 
 ## Examples
@@ -107,7 +110,8 @@ Used when ``object_type: IMG``
 - action: FIND
   object_type: TEXT
   text: "Login"
-  click: true
+  interaction:
+    type: CLICK
 ```
 
 ### 2. Image-based detection
@@ -116,7 +120,8 @@ Used when ``object_type: IMG``
 - action: FIND
   object_type: IMG
   image_path: "buttons/login_button.png"
-  click: true
+  interaction:
+    type: CLICK
 ```
 
 ### 3. Find with partial text match
@@ -136,16 +141,20 @@ In this example, if "Welcome" is in a phrase like "Welcome User", it will still 
 
 ```yaml
 - action: FIND
+  name: "setup_upload"
   object_type: TEXT
-  text: "Upload"
-  save_as: UPLOAD_BUTTON_COORD
-
-- action: UPLOAD_FILE
-  file_path: "data.csv"
-  coord: $UPLOAD_BUTTON_COORD
+  text: "upload"
+  search_area:
+    row: 2 
+    column: 2
+    grid_rows: 3    
+    grid_cols: 3 
+  interaction:
+    type: UPLOAD  
+    file_path: "data/dataset.csv"
 ```
 
-In this case, what we're doing is finding the Upload button so we can then use it in conjunction with the UPLOAD_FILE action, for example.
+In this case, what we're doing is finding the Upload button and making a upload action
 
 ### 5. Find with click + offset adjustment
 
@@ -155,9 +164,10 @@ Useful when the clickable area is not exactly centered.
 - action: FIND
   object_type: TEXT
   text: "Submit"
-  click: true
-  x_coord: 10
-  y_coord: -5
+  interaction:
+    type: CLICK  
+    offset:
+      y: 30
 ```
 
 ### 6. Next Condition
@@ -186,7 +196,8 @@ In this example, we are checking if an object has been found. If it has, it goes
 - action: FIND
   object_type: TEXT
   text: "End Of Page"
-  scroll: true
+  search_strategy:
+    scroll: true
 ```
 
 ### 8. Optional Find
@@ -236,12 +247,14 @@ This is a case where we are repeating the same find until we find the desired ob
 
 ## Tip
 
-The `FIND` action is designed to be robust against UI changes.
+- The `FIND` action is designed to be robust against UI changes. Prefer:
+    - `TEXT` when possible (more stable across layouts)
+    - `IMG` when text is dynamic or not accessible via OCR
+- Performance: Always use search_area when you know the approximate region of the element. Processing 1/9 of the image (3x3 grid) is significantly faster than a full-screen OCR.
 
-Prefer:
+- Robustness: Using position: 0 ensures that if two "Confirm" buttons appear in the same area, the bot always picks the first one.
 
-- `TEXT` when possible (more stable across layouts)
-- `IMG` when text is dynamic or not accessible via OCR
+- Debug: Set debug: true at the action level to see the [R_C] (Row/Column) visual markers on the generated debug image. This helps verify if your search_area configuration is correct.
 
 ---
 

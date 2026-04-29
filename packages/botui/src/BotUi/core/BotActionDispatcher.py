@@ -75,7 +75,7 @@ class BotActionDispatcher:
             )
     
     
-    def _apply_global_step_behavior(self, step_info):
+    def _apply_global_step_behavior(self, step_info): #TODO: Aqui ou no post action do step?
         if step_info.get("refresh"):
             self.bot_driver.reload()
         if step_info.get("wait"):
