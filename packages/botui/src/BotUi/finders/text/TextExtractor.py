@@ -254,13 +254,10 @@ class TextExtractor:
         w_step = w // cols
 
         parts = {}
-
-        for r in range(rows):
-            if self.row_target and r != self.row_target:
-                continue
-            for c in range(cols):
-                if self.column_target and c != self.column_target:
-                    continue
+        row_range = [self.row_target] if self.row_target is not None else range(rows)
+        col_range = [self.column_target] if self.column_target is not None else range(cols)
+        for r in row_range:
+            for c in col_range:
                 y_start = r * h_step
                 y_end = (r + 1) * h_step if r < rows - 1 else h
                 x_start = c * w_step
