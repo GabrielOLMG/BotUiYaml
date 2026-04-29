@@ -37,7 +37,7 @@ ACTION_SCHEMA = {
             "next": dict, # Como validar melhor?
             "search_area": dict, # DONE!
             "interaction": dict, # click, type(Click, Upload,...), offset(dict)(y_coord,x_coord), file_path, write(?)
-            "search_strategy": dict # scroll, scroll_direction
+            "search_strategy": dict, # scroll, scroll_direction
             # ---------------
             **GLOBAL_FIELDS
         },

@@ -48,11 +48,15 @@ def start_bot(
 def ocr_test(
     image_path: str = typer.Option(...),
     text_target: str | None = typer.Option(None),
+    search_area: str | None = typer.Option(None),
+
 ):
     try: 
         from BotUi.finders.text.TextExtractor import TextExtractor
-        
-        extractor = TextExtractor(model_type="rapid_ocr", save_debug_internal=True)
+
+        if search_area:
+            search_area=json.loads(search_area)
+        extractor = TextExtractor(model_type="rapid_ocr", save_debug_internal=True, search_area=search_area)
 
         data = extractor.run(image_path, text_target)
 

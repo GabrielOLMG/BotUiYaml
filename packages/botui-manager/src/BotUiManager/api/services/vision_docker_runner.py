@@ -31,6 +31,11 @@ def run_bot_container_vision(
 
     if payload.text_target:
         cmd.extend(["--text-target", payload.text_target])
+    
+    if payload.search_area:
+        # Transforma o dict em string JSON compacta
+        search_area_json = json.dumps(payload.search_area.model_dump(), separators=(',', ':'))
+        cmd.extend(["--search-area", search_area_json])
 
 
     result_process = subprocess.run(cmd, capture_output=True, text=True)

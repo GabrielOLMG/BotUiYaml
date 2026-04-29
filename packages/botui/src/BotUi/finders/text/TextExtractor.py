@@ -27,7 +27,7 @@ class TextExtractor:
         self.target_result = BotTargetResult(found=False, error=False, target_type="TEXT")
 
         # -- Internal Settings -- #
-        self.overlap = 100
+        self.overlap = 50
         self.save_debug_internal=save_debug_internal
         self.log_text = f"[TextExtractor.run [Text Model: {model_type}]"
 
@@ -36,8 +36,8 @@ class TextExtractor:
         self.position = position
 
         # -- Init Search Area Fields-- #
-        self.column_target = search_area.get("row", None)
-        self.row_target = search_area.get("column", None)
+        self.column_target = search_area.get("column", None)
+        self.row_target = search_area.get("row", None)
         self.grid_cols = search_area.get("grid_cols", 3)
         self.grid_rows = search_area.get("grid_rows", 3)
 
