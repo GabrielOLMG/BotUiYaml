@@ -31,24 +31,13 @@ ACTION_SCHEMA = {
         },
         "optional": {
             "in_text": bool, # TODO: Pode fazer parte do operator!
-
-            # TODO: Transformar em um dicionario relacionado ao scrol?
-            "scroll": bool,
-            "scroll_direction": str,
-            # ---------------
-
-            "next": dict, # Como validar melhor?
-            
-            "row_target": int, # TODO: MELHORAR!
-            "column_target": int, # TODO: MELHORAR!
-            "y_coord": int,
-            "x_coord": int,
-            "save_as": str,
-            "click": bool,
-
-            # TODO: Transformar em um diconario q englobe os 2?
             "position": int,
-            "side": str,
+            "save_as": str,
+            # --------------- # TODO: Achar melhor forma de validar esta parte!
+            "next": dict, # Como validar melhor?
+            "search_area": dict, # row_target, column_target, row_total, columns_total
+            "interaction": dict, # y_coord, x_coord, click, type(Click, Upload,...), offset(dict)(x,y), file_path, write(?)
+            "search_strategy": dict # scroll, scroll_direction
             # ---------------
             **GLOBAL_FIELDS
         },
