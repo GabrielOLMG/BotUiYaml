@@ -1,6 +1,6 @@
 - ATAULMENTE O NEXT SO FUNCIONA  SE FOR TUDO DA MSM PIPELINE, ENTRE PIPELINES N FIUNCONA!
 - fazer um check se existe nomes de step duplicados
-
+- o file_path do upload(dentro do find) nao esta aceitando variaveis externas, mudar!!
 # Documentaçao 
 
 - falar do target result na documentaçao
