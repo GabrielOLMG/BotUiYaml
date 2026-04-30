@@ -20,7 +20,7 @@ class TextExtractor:
             position = 0,
             search_area:dict={},
             *,
-            save_debug_internal=False
+            save_debug_internal=None
         ):
         self.model_type = model_type
         self.split_images = split_images
@@ -354,7 +354,7 @@ class TextExtractor:
             image_debug = self._get_bbox_texts(image_debug, all_texts, show_part=True)
 
         if self.save_debug_internal:
-            cv2.imwrite("/app/data/bbox_texts_debug.png", image_debug)
+            cv2.imwrite(self.save_debug_internal, image_debug)
 
         self.target_result.debug_image = image_debug
 

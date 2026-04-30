@@ -47,6 +47,7 @@ def start_bot(
 @app.command()
 def ocr_test(
     image_path: str = typer.Option(...),
+    save_at: str | None = typer.Option(None),
     text_target: str | None = typer.Option(None),
     search_area: str | None = typer.Option(None),
 
@@ -56,7 +57,7 @@ def ocr_test(
 
         if search_area:
             search_area=json.loads(search_area)
-        extractor = TextExtractor(model_type="rapid_ocr", save_debug_internal=True, search_area=search_area)
+        extractor = TextExtractor(model_type="rapid_ocr", save_debug_internal=save_at, search_area=search_area)
 
         data = extractor.run(image_path, text_target)
 
