@@ -22,7 +22,7 @@ def get_outputs(container_id, pipeline_name):
         
         screenshot_debug = None
         if debug_screenshot_b64:
-            screenshot = base64.b64decode(debug_screenshot_b64)
+            screenshot_debug = base64.b64decode(debug_screenshot_b64)
 
         return exists, screenshot, logs, screenshot_debug
     except Exception as e:
