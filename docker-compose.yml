@@ -18,6 +18,8 @@ services:
       - DOCKER_NETWORK=botui_network
       - BOTUI_IMAGE=botui
       - BOT_PATH=/app/bot
+      - VISION_PATH=/app/vision
+
   
   # docker compose up dashboard --build
   dashboard: 

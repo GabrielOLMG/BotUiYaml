@@ -1,66 +1,130 @@
+import os
+import io
 import uuid
+import json
 import base64
-from pathlib import Path
-from fastapi import APIRouter
+import tarfile
 import subprocess
 
-from BotUiManager.api.services.vision_docker_runner import run_bot_container_vision
-from BotUiManager.api.models import OCRPayload, TemplateMatchPayload, OCRResult
+from pathlib import Path
+from fastapi import APIRouter
+
+from BotUiManager.api.services.general import retrieve_content_from_container
+from BotUiManager.api.services.vision_docker_runner import run_container_vision
+from BotUiManager.api.models import OCRPayload, TemplateMatchPayload
 
 router = APIRouter()
 
-def remove_box_from_output(data: dict) -> dict:
-    import copy
-    data = copy.deepcopy(data)
-
-    debug_json = data.get("result", {}).get("debug_json", {})
-
-    for region, items in debug_json.items():
-        for item in items:
-            item.pop("box", None)  # remove "box" se existir
-            item.pop("score", None)  # remove "box" se existir
-            item.pop("center", None)  # remove "box" se existir
+ROOT_API = os.getenv("VISION_PATH")
 
 
-    return data
+@router.post("/vision/template_match", tags=["vision"])
+def template_match_simulate(payload: TemplateMatchPayload):
+    job_id = str(uuid.uuid4())
+    save_path = f"{ROOT_API}/template_match_simulate.png"
+    source_image_name = Path(payload.source_image).name 
 
+    docker_code = [
+        "-v", f"{payload.source_image}:{ROOT_API}/{source_image_name}"
+    ]
+    cli_code = [
+        "run-bot", "template-match-test", 
+        "--save-at", save_path,
+        "--source-image", f"{ROOT_API}/{source_image_name}",
+    ]
+    
+    if payload.template_image:
+        template_image_name = Path(payload.template_image).name 
+        cli_code.extend(["--template-image", f"{ROOT_API}/{template_image_name}"])
+        docker_code.extend(["-v", f"{payload.template_image}:{ROOT_API}/{template_image_name}"])
+
+    if payload.search_area:
+        search_area_json = json.dumps(payload.search_area.model_dump(), separators=(',', ':'))
+        cli_code.extend(["--search-area", search_area_json])
+
+    result_cli, container_name = run_container_vision(
+        job_id=job_id, 
+        docker_code=docker_code,
+        cli_code=cli_code
+    )
+
+    subprocess.run(["docker", "rm", "-f", container_name])
+    return {
+        "success": True,
+        "result": result_cli
+    }
 
 @router.post("/vision/ocr", tags=["vision"])
 def ocr_simulate(payload: OCRPayload):
     job_id = str(uuid.uuid4())
+    save_path = f"{ROOT_API}/ocr_simulate.png"
+    image_path_name = Path(payload.image_path).name 
 
-    # 1. Executa o container e pega o nome dele
-    result_cli, container_name = run_bot_container_vision(job_id, payload)
+    docker_code = [
+        "-v", f"{payload.image_path}:{ROOT_API}/{image_path_name}"
+    ]
+    cli_code = [
+        "run-bot", "ocr-test",
+        "--save-at", save_path,
+        "--image-path", f"{ROOT_API}/{image_path_name}",
+    ]
+
+    if payload.text_target:
+        cli_code.extend(["--text-target", payload.text_target])
+    if payload.search_area:
+        search_area_json = json.dumps(payload.search_area.model_dump(), separators=(',', ':'))
+        cli_code.extend(["--search-area", search_area_json])
+
+    result_cli, container_name = run_container_vision(
+        job_id=job_id, 
+        docker_code=docker_code,
+        cli_code=cli_code
+    )
+
+    debug_b64 = retrieve_content_from_container(save_path, container_name, is_binary=True)
     
-    if not result_cli.get("success"):
-        return result_cli
-
-    debug_b64 = None
-    try:
-        path_inside_container = "/app/data/bbox_texts_debug.png"
-        cp_cmd = ["docker", "cp", f"{container_name}:{path_inside_container}", "-"]
-        
-        # O docker cp com '-' gera um stream TAR
-        cp_process = subprocess.run(cp_cmd, capture_output=True)
-        
-        if cp_process.returncode == 0:
-            import tarfile
-            import io
-            # Extraímos o arquivo do stream TAR em memória
-            with tarfile.open(fileobj=io.BytesIO(cp_process.stdout)) as tar:
-                # O nome no tar será apenas o nome do arquivo
-                member = tar.getmember("bbox_texts_debug.png")
-                f = tar.extractfile(member)
-                if f:
-                    debug_b64 = base64.b64encode(f.read()).decode("utf-8")
-    except Exception as e:
-        print(f"Erro ao extrair imagem de debug: {e}")
-    finally:
-        # 3. Agora que pegamos a imagem, podemos remover o container manualmente
-        subprocess.run(["docker", "rm", "-f", container_name])
+    subprocess.run(["docker", "rm", "-f", container_name])
 
     return {
         "success": True,
-        "result": result_cli.get("result"),
+        "result": result_cli,
         "debug_image": debug_b64
     }
+
+
+# @router.post("/vision/ocr", tags=["vision"])
+# def ocr_simulate(payload: OCRPayload):
+#     job_id = str(uuid.uuid4())
+
+#     result_cli, container_name = run_bot_container_vision(job_id, payload)
+    
+#     if not result_cli.get("success"):
+#         return result_cli
+
+#     debug_b64 = None
+#     try:
+#         path_inside_container = "/app/data/bbox_texts_debug.png"
+#         cp_cmd = ["docker", "cp", f"{container_name}:{path_inside_container}", "-"]
+        
+#         cp_process = subprocess.run(cp_cmd, capture_output=True)
+        
+#         if cp_process.returncode == 0:
+
+#             with tarfile.open(fileobj=io.BytesIO(cp_process.stdout)) as tar:
+#                 # O nome no tar será apenas o nome do arquivo
+#                 member = tar.getmember("bbox_texts_debug.png")
+#                 f = tar.extractfile(member)
+#                 if f:
+#                     debug_b64 = base64.b64encode(f.read()).decode("utf-8")
+#     except Exception as e:
+#         print(f"Erro ao extrair imagem de debug: {e}")
+#     finally:
+#         # 3. Agora que pegamos a imagem, podemos remover o container manualmente
+#         subprocess.run(["docker", "rm", "-f", container_name])
+
+#     return {
+#         "success": True,
+#         "result": result_cli.get("result"),
+#         "debug_image": debug_b64
+#     }
+

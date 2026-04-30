@@ -29,11 +29,13 @@ class OCRPayload(BaseModel):
 class TemplateMatchPayload(BaseModel):
     source_image: str = Field(
         ...,
-        description="absolute path to image"
+        description="absolute path to image",
+        example= "/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_debug/template_matching/source.png"
     )
 
     template_image: Optional[str] = Field(
         None, 
+        example="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_debug/template_matching/template.png",
         description="Image to try to locate in the image"
     )
 
