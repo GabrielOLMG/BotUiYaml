@@ -32,7 +32,7 @@ def run_job(payload: RunBotRequest):
     )
 
 
-@router.get("/jobs/{container_id}/collect", tags=["jobs"])
+@router.get("/jobs/{container_id}/{pipeline_name}/collect", tags=["jobs"])
 def collect_container_outputs(container_id: str, pipeline_name: str):
     from BotUiManager.api.services.general import retrieve_folder_from_container, retrieve_logs_from_container, container_exists
     outputs_path = f"{ROOT_API}/{pipeline_name}/outputs"

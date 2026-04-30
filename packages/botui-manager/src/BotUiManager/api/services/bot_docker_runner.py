@@ -48,7 +48,8 @@ def run_bot_container(
     return {
         "job_id": job_id,
         "container_name": container_name,
-        "container_id": result.stdout.strip()
+        "container_id": result.stdout.strip(),
+        "pipeline_name": dir_name
     }
 
 
