@@ -1,9 +1,6 @@
 import os
-import io
 import uuid
 import json
-import base64
-import tarfile
 import subprocess
 
 from pathlib import Path
@@ -47,12 +44,14 @@ def template_match_simulate(payload: TemplateMatchPayload):
         docker_code=docker_code,
         cli_code=cli_code
     )
+    
+    # debug_b64 = retrieve_content_from_container(save_path, container_name, is_binary=True)
 
     subprocess.run(["docker", "rm", "-f", container_name])
     return {
         "success": True,
         "result": result_cli,
-        "debug_image": debug_b64
+        "debug_image": None #debug_b64
 
     }
 

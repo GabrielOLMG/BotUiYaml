@@ -77,6 +77,23 @@ def ocr_test(
 
     typer.echo(json.dumps(output))
 
+@app.command()
+def template_match_test(
+    source_image: str = typer.Option(...),
+    template_image: str | None = typer.Option(None),
+    save_at: str | None = typer.Option(None),
+    search_area: str | None = typer.Option(None),
+
+):
+
+    output = {
+        "success": True,
+        "result": None,
+        "error": None
+    }
+
+    typer.echo(json.dumps(output))
+
 
 if __name__ == "__main__":
     app()
