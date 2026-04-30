@@ -18,7 +18,7 @@ def run_bot_container(
     network = os.getenv("DOCKER_NETWORK", "botui_network")
 
     init_cmd = ["docker", "run", "-d", "--network", network]
-    if False and not payload.debug:
+    if not payload.debug:
         init_cmd.append("--rm")
     final_cmd = [
         "--name", container_name,
