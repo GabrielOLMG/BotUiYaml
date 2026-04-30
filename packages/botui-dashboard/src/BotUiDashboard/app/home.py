@@ -63,7 +63,7 @@ with st.sidebar:
     
     st.subheader("Tools")
     if st.button("OCR Toolkit", use_container_width=True):
-        open_ocr_toolkit(pipeline_dir)
+        open_ocr_toolkit()
     
     if st.button("View screenshot history", use_container_width=True):
         open_screenshot_history()

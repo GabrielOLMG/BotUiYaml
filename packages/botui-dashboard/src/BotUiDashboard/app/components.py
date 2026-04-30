@@ -43,7 +43,7 @@ def inject_auto_scroll_js():
 
 
 @st.dialog("OCR Toolkit", width="large")
-def open_ocr_toolkit(pipeline_dir):
+def open_ocr_toolkit():
     
     with st.container(border=True):
         col1, col2 = st.columns(2)
