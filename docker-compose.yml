@@ -2,6 +2,7 @@
 
 
 services:
+  # docker compose up api --build
   api:
     build:
       context: .
@@ -17,7 +18,10 @@ services:
       - BOTUI_ENV=dev
       - DOCKER_NETWORK=botui_network
       - BOTUI_IMAGE=botui
-  dashboard: # docker compose up dashboard --build
+      - BOT_PATH="/app/bot/"
+  
+  # docker compose up dashboard --build
+  dashboard: 
     build:
       context: .
       dockerfile: BotUi_Setup/Dockerfile.app
