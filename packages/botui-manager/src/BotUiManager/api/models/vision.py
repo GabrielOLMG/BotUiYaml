@@ -27,12 +27,12 @@ class OCRPayload(BaseModel):
 
 
 class TemplateMatchPayload(BaseModel):
-    image_path: str = Field(
+    source_image: str = Field(
         ...,
         description="absolute path to image"
     )
 
-    image_target: Optional[str] = Field(
+    template_image: Optional[str] = Field(
         None, 
         description="Image to try to locate in the image"
     )
