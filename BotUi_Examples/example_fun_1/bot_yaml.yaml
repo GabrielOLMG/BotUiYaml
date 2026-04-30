@@ -240,23 +240,6 @@ pipelines:
 
 
 
-        
-
-
-      # # PIPILINE AQ
-      # - action: WRITE
-      #   name: end
-      #   text: "/leave"
-
-      # - action: KEYS_SELECTIONS
-      #   keys:
-      #     - ENTER
-
-      # - action: FIND
-      #   object_type: TEXT
-      #   text: "Forfeit"
-      #   in_text: False
-      #   click: true
 
 
 
