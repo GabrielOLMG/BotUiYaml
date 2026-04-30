@@ -36,6 +36,7 @@ with st.sidebar:
     st.subheader("Bot Control")
     if not st.session_state.get("bot_running"):
         if st.button("Start Execution", use_container_width=True, type="primary"):
+            st.session_state.screenshot_history = []
             payload = {
                 "pipeline_dir": pipeline_dir,
                 "bot_relative_path": bot_path,
