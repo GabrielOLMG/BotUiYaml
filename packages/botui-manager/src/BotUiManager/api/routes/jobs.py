@@ -1,6 +1,7 @@
+import os
+import json
 import uuid
-import subprocess
-from pathlib import Path
+import base64
 
 from fastapi import APIRouter, HTTPException, Response
 
@@ -9,6 +10,7 @@ from BotUiManager.api.services.bot_docker_runner import run_bot_container, get_c
 
 router = APIRouter()
 
+ROOT_API = os.getenv("BOT_PATH")
 
 @router.post(
     path="/jobs/run",
@@ -30,36 +32,42 @@ def run_job(payload: RunBotRequest):
     )
 
 
-@router.get("/jobs/{job_id}/logs", tags=["jobs"])
-def get_job_logs(job_id: str):
-    container_name = f"botui_{job_id}" 
-    
-    logs = get_container_logs(container_name)
-    
-    return {
-        "job_id": job_id,
-        "logs": logs
+@router.get("/jobs/{container_id}/collect", tags=["jobs"])
+def collect_container_outputs(container_id: str, pipeline_name: str):
+    from BotUiManager.api.services.general import retrieve_folder_from_container, retrieve_logs_from_container, container_exists
+    outputs_path = f"{ROOT_API}/{pipeline_name}/outputs"
+
+
+    screenshot_path = f"./screenshots/screenshot_page.png" 
+    debug_screenshot_path = f"./debugs/debug.png" 
+    debug_json_path = f"./debugs/debug.json"
+
+
+    result = {
+        "exists": False,
+        "screenshot": None,
+        "debug_screenshot": None,
+        "debug_json": None,
+        "logs": None
     }
+    if not container_exists(container_id):
+            return result
+    
+    result["exists"] = True
+    result["logs"] = retrieve_logs_from_container(container_id)
+    files = retrieve_folder_from_container(container_id, outputs_path)
 
+    if files:
+        if screenshot_path in files:
+            result["screenshot"] = base64.b64encode(files[screenshot_path]).decode("utf-8")
+        
+        if debug_screenshot_path in files:
+            result["debug_screenshot"] = base64.b64encode(files[debug_screenshot_path]).decode("utf-8")
+        if debug_json_path in files:
+            try:
+                result["debug_json"] = json.loads(files[debug_json_path].decode("utf-8"))
+            except:
+                pass
 
-@router.get("/jobs/{job_id}/screenshot", tags=["jobs"])
-def get_job_screenshot(job_id: str, pipeline_dir: str):
-    container_name = f"botui_{job_id}"
-    dir_name = Path(pipeline_dir).name
-    screenshot_path = f"/app/bots/{dir_name}/outputs/screenshots/screenshot_page.png"
-
-    try:
-        # Usamos 'cat' dentro do container para jogar os bytes no stdout do processo
-        cmd = ["docker", "exec", container_name, "cat", screenshot_path]
-        result = subprocess.run(cmd, capture_output=True)
-
-        if result.returncode != 0:
-            # Se o arquivo ainda não existe (o bot não tirou print ainda)
-            raise HTTPException(status_code=404, detail="Screenshot ainda não gerada.")
-
-        # Enviamos os bytes capturados no stdout diretamente para o frontend
-        return Response(content=result.stdout, media_type="image/png")
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return result
     

@@ -5,34 +5,35 @@ from pathlib import Path
 
 from BotUiManager.api.models import RunBotRequest
 
+ROOT_API = os.getenv("BOT_PATH")
+NETWORK = os.getenv("DOCKER_NETWORK", "botui_network")
 
 def run_bot_container(
         job_id,
-        payload: RunBotRequest
+        payload: RunBotRequest,
     )-> dict:
     container_name = f"botui_{'debug_' if payload.debug else ''}{job_id}"
     dir_name = Path(payload.pipeline_dir).name
     debug_flag = "--debug" if payload.debug else ""
 
+    
 
-    network = os.getenv("DOCKER_NETWORK", "botui_network")
-
-    init_cmd = ["docker", "run", "-d", "--network", network]
+    init_cmd = ["docker", "run", "-d", "--network", NETWORK]
     if not payload.debug:
         init_cmd.append("--rm")
     final_cmd = [
         "--name", container_name,
-        "-v", f"{payload.pipeline_dir}:/app/bots/{dir_name}",
+        "-v", f"{payload.pipeline_dir}:{ROOT_API}/{dir_name}",
         "botui",
         "sh", "-c",
         (   
-            f"mkdir -p /app/bots/{dir_name}/outputs/logs && "
+            f"mkdir -p {ROOT_API}/{dir_name}/outputs/logs && "
             f"run-bot start-bot "
-            f"--pipeline /app/bots/{dir_name} "
+            f"--pipeline {ROOT_API}/{dir_name} "
             f"--bot {payload.bot_relative_path} "
             f"--bot-variables {payload.globals_relative_path or ''} "
             f"{debug_flag} "
-            f"2>&1 | tee /app/bots/{dir_name}/outputs/logs/bot_docker.log"
+            f"2>&1 | tee {ROOT_API}/{dir_name}/outputs/logs/bot_docker.log"
         )
     ]
     cmd = init_cmd + final_cmd
@@ -49,6 +50,7 @@ def run_bot_container(
         "container_name": container_name,
         "container_id": result.stdout.strip()
     }
+
 
 def get_container_logs(container_name: str):
     try:
