@@ -25,21 +25,19 @@ class OCRPayload(BaseModel):
         description="Grid-based search area configuration"
     )
 
-class OCRResult(BaseModel):
-    name: str = Field(
-        ...,
-        description="Step Identifier",
-    )
-
 
 class TemplateMatchPayload(BaseModel):
-    image_path: bool = Field(
+    image_path: str = Field(
         ...,
         description="absolute path to image"
-
     )
-    
-class TemplateMatchResult(BaseModel):
-    name: str = Field(
-        ...,
+
+    image_target: Optional[str] = Field(
+        None, 
+        description="Image to try to locate in the image"
+    )
+
+    search_area: Optional[SearchAreaPayload] = Field(
+        default_factory=SearchAreaPayload,
+        description="Grid-based search area configuration"
     )
