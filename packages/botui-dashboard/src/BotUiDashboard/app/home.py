@@ -83,7 +83,7 @@ if st.session_state.get("bot_running"):
     pipeline_name = st.session_state.get("pipeline_name")
 
     while st.session_state.bot_running:
-        exists, screenshot, logs = get_outputs(container_id, pipeline_name)
+        exists, screenshot, logs, screenshot_debug = get_outputs(container_id, pipeline_name)
 
         if not exists:
             st.session_state.bot_running = False
@@ -94,6 +94,8 @@ if st.session_state.get("bot_running"):
             last_hash = st.session_state.get("last_screenshot_hash")
             if current_hash != last_hash:
                 st.session_state.screenshot_history.append(screenshot)
+                if screenshot_debug:
+                    st.session_state.screenshot_history.append(screenshot_debug)
                 st.session_state.last_screenshot_hash = current_hash
                 
                 if len(st.session_state.screenshot_history) > MAX_SCREENSHOTS:
