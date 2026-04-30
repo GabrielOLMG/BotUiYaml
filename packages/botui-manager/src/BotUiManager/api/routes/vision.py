@@ -82,7 +82,6 @@ def ocr_simulate(payload: OCRPayload):
         docker_code=docker_code,
         cli_code=cli_code
     )
-    print(result_cli)
     debug_b64 = retrieve_content_from_container(save_path, container_name, is_binary=True)
     
     subprocess.run(["docker", "rm", "-f", container_name])
