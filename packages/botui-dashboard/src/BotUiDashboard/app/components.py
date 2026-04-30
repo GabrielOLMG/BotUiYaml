@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import base64
 
+from BotUiDashboard.app.api_client import ocr_endpoint
+
 API_BASE_URL = "http://botui_api:8000"
 
 def inject_custom_css(log_height):
@@ -87,26 +89,15 @@ def open_ocr_toolkit():
         }
 
         with st.spinner("Processing OCR..."):
-            try:
-                from api_client import API_BASE_URL 
-                response = requests.post(f"{API_BASE_URL}/vision/ocr", json=payload, timeout=60)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    st.success("Analysis finished!")
-                    
-                    with st.expander("JSON Result"):
-                        st.json(data.get("result"))
-                    
-                    if data.get("debug_image"):
-                        import base64
-                        img_bytes = base64.b64decode(data["debug_image"])
-                        debug_canvas.image(img_bytes, use_container_width=True)
-                else:
-                    st.error(f"Api Error: {response.text}")
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
-        
+            result = ocr_endpoint(payload=payload)
+            if result["success"]:
+                st.success(result["message"])
+                with st.expander("JSON Result"):
+                    st.json(result["success"])
+                if result["image"]:
+                    debug_canvas.image(result["image"], use_container_width=True)
+            else:
+                st.error(result["message"])        
 
 
 @st.dialog("Screenshot History", width="large")

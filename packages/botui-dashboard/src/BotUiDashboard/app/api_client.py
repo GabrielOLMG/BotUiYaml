@@ -28,18 +28,39 @@ def get_outputs(container_id, pipeline_name):
     except Exception as e:
         return False, None, f"Erro de conexão: {str(e)}", None
 
-def fetch_logs(job_id):
+def ocr_endpoint(payload):
+    result = {
+        "success": False,
+        "message": None,
+        "json": None,
+        "image": None
+    }
     try:
-        response = requests.get(f"{API_BASE_URL}/jobs/{job_id}/logs", timeout=2)
-        return response.json().get("logs", "Sem logs.") if response.status_code == 200 else "Offline"
-    except: return "Erro de conexão"
+        response = requests.post(f"{API_BASE_URL}/vision/ocr", json=payload, timeout=60)
 
-def fetch_screenshot(job_id, pipeline_dir):
-    try:
-        params = {"pipeline_dir": pipeline_dir}
-        res = requests.get(f"{API_BASE_URL}/jobs/{job_id}/screenshot", params=params, timeout=2)
-        return res.content if res.status_code == 200 else None
-    except: return None
+        if response.status_code == 200:
+            data = response.json()
+            result["success"] = True
+            result["message"] = "Analysis finished!"
+
+            result["json"] = data.get("result")
+
+            if data.get("debug_image"):
+                result["image"] = base64.b64decode(data["debug_image"])
+        else:
+            result["message"] = f"Api Error: {response.text}"
+        
+        return result
+    except Exception as err:
+        result["message"] = f"Error: {str(err)}"
+        return result
+
+
+
+
+        
+    
+
 
 def start_bot_api(payload):
     return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
