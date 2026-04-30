@@ -47,7 +47,7 @@ pipelines:
           grid_cols: 3
 
       - action: WRITE
-        name: wirte_username
+        name: write_username
         text: $USERNAME
 
       - action: KEYS_SELECTIONS
