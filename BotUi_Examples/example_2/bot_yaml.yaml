@@ -1,0 +1,46 @@
+pipelines:
+  init:
+    url: $URL
+    steps:
+      - action: FIND
+        name: google_check
+        object_type: TEXT
+        text: "CONCORDO"
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 0
+          column: 1
+          grid_rows: 1    
+          grid_cols: 2
+        next:
+          true: search_input
+          false: end
+
+      - action: FIND
+        name: search_input
+        object_type: TEXT
+        text: "Selecione"
+        in_text: True
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 0
+          column: 0
+          grid_rows: 5    
+          grid_cols: 1
+        next:
+          true: write_input
+          false: end
+
+      - action: WRITE
+        name: write_input
+        text: Hong Kong
+      
+      # --------------------------------
+      # END
+      # --------------------------------
+
+      - action: STOP_IF
+        name: end
+        condition: "True"
