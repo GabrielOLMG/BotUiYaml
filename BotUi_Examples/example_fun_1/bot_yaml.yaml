@@ -3,114 +3,260 @@ pipelines:
     url: $URL
     steps:
       - action: FIND
-        name: 1 
+        name: google_check
         object_type: TEXT
         text: "Consent"
-        click: True
-        # debug: True
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 1
+          column: 1
+          grid_rows: 3    
+          grid_cols: 2
         next:
-          true: 2
-          false: 2
+          true: find_choose_name
+          false: find_choose_name
         
-      # Pipeline aqui
+      # --------------------------------
+      # LOGGING
+      # --------------------------------
       - action: FIND
-        name: 2
+        name: find_choose_name
         object_type: TEXT
         text: "Choose name"
-        click: True
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 0
+          column: 2
+          grid_rows: 3    
+          grid_cols: 3
+
       - action: FIND
+        name: find_username
         object_type: TEXT
         text: "Username"
-        helper: Procura user
-        y_coord: 2
-        click: True
+        interaction:
+          type: CLICK  
+          offset:
+            y: 10
+        search_area:
+          row: 0
+          column: 2
+          grid_rows: 3    
+          grid_cols: 3
+
       - action: WRITE
+        name: wirte_username
         text: $USERNAME
-        helper: Escreve user
 
       - action: KEYS_SELECTIONS
+        name: enter_key
         keys:
           - ENTER
-        helper: Enter
         
       - action: FIND
-        name: 6
+        name: find_password
         object_type: TEXT
         text: "Password"
-        y_coord: 2
-        click: True
-        helper: Procura Pass
+        interaction:
+          type: CLICK  
+          offset:
+            y: 10
+        search_area:
+          row: 0
+          column: 1
+          grid_rows: 2    
+          grid_cols: 3
         next:
-          true: 7
-          false: 6
+          true: write_password
+          false: find_password
+
       - action: WRITE
-        name: 7
+        name: write_password
         text: $PASSWORD
+
+      - action: KEYS_SELECTIONS
+        name: enter_key
+        keys:
+          - ENTER
+
+      - action: FIND
+        name: check_if_logged 
+        object_type: TEXT
+        text: $USERNAME
+        search_area:
+          row: 0
+          column: 2
+          grid_rows: 3    
+          grid_cols: 3
+        next:
+          true: check_if_is_battling
+          false: check_if_logged
+        
+
+      # --------------------------------
+      # CHECK IF IS BATTLEING
+      # --------------------------------
+      - action: FIND
+        name: check_if_is_battling
+        object_type: TEXT
+        text: "Choose"
+        in_text: True
+        debug: True
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 1
+          column: 0
+          grid_rows: 3    
+          grid_cols: 3
+        next:
+          true: apologies
+          false: find_format_box
+
+
+      # --------------------------------
+      # IF IS NOT BATTLEING
+      # --------------------------------
+
+      - action: FIND
+        name: find_format_box
+        object_type: TEXT
+        text: "Format"
+        interaction:
+          type: CLICK  
+          offset:
+            y: 10
+        search_area:
+          row: 0
+          column: 0
+          grid_rows: 3    
+          grid_cols: 3
+      
+      - action: FIND
+        name: select_game_tab
+        object_type: TEXT
+        text: "Randomized Metas"
+        in_text: true
+        debug: True
+        interaction:
+          type: CLICK  
+          offset:
+            x: -20
+        search_area:
+          row: 0
+          column: 1
+          grid_rows: 3    
+          grid_cols: 5
+        next: 
+          True: select_game_mode
+          False: end
+
+      - action: FIND
+        name: select_game_mode
+        object_type: TEXT
+        text: "Challenge Cup 1v1"
+        search_area:
+          row: 0
+          column: 0
+          grid_rows: 1    
+          grid_cols: 1
+        interaction:
+          type: CLICK  
+        next: 
+          True: start_searching
+          False: end
+
+      - action: FIND
+        name: start_searching
+        object_type: TEXT
+        text: "Battle!"
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 0
+          column: 0
+          grid_rows: 3    
+          grid_cols: 3
+        next: 
+          True: waiting_battle
+          False: end
+      
+      - action: FIND
+        name: waiting_battle
+        object_type: TEXT
+        text: "Choose"
+        debug: True
+        search_area:
+          row: 1
+          column: 0
+          grid_rows: 3    
+          grid_cols: 3
+        next:
+          true: apologies
+          false: waiting_battle
+
+
+      # --------------------------------
+      # IF IS BATTLEING
+      # --------------------------------
+
+      - action: WRITE
+        name: apologies
+        text: "I'm a bot under construction, sorry for the inconvenience."
+      
       - action: KEYS_SELECTIONS
         keys:
           - ENTER
-        wait: 3
-      # - action: FIND
-      #   name: check_logado 
-      #   object_type: TEXT
-      #   text: $USERNAME
-      #   helper: "Tentando localizar nome logado!"
-      #   next:
-      #     true: check_format
-      #     false: check_logado
-        
-      # PIPILINE AQ
-      - action: FIND
-        name: 9
-        object_type: TEXT
-        text: "Turn"
-        in_text: true
-        click: true
-        next:
-          true: end
-          false: 10
-
-
-      - action: FIND
-        name: 10
-        object_type: TEXT
-        text: "Format"
-        y_coord: 20
-        click: true
       
-      - action: FIND
-        name: selec_gamemode
-        object_type: TEXT
-        text: "Randomized Metas"
-        click: true
-        x_coord: -10
-
-      - action: FIND
-        object_type: TEXT
-        text: "Challenge Cup 1v1"
-        click: true
-
-      - action: FIND
-        object_type: TEXT
-        text: "Battle!"
-        click: true
-        
-
-
-      # PIPILINE AQ
       - action: WRITE
-        name: end
+        name: leaving_battle
         text: "/leave"
 
       - action: KEYS_SELECTIONS
         keys:
           - ENTER
-
+      
       - action: FIND
         object_type: TEXT
         text: "Forfeit"
         in_text: False
-        click: true
+        interaction:
+          type: CLICK  
+        search_area:
+          row: 0
+          column: 1
+          grid_rows: 3    
+          grid_cols: 3
+
+      # --------------------------------
+      # END
+      # --------------------------------
+
+      - action: STOP_IF
+        name: end
+        condition: "True"
+
+
+
+        
+
+
+      # # PIPILINE AQ
+      # - action: WRITE
+      #   name: end
+      #   text: "/leave"
+
+      # - action: KEYS_SELECTIONS
+      #   keys:
+      #     - ENTER
+
+      # - action: FIND
+      #   object_type: TEXT
+      #   text: "Forfeit"
+      #   in_text: False
+      #   click: true
 
 
 
