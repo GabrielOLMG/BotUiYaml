@@ -81,7 +81,7 @@ run-app:
 	@echo "🚀 Starting BotUI FRONT-END..."
 	@echo "======================================"
 	docker compose up dashboard -d
-	@echo "✅ API running at http://localhost:8000"
+	@echo "✅ APP running at http://localhost:8501"
 
 
 # ==========================================
