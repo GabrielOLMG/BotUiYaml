@@ -94,8 +94,8 @@ if st.session_state.get("bot_running"):
             last_hash = st.session_state.get("last_screenshot_hash")
             if current_hash != last_hash:
                 st.session_state.screenshot_history.append(screenshot)
-                if screenshot_debug:
-                    st.session_state.screenshot_history.append(screenshot_debug)
+                # if screenshot_debug:
+                #     st.session_state.screenshot_history.append(screenshot_debug)
                 st.session_state.last_screenshot_hash = current_hash
                 
                 if len(st.session_state.screenshot_history) > MAX_SCREENSHOTS:
