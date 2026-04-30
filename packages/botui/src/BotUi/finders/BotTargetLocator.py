@@ -52,7 +52,7 @@ class BotTargetLocator:
             search_area: dict={},
             debug:bool=False,
         ):
-        from BotUi.finders.image import find_image_center_match_template, find_image_center_sift
+        from BotUi.finders.image.old import find_image_center_match_template, find_image_center_sift
         approaches_functions = [find_image_center_match_template, find_image_center_sift]
         image_source = cv2.imread(self.image_source_path, 0)
         template = cv2.imread(template_path, 0)
