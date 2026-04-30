@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import base64
 
-# URL base da API (centralizada para facilitar manutenção)
 API_BASE_URL = "http://botui_api:8000"
 
 def inject_custom_css(log_height):
