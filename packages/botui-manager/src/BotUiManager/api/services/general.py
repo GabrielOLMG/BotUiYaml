@@ -29,8 +29,6 @@ def retrieve_folder_from_container(container_id, container_path):
     except Exception as e:
         print(f"Erro ao extrair: {e}")
     return artifacts
-    
-    return artifacts
 
 def retrieve_content_from_container(path, container_id, is_binary=True):
     try:

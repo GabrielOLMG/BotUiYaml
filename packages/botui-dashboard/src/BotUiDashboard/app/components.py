@@ -93,7 +93,7 @@ def open_ocr_toolkit():
             if result["success"]:
                 st.success(result["message"])
                 with st.expander("JSON Result"):
-                    st.json(result["success"])
+                    st.json(result["json"])
                 if result["image"]:
                     debug_canvas.image(result["image"], use_container_width=True)
             else:
