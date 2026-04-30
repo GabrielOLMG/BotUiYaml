@@ -1,7 +1,7 @@
-# docker compose up --build
 
 
 services:
+  # docker compose up api --build
   api:
     build:
       context: .
@@ -17,6 +17,20 @@ services:
       - BOTUI_ENV=dev
       - DOCKER_NETWORK=botui_network
       - BOTUI_IMAGE=botui
+      - BOT_PATH=/app/bot
+  
+  # docker compose up dashboard --build
+  dashboard: 
+    build:
+      context: .
+      dockerfile: BotUi_Setup/Dockerfile.app
+    container_name: botui_app
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+    networks:
+      - botui_network
 
 networks:
   botui_network:

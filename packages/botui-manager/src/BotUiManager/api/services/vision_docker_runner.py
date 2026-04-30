@@ -20,7 +20,7 @@ def run_bot_container_vision(
     botui_image = os.getenv("BOTUI_IMAGE")
 
     cmd = [
-        "docker", "run", "--rm",
+        "docker", "run",# "--rm",
         "--network", network,
         "--name", container_name,
         "-v", f"{parent}:/app/data/",
@@ -33,18 +33,15 @@ def run_bot_container_vision(
         cmd.extend(["--text-target", payload.text_target])
     
     if payload.search_area:
-        # Transforma o dict em string JSON compacta
         search_area_json = json.dumps(payload.search_area.model_dump(), separators=(',', ':'))
         cmd.extend(["--search-area", search_area_json])
 
 
     result_process = subprocess.run(cmd, capture_output=True, text=True)
-    print("STDOUT:", result_process.stdout)
-    print("STDERR:", result_process.stderr)
-
-
     
-    result_cli = json.loads(result_process.stdout)
+    try:
+        result_cli = json.loads(result_process.stdout)
+    except:
+        result_cli = {"success": False, "error": result_process.stderr}
 
-
-    return result_cli
+    return result_cli, container_name
