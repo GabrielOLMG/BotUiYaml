@@ -55,12 +55,5 @@ def ocr_endpoint(payload):
         result["message"] = f"Error: {str(err)}"
         return result
 
-
-
-
-        
-    
-
-
 def start_bot_api(payload):
     return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
