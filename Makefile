@@ -105,14 +105,14 @@ clean-botui:
 	@echo "🧹 Cleaning BotUI system..."
 	@echo "======================================"
 
-	-docker ps -q --filter "name=botui" | xargs -r docker stop
-	-docker ps -a -q --filter "name=botui" | xargs -r docker rm -f
+	-docker ps -q | grep botui | xargs -r docker stop
+	-docker ps -a -q | grep botui | xargs -r docker rm -f
 	-docker images | grep botui | awk '{print $$3}' | xargs -r docker rmi -f
 	-docker volume ls -q | grep botui | xargs -r docker volume rm
-	-docker network ls -q --filter "name=botui" | xargs -r docker network rm
+	-docker network ls -q | grep botui | xargs -r docker network rm
 
 	@echo "✅ Clean complete!"
-
+	
 stop-botui:
 	@echo "🛑 Stopping all BotUI containers..."
 	docker ps -q --filter "name=botui" | xargs -r docker stop
