@@ -21,7 +21,8 @@ class FindAction(BaseAction):
 
         # 2)
         attempts = 0
-        max_attempts = FindConstants.MAX_ATTEMPTS if scroll_enabled else 1
+        max_scroll = search_strategy.get("max_scroll", FindConstants.MAX_ATTEMPTS)
+        max_attempts = max_scroll if scroll_enabled else 1
 
         while attempts < max_attempts:
             target_result = self._find_target(object_type, offset=interaction.get("offset", {}))
