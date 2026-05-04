@@ -27,6 +27,10 @@ class BotDriver(ABC):
         pass
 
     @abstractmethod
+    def download_file(self, file_path: str, coord:tuple, timeout: int):
+        pass
+
+    @abstractmethod
     def write(self, text):
         pass
 

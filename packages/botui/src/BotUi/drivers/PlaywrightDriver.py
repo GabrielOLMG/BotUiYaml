@@ -120,6 +120,41 @@ class PlaywrightDriver(BotDriver):
 
         return True, None
 
+    def download_file(self, file_path: str, coord, timeout=30000):
+        from BotUi.utils.utils import parse_coord
+        from pathlib import Path
+        import os
+
+        coord = parse_coord(coord)
+        if coord is None:
+            return False, f"[PlaywrightDriver.download_file] Invalid or missing coordinates: coord='{coord}'"
+        
+        try:
+            x, y = coord
+        except Exception as e:
+            return False, f"[PlaywrightDriver.download_file] Coord inválida {coord}: {e}"
+
+        try:
+            full_path = Path(file_path).resolve()
+            os.makedirs(full_path.parent, exist_ok=True)
+        except Exception as e:
+            return False, f"[PlaywrightDriver.download_file] Erro ao preparar caminho '{file_path}': {e}"
+
+        try:
+            with self.page.expect_download(timeout=timeout) as download_info:
+                success, error = self.click(coord=(x, y))
+                if not success:
+                    return False, f"[PlaywrightDriver.download_file] {error}"
+
+            download = download_info.value
+            
+            download.save_as(str(full_path))
+            
+            return True, None
+            
+        except Exception as e:
+            return False, f"[PlaywrightDriver.download_file] Falha durante o processo de download: {e}"
+
     def write(self, text):
         try:
             self.page.keyboard.insert_text(text)

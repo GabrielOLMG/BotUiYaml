@@ -166,6 +166,13 @@ class FindAction(BaseAction):
             success, error = self.bot_driver.upload_file(file_path, object_coord)
             if not success:
                 return f"[FindAction._apply_on_found.upload] {error}"
+        elif interaction_type == "DOWNLOAD":
+            file_path = interaction.get("file_path", None)
+            if not file_path:
+                return f"[FindAction._apply_on_found.download] To download a file, you need to have the 'file_path' field in 'interaction'." 
+            success, error = self.bot_driver.download_file(file_path, object_coord)
+            if not success:
+                return f"[FindAction._apply_on_found.download] {error}"
         else:
             return f"[FindAction._apply_on_found.click] The 'type' used in the 'interaction' does not exist.: {interaction}"
 
