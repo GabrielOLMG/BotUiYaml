@@ -115,7 +115,7 @@ clean-botui:
 	
 stop-botui:
 	@echo "🛑 Stopping all BotUI containers..."
-	docker ps -q --filter "name=botui" | xargs -r docker stop
+	-docker ps -q | grep botui | xargs -r docker stop
 	@echo "✅ Stopped."
 
 kill-botui:
