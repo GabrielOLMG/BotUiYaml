@@ -11,7 +11,6 @@ from BotUi.actions.RunScriptAction import RunScriptAction
 from BotUi.actions.FindTextByColorAction import FindTextByColorAction
 from BotUi.actions.StopIfAction import StopIfAction
 from BotUi.actions.UploadAction import UploadAction
-from BotUi.actions.DoWhileAction import DoWhileAction
 
 @dataclass
 class BotActionDispatcherResult:
@@ -28,7 +27,6 @@ class BotActionDispatcher:
         "FIND_TEXT_BY_COLOR": FindTextByColorAction,
         "STOP_IF": StopIfAction,
         "UPLOAD_FILE": UploadAction,
-        "DO_WHILE": DoWhileAction,
     }
 
     def __init__(self, bot_driver, bot_app):
