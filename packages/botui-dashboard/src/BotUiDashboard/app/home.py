@@ -4,7 +4,7 @@ import time
 
 from pathlib import Path
 
-from BotUiDashboard.app.api_client import get_outputs, start_bot_api
+from BotUiDashboard.app.api_client import get_outputs, start_bot_api, kill_bot_api
 from BotUiDashboard.app.components import inject_custom_css, inject_auto_scroll_js, open_ocr_toolkit, open_image_toolkit, open_screenshot_history
 from BotUiDashboard.app.state_manager import init_state
 
@@ -56,10 +56,19 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"API Failure: {e}")
     else:
-        if st.button("Stop Visual Monitoring", use_container_width=True):
+        if st.button("Stop Bot", use_container_width=True):
+            container_id = st.session_state.get("last_container_id")
+            res = kill_bot_api(container_id)
+            
+            if res.status_code == 200:
+                final_entry = "\n\n[SYSTEM] --- EXECUTION KILLED BY USER ---\n"
+                st.session_state.last_log += final_entry
+                st.session_state.post_kill_msg = ("Bot interrompido!", "💀")
+            else:
+                st.error(f"Falha ao encerrar: {res.text}")
+            
             st.session_state.bot_running = False
             st.rerun()
-    
     st.divider()
     
     st.subheader("Tools")

@@ -2,8 +2,8 @@ import os
 import json
 import uuid
 import base64
-
-from fastapi import APIRouter, HTTPException, Response
+import subprocess
+from fastapi import APIRouter, HTTPException, Response, status
 
 from BotUiManager.api.models import RunBotRequest, RunBotResponse
 from BotUiManager.api.services.bot_docker_runner import run_bot_container, get_container_logs
@@ -31,6 +31,39 @@ def run_job(payload: RunBotRequest):
         **result
     )
 
+
+@router.get("/jobs/{container_id}/kill", tags=["jobs"])
+def kill_bot(container_id: str):
+    try:
+        subprocess.run(
+            ["docker", "rm", "-f", container_id],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        
+        return {
+            "status": "success",
+            "message": f"Container {container_id} stopped and removed via CLI."
+        }
+
+    except subprocess.CalledProcessError as e:
+        error_msg = e.stderr.strip()
+        if "No such container" in error_msg:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Container {container_id} not found in Docker."
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Docker CLI error: {error_msg}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {str(e)}"
+        )
+ 
 
 @router.get("/jobs/{container_id}/{pipeline_name}/collect", tags=["jobs"])
 def collect_container_outputs(container_id: str, pipeline_name: str):

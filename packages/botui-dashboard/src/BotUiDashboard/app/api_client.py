@@ -84,3 +84,7 @@ def image_endpoint(payload):
 
 def start_bot_api(payload):
     return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
+
+def kill_bot_api(container_id):
+    response = requests.get(f"{API_BASE_URL}/jobs/{container_id}/kill", timeout=5)
+    return response
