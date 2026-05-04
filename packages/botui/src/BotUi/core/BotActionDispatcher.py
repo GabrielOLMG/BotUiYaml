@@ -10,7 +10,7 @@ from BotUi.actions.KeySelectionsAction import KeySelectionsAction
 from BotUi.actions.RunScriptAction import RunScriptAction
 from BotUi.actions.FindTextByColorAction import FindTextByColorAction
 from BotUi.actions.StopIfAction import StopIfAction
-from BotUi.actions.UploadAction import UploadAction
+from BotUi.actions.ImportActionsAction import ImportActionsAction
 
 @dataclass
 class BotActionDispatcherResult:
@@ -26,7 +26,7 @@ class BotActionDispatcher:
         "RUN_SCRIPT": RunScriptAction,
         "FIND_TEXT_BY_COLOR": FindTextByColorAction,
         "STOP_IF": StopIfAction,
-        "UPLOAD_FILE": UploadAction,
+        "IMPORT_ACTIONS": ImportActionsAction,
     }
 
     def __init__(self, bot_driver, bot_app):

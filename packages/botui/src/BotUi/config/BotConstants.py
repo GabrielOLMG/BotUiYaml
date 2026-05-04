@@ -67,15 +67,6 @@ ACTION_SCHEMA = {
             **GLOBAL_FIELDS
         }
     },
-    "UPLOAD_FILE": {
-        "required": {
-            "file_path": str,
-            "coord": (list, str),  # aceita os dois por agora
-        },
-        "optional": {
-            **GLOBAL_FIELDS
-        }
-    },
     "STOP_IF": {
         "required": {
             "condition": str,
@@ -90,19 +81,11 @@ ACTION_SCHEMA = {
             **GLOBAL_FIELDS
         }
     },
-    "DO_WHILE": {
-        "required": {
-            "while_condition": list,
-            "do": list
-
-        },
-    },
     "FOR_EACH": {
         "required": {
             "loop_var": str,
             "items": str,
             "steps": list
-
         },
     }
 }
