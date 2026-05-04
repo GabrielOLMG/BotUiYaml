@@ -22,11 +22,12 @@ class BotUIApp:
             self,
             yaml_path: str,
             output_folder: str,
+            bot_container_path: str,
             global_yaml_path:str=None, 
             screenshot_folder:str=None,
             log_folder:str=None,
             debug_folder:str=None,
-            debug_mode=False
+            debug_mode=False,
         ):
         
         # 1) Carrega Yaml Principal 
@@ -48,6 +49,7 @@ class BotUIApp:
         os.makedirs(self.log_folder, exist_ok=True)
 
         # 5) Path
+        self.bot_container_path = bot_container_path
         self.log_path = os.path.join(self.log_folder, "BotUI.log")
         self.screenshot_path = os.path.join(self.screenshot_folder, "screenshot_page.png")
         self.debug_path = os.path.join(self.debug_folder, "debug.png")
@@ -197,9 +199,10 @@ class BotUIApp:
 
             # Steps
             if "steps" in pipeline_infos:
-                pipeline_infos["steps"] = self.expand_for_each(
+                pipeline_infos["steps"] = self.expand_step(
                     pipeline_infos["steps"]
                 )
+
             for step in pipeline_infos["steps"]:
                 for key_name, raw_value in step.items():
                     step[key_name] = resolve_variables(raw_value, self.data_store)
@@ -218,7 +221,7 @@ class BotUIApp:
     # Helpers ( Tentar Generalizar para remover daqui)
     # -----------------------
 
-    def _expand_action(self, step):
+    def _expand_for_each_step(self, step):
         loop_var = step.get("loop_var")
         items = step.get("items", [])
         inner_steps = step.get("steps", [])
@@ -256,27 +259,42 @@ class BotUIApp:
 
                 # 🔁 Se o step expandido ainda tiver FOR_EACH dentro, processa recursivamente
                 if step_obj.get("action") == "FOR_EACH":
-                    expanded_steps.extend(self._expand_action(step_obj))
+                    expanded_steps.extend(self._expand_for_each_step(step_obj))
                 else:
                     expanded_steps.append(step_obj)
 
         return expanded_steps
 
-    def expand_for_each(self, steps: list):
+    def _expand_imported_action(self, step):
+        import_path = f"{self.bot_container_path}/{step.get('path')}"
+        if not import_path:
+            raise ValueError("IMPORT_ACTIONS requer o campo 'path'")
+
+        try:
+            with open(import_path, 'r', encoding='utf-8') as f:
+                import_content = yaml.safe_load(f)
+        except Exception as e:
+            raise FileNotFoundError(f"Erro ao carregar YAML importado em '{import_path}': {e}")
+
+        if not isinstance(import_content, list):
+            raise ValueError(f"O arquivo importado '{import_path}' deve conter uma lista de ações, mas recebeu {type(import_content)}")
+
+        return self.expand_step(import_content)
+
+    def expand_step(self, steps: list):
         expanded_steps = []
         for step in steps:
             if step.get("action") == "FOR_EACH":
-                expanded_steps.extend(self._expand_action(step))
+                expanded_steps.extend(self._expand_for_each_step(step))
+
+            elif step.get("action") == "IMPORT_ACTIONS":
+                expanded_steps.extend(self._expand_imported_action(step))
             else:
                 # 🔁 verifica se há FOR_EACH dentro de steps aninhados
                 if "steps" in step and isinstance(step["steps"], list):
-                    step["steps"] = self.expand_for_each(step["steps"])
+                    step["steps"] = self._expand_for_each_step(step["steps"])
                 expanded_steps.append(step)
         return expanded_steps
-
-
-
-
 
 
     def _expand_reference(self):

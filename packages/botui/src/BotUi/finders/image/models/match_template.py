@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 class MatchTemplateService:
     def __init__(self, threshold=0.95):

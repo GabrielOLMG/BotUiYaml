@@ -39,7 +39,8 @@ def start_bot(
         yaml_path=str(yaml_path),
         output_folder=str(output_folder),
         global_yaml_path=yaml_variables,
-        debug_mode=debug
+        debug_mode=debug,
+        bot_container_path=f"{pipeline_path}"
     )
 
     bot_ui.run()

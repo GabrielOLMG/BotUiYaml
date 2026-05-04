@@ -87,7 +87,12 @@ ACTION_SCHEMA = {
             "items": str,
             "steps": list
         },
-    }
+    },
+    "IMPORT_ACTIONS": {
+        "required": {
+            "path": str,  # PAth relativo ao volume criado!
+        },
+    },
 }
 
 
