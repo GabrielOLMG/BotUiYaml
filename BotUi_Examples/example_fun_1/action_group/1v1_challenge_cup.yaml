@@ -1,0 +1,27 @@
+- action: WRITE
+  name: apologies
+  text: "I'm a bot under construction, sorry for the inconvenience."
+
+- action: KEYS_SELECTIONS
+  keys:
+    - ENTER
+
+- action: WRITE
+  name: leaving_battle
+  text: "/leave"
+
+- action: KEYS_SELECTIONS
+  keys:
+    - ENTER
+
+- action: FIND
+  object_type: TEXT
+  text: "Forfeit"
+  in_text: False
+  interaction:
+    type: CLICK  
+  search_area:
+    row: 0
+    column: 1
+    grid_rows: 3    
+    grid_cols: 3

@@ -64,7 +64,7 @@ class BotMediaManager:
 
         return last != prev
 
-    def create_final_media(self, output_format="gif", fps=5):
+    def create_final_media(self, output_format="mp4", fps=3):
         frames = self._normalize_media()
         output_path = Path(self.output_path).resolve().parent / f"history.{output_format}"
         if not frames:

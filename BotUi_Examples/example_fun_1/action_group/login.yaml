@@ -1,0 +1,92 @@
+- action: FIND
+  name: google_check
+  object_type: TEXT
+  text: "Consent"
+  interaction:
+    type: CLICK  
+  search_area:
+    row: 1
+    column: 1
+    grid_rows: 3    
+    grid_cols: 2
+  next:
+    true: find_choose_name
+    false: find_choose_name
+  
+# --------------------------------
+# LOGGING
+# --------------------------------
+- action: FIND
+  name: find_choose_name
+  object_type: TEXT
+  text: "Choose name"
+  interaction:
+    type: CLICK  
+  search_area:
+    row: 0
+    column: 2
+    grid_rows: 3    
+    grid_cols: 3
+
+- action: FIND
+  name: find_username
+  object_type: TEXT
+  text: "Username"
+  interaction:
+    type: CLICK  
+    offset:
+      y: 10
+  search_area:
+    row: 0
+    column: 2
+    grid_rows: 3    
+    grid_cols: 3
+
+- action: WRITE
+  name: write_username
+  text: $USERNAME
+
+- action: KEYS_SELECTIONS
+  name: enter_key
+  keys:
+    - ENTER
+  
+- action: FIND
+  name: find_password
+  object_type: TEXT
+  text: "Password"
+  interaction:
+    type: CLICK  
+    offset:
+      y: 10
+  search_area:
+    row: 0
+    column: 1
+    grid_rows: 2    
+    grid_cols: 3
+  next:
+    true: write_password
+    false: find_password
+
+- action: WRITE
+  name: write_password
+  text: $PASSWORD
+
+- action: KEYS_SELECTIONS
+  name: enter_key
+  keys:
+    - ENTER
+
+- action: FIND
+  name: check_if_logged 
+  object_type: TEXT
+  text: $USERNAME
+  search_area:
+    row: 0
+    column: 2
+    grid_rows: 3    
+    grid_cols: 3
+  next:
+    true: check_if_is_battling
+    false: check_if_logged
+  

@@ -1,0 +1,76 @@
+- action: FIND
+  name: find_format_box
+  object_type: TEXT
+  text: "Format"
+  interaction:
+    type: CLICK  
+    offset:
+      y: 10
+  search_area:
+    row: 0
+    column: 0
+    grid_rows: 3    
+    grid_cols: 3
+
+- action: FIND
+  name: select_game_tab
+  object_type: TEXT
+  text: "Randomized Metas"
+  in_text: true
+  debug: True
+  interaction:
+    type: CLICK  
+    offset:
+      x: -20
+  search_area:
+    row: 0
+    column: 1
+    grid_rows: 3    
+    grid_cols: 5
+  next: 
+    True: select_game_mode
+    False: end
+
+- action: FIND
+  name: select_game_mode
+  object_type: TEXT
+  text: "Challenge Cup 1v1"
+  search_area:
+    row: 0
+    column: 0
+    grid_rows: 1    
+    grid_cols: 1
+  interaction:
+    type: CLICK  
+  next: 
+    True: start_searching
+    False: end
+
+- action: FIND
+  name: start_searching
+  object_type: TEXT
+  text: "Battle!"
+  interaction:
+    type: CLICK  
+  search_area:
+    row: 0
+    column: 0
+    grid_rows: 3    
+    grid_cols: 3
+  next: 
+    True: waiting_battle
+    False: end
+
+- action: FIND
+  name: waiting_battle
+  object_type: TEXT
+  text: "Choose"
+  debug: True
+  search_area:
+    row: 1
+    column: 0
+    grid_rows: 3    
+    grid_cols: 3
+  next:
+    true: apologies
+    false: waiting_battle
