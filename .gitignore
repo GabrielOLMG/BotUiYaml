@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 _teste/
 _debug/
+_prod/
+
