@@ -120,7 +120,7 @@ class PlaywrightDriver(BotDriver):
 
         return True, None
 
-def download_file(self, file_path: str, coord, timeout=30000):
+    def download_file(self, file_path: str, coord, timeout=30000):
         from BotUi.utils.utils import parse_coord
         from pathlib import Path
         import os
