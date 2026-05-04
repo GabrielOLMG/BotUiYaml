@@ -125,7 +125,6 @@ class PlaywrightDriver(BotDriver):
         from pathlib import Path
         import os
 
-        # 1. Coordinate Validation
         coord = parse_coord(coord)
         if coord is None:
             return False, f"[PlaywrightDriver.download_file] Invalid or missing coordinates: coord='{coord}'"
@@ -137,8 +136,6 @@ class PlaywrightDriver(BotDriver):
         except Exception as e:
             return False, f"[PlaywrightDriver.download_file] Preparation error: {e}"
 
-        # --- ATTEMPT 1: Direct Download ---
-        # This handles cases where the server sends 'Content-Disposition: attachment'
         try:
             with self.page.expect_download(timeout=timeout) as download_info:
                 success, error = self.click(coord=(x, y))
@@ -150,22 +147,17 @@ class PlaywrightDriver(BotDriver):
             return True, None
 
         except Exception:
-            # If a timeout occurs, it might be because the file opened in a new tab instead
             print(f"[PlaywrightDriver] Direct download failed or opened in a tab. Attempting fallback...")
 
-        # --- ATTEMPT 2: Fallback for New Tab (Popup) ---
-        # This handles cases where the file (like a PDF) opens in a new tab for viewing
+        # --- Fallback for New Tab (Popup) ---
         try:
-            # Check if a new page was opened in the context after the previous click
             pages = self.page.context.pages
             
             if len(pages) > 1:
-                # Usually, the last page in the list is the newly opened tab
                 new_tab = pages[-1]
                 new_tab.wait_for_load_state("networkidle")
                 url = new_tab.url
                 
-                # Use Playwright's request context to fetch the file content from the URL
                 response = self.page.context.request.get(url)
                 
                 if response.status == 200:

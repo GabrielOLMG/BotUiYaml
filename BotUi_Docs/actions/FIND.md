@@ -39,7 +39,7 @@ Internally, all detection methods are delegated to the `BotTargetLocator`, which
     direction: str # Default: DOWN
   
   interaction:      # Consequence If Find
-    type: CLICK | UPLOAD
+    type: CLICK | UPLOAD | DOWNLOAD
 ```
 
 ---
@@ -137,7 +137,7 @@ Useful when the UI text is dynamic or slightly different.
 
 In this example, if "Welcome" is in a phrase like "Welcome User", it will still be able to find it because it contains the located text.
 
-### 4. Save coordinates for later use
+### 4. Upload File
 
 ```yaml
 - action: FIND
@@ -243,6 +243,18 @@ This is a case where we have a step that, regardless of whether or not it succes
 ```
 This is a case where we are repeating the same find until we find the desired object; it will only continue when available.
 
+### 11. Download File
+
+```yaml
+- action: FIND
+  name: "setup_download"
+  object_type: TEXT
+  text: "download"
+  interaction:
+    type: DOWNLOAD  
+    file_path: "data/dataset.csv"
+```
+In this case, what we're doing is finding the Download button and triggering a download action.
 ---
 
 ## Tip
