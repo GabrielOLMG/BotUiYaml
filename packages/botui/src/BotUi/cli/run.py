@@ -87,11 +87,28 @@ def template_match_test(
 
 ):
 
-    output = {
-        "success": True,
-        "result": None,
-        "error": None
-    }
+    try: 
+        from BotUi.finders.image.ImageExtractor import ImageExtractor
+
+        if search_area:
+            search_area=json.loads(search_area)
+        extractor = ImageExtractor(save_debug_internal=save_at, search_area=search_area)
+
+        data = extractor.run(source_image=source_image, template_image=template_image)
+
+        output = {
+            "success": True,
+            "result": data.to_dict(),
+            "error": None
+        }
+    except Exception as err:
+        import traceback
+        tb = traceback.format_exc()
+        output = {
+            "success": False,
+            "result": None,
+            "error": f"{str(err)} -> {tb}"
+        }
 
     typer.echo(json.dumps(output))
 

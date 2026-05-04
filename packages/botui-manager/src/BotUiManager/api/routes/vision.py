@@ -45,13 +45,13 @@ def template_match_simulate(payload: TemplateMatchPayload):
         cli_code=cli_code
     )
     
-    # debug_b64 = retrieve_content_from_container(save_path, container_name, is_binary=True)
+    debug_b64 = retrieve_content_from_container(save_path, container_name, is_binary=True)
 
     subprocess.run(["docker", "rm", "-f", container_name])
     return {
         "success": True,
         "result": result_cli,
-        "debug_image": None #debug_b64
+        "debug_image": debug_b64
 
     }
 

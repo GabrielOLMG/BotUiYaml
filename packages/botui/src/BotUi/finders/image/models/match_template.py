@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 class MatchTemplateService:
-    def __init__(self, threshold=0.95):
+    def __init__(self, threshold=0.9):
         self.threshold = threshold
 
     def run(self, source, template):
@@ -20,7 +20,6 @@ class MatchTemplateService:
         # 2)
         indices = np.where(correlated_matrix_norm >= self.threshold)
 
-
         # 3
         h, w = template.shape[:2]
         results = []
@@ -29,7 +28,12 @@ class MatchTemplateService:
         for row, col in zip(*indices):
             score = float(correlated_matrix_norm[row, col])
             
-            box = [int(col), int(row), int(col + w), int(row + h)]
+            box = [
+                [int(col), int(row)],           # Top-left
+                [int(col + w), int(row)],       # Top-right
+                [int(col + w), int(row + h)],   # Bottom-right
+                [int(col), int(row + h)]        # Bottom-left
+            ]
             
             results.append({
                 "box": box,

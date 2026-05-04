@@ -12,7 +12,7 @@ BLUE = (255, 0, 0)
 class ImageExtractor:
     def __init__(
             self,
-            model_type = "rapid_ocr",
+            model_type = "match_template",
             split_images = True,
             search_area:dict={},
             *,
@@ -37,9 +37,9 @@ class ImageExtractor:
     # -----------------------
     # Main
     # -----------------------
-    def run(self, source_image, templeta_image=None):
+    def run(self, source_image, template_image=None):
         try:
-            return self._run(source_image=source_image, templeta_image=templeta_image)
+            return self._run(source_image=source_image, template_image=template_image)
         except Exception as err:
             import traceback
 
@@ -48,34 +48,41 @@ class ImageExtractor:
             self.target_result.log_message = f"{str(err)} -> {tb}"
             return self.target_result
 
-    def _run(self, source_image, templeta_image):
+    def _run(self, source_image, template_image):
         # 0) Init
-        image = cv2.imread(source_image)
-        if image is None:
+        source_image_loaded = cv2.imread(source_image)
+        if source_image_loaded is None:
             self.target_result.error = True
-            self.target_result.log_message = f"{self.log_text} Failed to open image: cv2.imread('{source_image}')"
+            self.target_result.log_message = f"{self.log_text} Failed to open image: cv2.imread('{source_image_loaded}')"
+            return self.target_result
+        
+        template_image_loaded = cv2.imread(template_image)
+        if template_image_loaded is None:
+            self.target_result.error = True
+            self.target_result.log_message = f"{self.log_text} Failed to open image: cv2.imread('{template_image}')"
             return self.target_result
 
+
         # 1) 
-        # images_parts = self._process_image_parts(image)
-        # self.target_result.debug_json = images_parts 
+        images_parts = self._process_image_parts(source_image_loaded, template_image_loaded)
+        self.target_result.debug_json = images_parts 
 
-        # 3) Flat parts
-        # all_raw_results = []
-        # for part_results in images_parts.values():
-        #     all_raw_results.extend(part_results)
+        # 2) Flat parts
+        all_raw_results = []
+        for part_results in images_parts.values():
+            all_raw_results.extend(part_results)
 
 
-        # 6) Create Debug image
-        self.create_debug(image, all_texts, targets_info)
+        # 3) Create Debug image
+        self.create_debug(source_image_loaded, all_raw_results)
+
 
         return self.target_result
 
     # -----------------------
     # Secondary functions
     # -----------------------
-
-    def _process_image_parts(self, image):
+    def _process_image_parts(self, image, template_image):
         """
             # Return: {FULL_IMAGE: [{'box':..., 'center':..., 'score':..., 'text':...}]...}
         """
@@ -86,7 +93,7 @@ class ImageExtractor:
         with ThreadPoolExecutor(max_workers=None) as executor:
             # Mapeamos a tarefa para cada partes
             future_to_part = {
-                executor.submit(self._extract_single_image, info["image"], info["offset"], name): name 
+                executor.submit(self._extract_single_image, info["image"], template_image, info["offset"], name): name 
                 for name, info in image_parts.items()
             }
             
@@ -95,19 +102,21 @@ class ImageExtractor:
                 try:
                     results[part_name] = future.result()
                 except Exception as exc:
-                    print(f"Parte {part_name} gerou uma exceção: {exc}")
+                    import traceback
+                    tb = traceback.format_exc()
+                    print(f"{str(exc)} -> {tb}")
                     results[part_name] = []
 
 
         return results
 
-    def _extract_single_image(self, image, offset, part_name):
+    def _extract_single_image(self, image, template_image, offset, part_name):
         """
-            # Return: [{'box':..., 'center':..., 'score':..., 'text':...}, ...] 
+            # Return: [{'box':..., 'center':..., 'score':...}, ...] 
         """
 
         # 1) 
-        model_result = self._run_model(image)
+        model_result = self._run_model(image, template_image)
         if not model_result:
             return []
 
@@ -133,16 +142,13 @@ class ImageExtractor:
             item["R_C"] = part_name
 
         return model_result
-    
-
-
-    
+     
     # -----------------------
     # Models functions
     # -----------------------
     def _init_model(self):
         self.model = None
-        if self.model_type == "rapid_ocr":
+        if self.model_type == "match_template":
             from BotUi.finders.image.models.match_template import MatchTemplateService
             self.model = MatchTemplateService()
             return self.model
@@ -150,16 +156,11 @@ class ImageExtractor:
             raise ValueError(f"Non-existent image model: {self.model_type}")
         
     def _run_model(self, source, template):
-        if self.model_type == "rapid_ocr":
-            from BotUi.finders.image.models.match_template import MatchTemplateService
-            return self.model.run(source, template)
-        else:
-            raise ValueError(f"Non-existent image model: {self.model_type}")
+        return self.model.run(source, template)
 
     # -----------------------
     # Helpers functions
     # -----------------------
-
     def _compute_centers(self, results):
         results_with_centers = []
 
@@ -175,7 +176,6 @@ class ImageExtractor:
 
             results_with_centers.append({
                 "box": result["box"],
-                "text": result["text"],
                 "score": result["score"],
                 "center": [center_x, center_y]
             })
@@ -190,12 +190,9 @@ class ImageExtractor:
             if not isinstance(item, dict):
                 raise TypeError(f"Item {i} is not a dict: {item}")
 
-            required_keys = {"box", "text", "score"}
+            required_keys = {"box", "score"}
             if not required_keys.issubset(item.keys()):
                 raise ValueError(f"Item {i} missing keys: {item}")
-
-            if not isinstance(item["text"], str):
-                raise TypeError(f"Item {i} has invalid text: {item}")
 
             if not isinstance(item["score"], (int, float)):
                 raise TypeError(f"Item {i} has invalid score: {item}")
@@ -234,15 +231,21 @@ class ImageExtractor:
 
         return parts
         
-
     # -----------------------
     # Debug functions
     # -----------------------
-
-    def create_debug(self, image, all_texts, texts_filtered):
+    def create_debug(self, image, all_founds):
         image_debug = image.copy()
  
         image_debug = self._draw_grid(image_debug)
+
+        image_debug = self._get_bbox_templates(image_debug, all_founds, show_part=True)
+
+
+        if self.save_debug_internal:
+            cv2.imwrite(self.save_debug_internal, image_debug)
+
+        self.target_result.debug_image = image_debug
 
         return image_debug
 
@@ -293,4 +296,58 @@ class ImageExtractor:
 
         return image
 
+    def _get_bbox_templates(self, image, texts_info, show_part=False):
+        overlay = image.copy()
+        
+        for index, text_info in enumerate(texts_info):
+            box = np.array(text_info["box"], dtype=np.int32)
+            
+            GREEN = (0, 255, 0)
+            BLUE = (255, 0, 0)
+            RED = (0, 0, 255)
+            WHITE = (255, 255, 255)
 
+            if not show_part:
+                cx, cy = map(int, text_info["center"])
+                color = GREEN if index == self.position else BLUE
+                
+                cv2.polylines(image, [box], True, color, 2)
+                cv2.putText(
+                    image,
+                    f"[{index}] {text_info['score']*100:.2f}%",
+                    (cx, cy - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    RED,
+                    2
+                )
+            else:
+                tl_x, tl_y = text_info["box"][0] 
+                
+                cv2.polylines(image, [box], True, BLUE, 2)
+                cv2.fillPoly(overlay, [box], BLUE)
+                
+                label = f" {text_info['R_C']} "
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                scale = 0.4
+                thickness = 1
+                
+                (tw, th), _ = cv2.getTextSize(label, font, scale, thickness)
+                
+                cv2.rectangle(image, (int(tl_x), int(tl_y - th - 5)), (int(tl_x + tw), int(tl_y)), RED, -1)
+                
+                cv2.putText(
+                    image, 
+                    label, 
+                    (int(tl_x), int(tl_y - 5)), 
+                    font, 
+                    scale, 
+                    WHITE, 
+                    thickness, 
+                    lineType=cv2.LINE_AA
+                )
+
+        if show_part:
+            image = cv2.addWeighted(overlay, 0.15, image, 0.85, 0)
+            
+        return image

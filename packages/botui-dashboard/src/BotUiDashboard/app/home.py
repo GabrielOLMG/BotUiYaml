@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 from BotUiDashboard.app.api_client import get_outputs, start_bot_api
-from BotUiDashboard.app.components import inject_custom_css, inject_auto_scroll_js, open_ocr_toolkit, open_screenshot_history
+from BotUiDashboard.app.components import inject_custom_css, inject_auto_scroll_js, open_ocr_toolkit, open_image_toolkit, open_screenshot_history
 from BotUiDashboard.app.state_manager import init_state
 
 LOG_HEIGHT = 250
@@ -65,6 +65,9 @@ with st.sidebar:
     st.subheader("Tools")
     if st.button("OCR Toolkit", use_container_width=True):
         open_ocr_toolkit()
+
+    if st.button("Image Toolkit", use_container_width=True):
+        open_image_toolkit()
     
     if st.button("View screenshot history", use_container_width=True):
         open_screenshot_history()

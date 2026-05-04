@@ -413,14 +413,12 @@ class TextExtractor:
         for index, text_info in enumerate(texts_info):
             box = np.array(text_info["box"], dtype=np.int32)
             
-            # Cores para o desenho
             GREEN = (0, 255, 0)
             BLUE = (255, 0, 0)
             RED = (0, 0, 255)
             WHITE = (255, 255, 255)
 
             if not show_part:
-                # --- COMPORTAMENTO ORIGINAL (MANTER EXATAMENTE COMO ESTAVA) ---
                 cx, cy = map(int, text_info["center"])
                 color = GREEN if index == self.position else BLUE
                 
@@ -435,10 +433,8 @@ class TextExtractor:
                     2
                 )
             else:
-                # --- COMPORTAMENTO NOVO (PARA DEBUG DE POSIÇÃO R_C) ---
                 tl_x, tl_y = text_info["box"][0] # Canto Superior Esquerdo
                 
-                # Desenha a BBox e preenche o overlay
                 cv2.polylines(image, [box], True, BLUE, 2)
                 cv2.fillPoly(overlay, [box], BLUE)
                 
@@ -447,13 +443,10 @@ class TextExtractor:
                 scale = 0.4
                 thickness = 1
                 
-                # Calcula tamanho para o fundo vermelho
                 (tw, th), _ = cv2.getTextSize(label, font, scale, thickness)
                 
-                # Retângulo de fundo saindo do Top-Left para cima
                 cv2.rectangle(image, (int(tl_x), int(tl_y - th - 5)), (int(tl_x + tw), int(tl_y)), RED, -1)
                 
-                # Texto branco sobre o fundo vermelho
                 cv2.putText(
                     image, 
                     label, 
@@ -466,7 +459,6 @@ class TextExtractor:
                 )
 
         if show_part:
-            # Aplica transparência apenas no modo show_part
             image = cv2.addWeighted(overlay, 0.15, image, 0.85, 0)
             
         return image

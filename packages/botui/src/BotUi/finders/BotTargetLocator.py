@@ -52,18 +52,21 @@ class BotTargetLocator:
             search_area: dict={},
             debug:bool=False,
         ):
-        from BotUi.finders.image.old import find_image_center_match_template, find_image_center_sift
-        approaches_functions = [find_image_center_match_template, find_image_center_sift]
-        image_source = cv2.imread(self.image_source_path, 0)
-        template = cv2.imread(template_path, 0)
+        from BotUi.finders.image.ImageExtractor import ImageExtractor
 
-        for approach_function in approaches_functions:
-            target_result = approach_function(image_source, template)
+        models = ["match_template"]#, "sift"]
+        external_settings = {
+            "search_area": search_area
+        }
 
+        for model in models:
+            image_extractor = ImageExtractor(model_type=model, **external_settings)
+            target_result = image_extractor.run(source_image=self.image_source_path, template_image=template_path)
             if target_result.found:
                 break
-        
+
         return target_result
+        
     
     
     # ------------------------------------ #

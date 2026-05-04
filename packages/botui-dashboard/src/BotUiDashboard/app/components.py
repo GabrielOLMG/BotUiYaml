@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import base64
 
-from BotUiDashboard.app.api_client import ocr_endpoint
+from BotUiDashboard.app.api_client import ocr_endpoint, image_endpoint
 
 API_BASE_URL = "http://botui_api:8000"
 
@@ -135,3 +135,61 @@ def open_screenshot_history():
         file_name=f"frame_{idx}.png",
         mime="image/png"
     )
+
+
+@st.dialog("OCR Toolkit", width="large")
+def open_image_toolkit():
+    
+    with st.container(border=True):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            source_image = st.text_input("Absolute path to the source image.", value="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_debug/template_matching/source.png")
+            template_image = st.text_input("Absolute path to the template.", value="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_debug/template_matching/template.png")
+
+        
+        with col2:
+            st.caption("Search Area (Leave blank for None)")
+            g_row1, g_row2 = st.columns(2)
+            
+            r_val = g_row1.text_input("Row", value="", placeholder="None")
+            c_val = g_row2.text_input("Column", value="", placeholder="None")
+            gr_val = g_row1.text_input("Grid Rows", value=1, placeholder="None")
+            gc_val = g_row2.text_input("Grid Cols", value=1, placeholder="None")
+
+            def to_int_or_none(val):
+                try:
+                    return int(val) if val.strip() != "" else None
+                except ValueError:
+                    return None
+
+            search_area = {
+                "row": to_int_or_none(r_val),
+                "column": to_int_or_none(c_val),
+                "grid_rows": to_int_or_none(gr_val),
+                "grid_cols": to_int_or_none(gc_val)
+            }
+
+    debug_canvas = st.empty()
+
+    if st.button("Analyze Image", use_container_width=True, type="primary"):
+        filtered_search_area = {k: v for k, v in search_area.items() if v is not None}
+        
+        final_search_area = filtered_search_area if filtered_search_area else None
+
+        payload = {
+            "source_image": source_image,
+            "template_image": template_image if template_image else None,
+            "search_area": final_search_area
+        }
+
+        with st.spinner("Processing OCR..."):
+            result = image_endpoint(payload=payload)
+            if result["success"]:
+                st.success(result["message"])
+                with st.expander("JSON Result"):
+                    st.json(result["json"])
+                if result["image"]:
+                    debug_canvas.image(result["image"], use_container_width=True)
+            else:
+                st.error(result["message"])    
