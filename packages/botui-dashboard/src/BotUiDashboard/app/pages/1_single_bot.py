@@ -41,7 +41,8 @@ with st.sidebar:
                 "pipeline_dir": pipeline_dir,
                 "bot_relative_path": bot_path,
                 "globals_relative_path": vars_path,
-                "debug": debug_mode
+                "debug": debug_mode,
+                "n_instances": 1
             }
             try:
                 res = start_bot_api(payload)

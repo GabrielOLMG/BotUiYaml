@@ -22,7 +22,9 @@ class WriteAction(BaseAction):
 
         value = self.step_info[field]
         if field == "file_path":
-            value = open_file(value)
+            internal_path = f"{self.bot_app.bot_container_path}/{value}"
+
+            value = open_file(internal_path)
             
         success, log_text = self.bot_driver.write(value)
 
