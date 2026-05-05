@@ -30,7 +30,7 @@ def get_outputs(job_id):
 
 
 def start_bot_api(payload):
-    return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
+    return requests.post(f"{API_BASE_URL}/jobs/batch", json=payload, timeout=10)
 
 def kill_bot_api(job_id):
     response = requests.get(f"{API_BASE_URL}/jobs/{job_id}/kill", timeout=5)

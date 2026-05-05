@@ -1,9 +1,10 @@
 import os
+import re
 import json
 import uuid
 import base64
 import subprocess
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Response, status, BackgroundTasks
 
 from BotUiManager.api.models import RunBotRequest, RunBotResponse
 from BotUiManager.api.services.bot_docker_runner import run_bot_container
@@ -33,6 +34,30 @@ def run_job(payload: RunBotRequest):
         status="STARTED",
         **result
     )
+
+
+@router.post("/jobs/batch", tags=["jobs"])
+def run_batch_jobs(payload: RunBotRequest, background_tasks: BackgroundTasks):
+    """
+    Inicia N instâncias do mesmo bot em paralelo.
+    """
+    n_instances = payload.n_instances
+    def start_multiple_bots(p: RunBotRequest, count: int):
+        for i in range(count):
+            job_id = str(uuid.uuid4())
+            try:
+                run_bot_container(job_id, p)
+                print(f"Bot {i+1}/{count} iniciado com sucesso.")
+            except Exception as e:
+                print(f"Falha ao iniciar bot {i+1}: {e}")
+
+    background_tasks.add_task(start_multiple_bots, payload, n_instances)
+
+    return {
+        "status": "batch_started",
+        "total_requested": n_instances,
+        "message": f"Iniciando {n_instances} instâncias em segundo plano."
+    }
 
 
 @router.get("/jobs/{job_id}/kill", tags=["jobs"])
@@ -119,11 +144,30 @@ def get_active_jobs():
         
         result = subprocess.run(cmd, capture_output=True, text=True)
         
+        if result.returncode != 0:
+            print(f"Erro no comando Docker: {result.stderr}")
+            return []
+
         if not result.stdout.strip():
             return []
 
         lines = result.stdout.strip().split('\n')
-        containers = [json.loads(line) for line in lines]
+        containers = []
+        
+        for line in lines:
+            try:
+                data = json.loads(line)
+                
+                exit_code = 0
+                if data["state"] == "exited":
+                    match = re.search(r'\((\d+)\)', data["status"])
+                    if match:
+                        exit_code = int(match.group(1))
+                
+                data["exit_code"] = exit_code
+                containers.append(data)
+            except (json.JSONDecodeError, ValueError):
+                continue
         
         return containers
 

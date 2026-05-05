@@ -37,9 +37,17 @@ def new_bot_dialog():
         pipeline_dir = st.text_input("Pipeline Directory", value="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_teste")
         bot_yaml_path = st.text_input("Bot YAML", value="bot_yaml.yaml")
         var_yaml_path = st.text_input("Variables YAML", value="bot_variables.yaml")
+    
+    with col2:
+        n = st.number_input("Numero de Bots Para criar", value=1, min_value=1, max_value= 10)
 
     if st.button("Start Execution", use_container_width=True, type="primary"):
-        payload = {"pipeline_dir": pipeline_dir, "bot_relative_path": bot_yaml_path, "globals_relative_path": var_yaml_path}
+        payload = {
+            "pipeline_dir": pipeline_dir,
+            "bot_relative_path": bot_yaml_path, 
+            "globals_relative_path": var_yaml_path,
+            "n_instances": int(n)
+        }
         try:
             res = start_bot_api(payload)
             if res.status_code == 200: st.rerun()
@@ -69,7 +77,7 @@ with c_new:
 
 st.divider()
 
-@st.fragment(run_every=3)
+@st.fragment(run_every=2)
 def render_table_rows():
     bots_streaming = get_active_workers()
     
@@ -89,7 +97,16 @@ def render_table_rows():
         jid = bot["name"].replace(f"{BOTUI_WORKER_NAME}_", "")
 
         row_c1.code(bot["name"], language=None)
-        color = "green" if bot["state"] == "running" else "gray"
+        state = bot["state"]
+        exit_code = bot["exit_code"]
+
+        if state == "running":
+            color = "green"
+        elif state == "exited":
+            color = "green" if exit_code == 0 else "red"
+        else:
+            color = "gray"
+
         row_c2.markdown(f":{color}[{bot['status']}]")
         
         if row_c3.button("Check", key=f"check_{bot['id']}", use_container_width=True):

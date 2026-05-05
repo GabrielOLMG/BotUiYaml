@@ -29,6 +29,10 @@ class RunBotRequest(BaseModel):
         description="",
     )
 
+    n_instances: int = Field(
+        default=1,
+        description="",
+    )
 # =========================
 # Payload Response
 # =========================
