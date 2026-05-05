@@ -206,6 +206,11 @@ class BotUIApp:
             for step in pipeline_infos["steps"]:
                 for key_name, raw_value in step.items():
                     step[key_name] = resolve_variables(raw_value, self.data_store)
+            
+            for step in pipeline_infos["steps"]:
+                for key_name, raw_value in step.items():
+                    step[key_name] = self._resolve_special_keys(raw_value)
+
 
         return self.main_yaml
         
@@ -215,7 +220,18 @@ class BotUIApp:
 
         self.logger.info(f"Novo Yaml Gerado Em '{self.yaml_processed_path}'")
         
+    def _resolve_special_keys(self, value):
+        if not isinstance(value, str):
+            return value
+    
+        if "{{RANDOM_ID}}" in str(value):
+            import uuid
+            random_val = str(uuid.uuid4())
+            value = value.replace("{{RANDOM_ID}}", random_val)
 
+        return value
+        
+        
 
     # -----------------------
     # Helpers ( Tentar Generalizar para remover daqui)

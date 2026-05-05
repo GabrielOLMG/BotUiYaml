@@ -3,9 +3,9 @@ import requests
 
 API_BASE_URL = "http://botui_api:8000"
 
-def get_outputs(container_id, pipeline_name):
+def get_outputs(job_id):
     try:
-        response = requests.get(f"{API_BASE_URL}/jobs/{container_id}/{pipeline_name}/collect", timeout=5)
+        response = requests.get(f"{API_BASE_URL}/jobs/{job_id}/collect", timeout=5)
         if not response.status_code == 200:
             return False, None, "Offline", None
         
@@ -27,6 +27,29 @@ def get_outputs(container_id, pipeline_name):
         return exists, screenshot, logs, screenshot_debug
     except Exception as e:
         return False, None, f"Erro de conexão: {str(e)}", None
+
+
+def start_bot_api(payload, batch=True):
+    if batch:
+        return requests.post(f"{API_BASE_URL}/jobs/batch", json=payload, timeout=10)
+    else:
+        return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
+
+
+
+def kill_bot_api(job_id):
+    response = requests.get(f"{API_BASE_URL}/jobs/{job_id}/kill", timeout=5)
+    return response
+
+def get_active_workers():
+    response = requests.get(f"{API_BASE_URL}/jobs/all", timeout=5)
+    return response.json()
+
+
+
+# -----------------------
+# Tools
+# -----------------------
 
 def ocr_endpoint(payload):
     result = {
@@ -82,9 +105,4 @@ def image_endpoint(payload):
         result["message"] = f"Error: {str(err)}"
         return result
 
-def start_bot_api(payload):
-    return requests.post(f"{API_BASE_URL}/jobs/run", json=payload, timeout=10)
 
-def kill_bot_api(container_id):
-    response = requests.get(f"{API_BASE_URL}/jobs/{container_id}/kill", timeout=5)
-    return response

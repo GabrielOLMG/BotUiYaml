@@ -29,6 +29,10 @@ class RunBotRequest(BaseModel):
         description="",
     )
 
+    n_instances: int = Field(
+        default=1,
+        description="",
+    )
 # =========================
 # Payload Response
 # =========================
@@ -53,9 +57,4 @@ class RunBotResponse(BaseModel):
     status: str = Field(
         ...,
         description="run status",
-    )
-
-    pipeline_name: str = Field(
-        ...,
-        description="pipelone name",
     )

@@ -1,149 +1,119 @@
+import os
 import streamlit as st
-import hashlib
-import time
 
-from pathlib import Path
 
-from BotUiDashboard.app.api_client import get_outputs, start_bot_api, kill_bot_api
-from BotUiDashboard.app.components import inject_custom_css, inject_auto_scroll_js, open_ocr_toolkit, open_image_toolkit, open_screenshot_history
-from BotUiDashboard.app.state_manager import init_state
+from BotUiDashboard.app.api_client import kill_bot_api, get_active_workers, get_outputs, start_bot_api
 
-LOG_HEIGHT = 250
-SCREENSHOT_WIDTH = 500
-REFRESH_RATE = 0.3
-MAX_SCREENSHOTS = 100
+st.set_page_config(layout="wide", page_title="BotUI Stress Control")
+BOTUI_WORKER_NAME = os.getenv("BOTUI_WORKER_NAME", "botui_worker")
 
-st.set_page_config(page_title="BotUi Control Center", layout="wide")
-
-init_state()
-
-inject_custom_css(LOG_HEIGHT)
-
-with st.sidebar:
-    st.title("BotUi")
+@st.dialog("Real-Time Monitoring", width="large")
+def show_bot_details(job_id):
+    st.markdown("<style>div[role='dialog'] {max-width: 95vw !important; width: 95vw !important;}</style>", unsafe_allow_html=True)
     
-    with st.expander("Path Settings", expanded=True):
-        pipeline_dir = st.text_input(
-            "Pipeline Directory", 
-            value="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_teste"
-        )
-        bot_path = st.text_input("Bot YAML", value="bot_yaml.yaml")
-        vars_path = st.text_input("Variables YAML", value="bot_variables.yaml")
-        debug_mode = st.checkbox("Bot Internal Debug", value=False)
-    
-    st.divider()
-
-    st.subheader("Bot Control")
-    if not st.session_state.get("bot_running"):
-        if st.button("Start Execution", use_container_width=True, type="primary"):
-            st.session_state.screenshot_history = []
-            payload = {
-                "pipeline_dir": pipeline_dir,
-                "bot_relative_path": bot_path,
-                "globals_relative_path": vars_path,
-                "debug": debug_mode
-            }
-            try:
-                res = start_bot_api(payload)
-                if res.status_code == 200:
-                    st.session_state.last_container_id = res.json().get("container_id")
-                    st.session_state.pipeline_name = res.json().get("pipeline_name")
-
-                    st.session_state.bot_running = True
-                    st.rerun()
-                else:
-                    st.error(f"Start error: {res.text}")
-            except Exception as e:
-                st.error(f"API Failure: {e}")
-    else:
-        if st.button("Stop Bot", use_container_width=True):
-            container_id = st.session_state.get("last_container_id")
-            res = kill_bot_api(container_id)
-            
-            if res.status_code == 200:
-                final_entry = "\n\n[SYSTEM] --- EXECUTION KILLED BY USER ---\n"
-                st.session_state.last_log += final_entry
-                st.session_state.post_kill_msg = ("Bot interrompido!", "💀")
-            else:
-                st.error(f"Falha ao encerrar: {res.text}")
-            
-            st.session_state.bot_running = False
-            st.rerun()
-    st.divider()
-    
-    st.subheader("Tools")
-    if st.button("OCR Toolkit", use_container_width=True):
-        open_ocr_toolkit()
-
-    if st.button("Image Toolkit", use_container_width=True):
-        open_image_toolkit()
-    
-    if st.button("View screenshot history", use_container_width=True):
-        open_screenshot_history()
-
-st.header("Execution Dashboard")
-
-canvas_placeholder = st.empty()
-st.divider()
-st.subheader("Execution Logs")
-log_placeholder = st.empty()
-
-inject_auto_scroll_js()
-pipeline_status_placeholder = st.empty()
-
-if st.session_state.get("bot_running"):
-    container_id = st.session_state.get("last_container_id")
-    pipeline_name = st.session_state.get("pipeline_name")
-
-    while st.session_state.bot_running:
-        exists, screenshot, logs, screenshot_debug = get_outputs(container_id, pipeline_name)
-
+    @st.fragment(run_every=1)
+    def dialog_content():
+        exists, screenshot, logs, _ = get_outputs(job_id)
         if not exists:
-            st.session_state.bot_running = False
-            st.rerun()
-
-        if screenshot:
-            current_hash = hashlib.md5(screenshot).hexdigest()
-            last_hash = st.session_state.get("last_screenshot_hash")
-            if current_hash != last_hash:
-                st.session_state.screenshot_history.append(screenshot)
-                # if screenshot_debug:
-                #     st.session_state.screenshot_history.append(screenshot_debug)
-                st.session_state.last_screenshot_hash = current_hash
-                
-                if len(st.session_state.screenshot_history) > MAX_SCREENSHOTS:
-                    st.session_state.screenshot_history.pop(0)
-
-            try:
-                canvas_placeholder.image(screenshot, width=SCREENSHOT_WIDTH, use_container_width=True)
-            except Exception as e:
-                print(f"Placeholder error: {e}")
+            st.error("Container not found.")
+            return
         
-        if not logs:
-            logs = st.session_state.last_log 
-        else: 
-            st.session_state.last_log = logs
+        col_log, col_img = st.columns([1, 1])
+        with col_log:
+            st.caption("Console Logs")
+            st.code(logs if logs else "Waiting...", height=600)
+        with col_img:
+            st.caption("Last Screenshot")
+            if screenshot: st.image(screenshot, use_container_width=True)
+            else: st.warning("No screenshots yet.")
 
-        log_placeholder.markdown(
-            f'<div class="log-container">{logs}</div>', 
-            unsafe_allow_html=True
-        )
+    st.write(f"Inspecting: **{job_id}**")
+    dialog_content()
+
+@st.dialog("New Bot", width="large")
+def new_bot_dialog():
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        pipeline_dir = st.text_input("Pipeline Directory", value="/Users/gabrielluciano/Desktop/coding/pessoal/BotUiYaml/_teste")
+        bot_yaml_path = st.text_input("Bot YAML", value="bot_yaml.yaml")
+        var_yaml_path = st.text_input("Variables YAML", value="bot_variables.yaml")
+    
+    with col2:
+        n = st.number_input("Numero de Bots Para criar", value=1, min_value=1, max_value= 10)
+
+    if st.button("Start Execution", use_container_width=True, type="primary"):
+        payload = {
+            "pipeline_dir": pipeline_dir,
+            "bot_relative_path": bot_yaml_path, 
+            "globals_relative_path": var_yaml_path,
+            "n_instances": int(n)
+        }
+        try:
+            res = start_bot_api(payload)
+            if res.status_code == 200: st.rerun()
+            else: st.error(f"Error: {res.text}")
+        except Exception as e: st.error(f"API Failure: {e}")
+
+
+st.subheader("Bots Control Panel")
+
+all_bots = get_active_workers()
+c_status, c_del, c_new = st.columns([4, 1, 1])
+
+with c_status:
+    count = len(all_bots)
+    running = sum(1 for b in all_bots if b['state'] == 'running')
+    st.write(f"Total: **{count}** | Running: **{running}**")
+
+with c_del:
+    if all_bots and st.button("Delete All", key="btn_del_all", use_container_width=True, type="primary"):
+        for b in all_bots:
+            kill_bot_api(b["name"].replace(f"{BOTUI_WORKER_NAME}_", ""))
+        st.rerun()
+
+with c_new:
+    if st.button("New Bot", key="btn_new_bot", use_container_width=True):
+        new_bot_dialog()
+
+st.divider()
+
+@st.fragment(run_every=2)
+def render_table_rows():
+    bots_streaming = get_active_workers()
+    
+    h1, h2, h3, h4 = st.columns([3, 1, 1, 1])
+    h1.write("**Bot Name**")
+    h2.write("**Status**")
+    h3.write("**Analysis**")
+    h4.write("**Action**")
+    st.divider()
+
+    if not bots_streaming:
+        st.info("No active workers.")
+        return
+
+    for bot in bots_streaming:
+        row_c1, row_c2, row_c3, row_c4 = st.columns([3, 1, 1, 1])
+        jid = bot["name"].replace(f"{BOTUI_WORKER_NAME}_", "")
+
+        row_c1.code(bot["name"], language=None)
+        state = bot["state"]
+        exit_code = bot["exit_code"]
+
+        if state == "running":
+            color = "green"
+        elif state == "exited":
+            color = "green" if exit_code == 0 else "red"
+        else:
+            color = "gray"
+
+        row_c2.markdown(f":{color}[{bot['status']}]")
         
-        time.sleep(REFRESH_RATE)
-        if not st.session_state.bot_running:
-            break
-else:
-    canvas_placeholder.info("Waiting for bot to start monitoring...")
-    if st.session_state.last_log:
-        log_placeholder.markdown(
-            f'<div class="log-container">{st.session_state.last_log}</div>', 
-            unsafe_allow_html=True
-        )
-    else:
-        log_placeholder.markdown(
-            '<div class="log-container">Waiting for execution logs...</div>', 
-            unsafe_allow_html=True
-        )
+        if row_c3.button("Check", key=f"check_{bot['id']}", use_container_width=True):
+            show_bot_details(jid)
 
-    if st.session_state.screenshot_history:
-        canvas_placeholder.image(st.session_state.screenshot_history[-1], width=SCREENSHOT_WIDTH, use_container_width=True)
+        if row_c4.button("Delete", key=f"del_{bot['id']}", use_container_width=True):
+            kill_bot_api(jid)
+            st.rerun() 
+
+render_table_rows()

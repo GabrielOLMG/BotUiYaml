@@ -36,13 +36,6 @@ class BotTargetLocator:
         # --------
 
 
-
-
-
-
-
-
-    
     # ------------------------------------ #
     # Image 
     # ------------------------------------ #
@@ -156,7 +149,6 @@ class BotTargetLocator:
         else:
             return self.target_original_center
 
-    # def _debug(self, debug_image = None):
     def _debug(self, target_result):
         if not self.debug:
             return target_result 

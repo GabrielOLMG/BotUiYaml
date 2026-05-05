@@ -27,7 +27,7 @@ def retrieve_folder_from_container(container_id, container_path):
                         if f:
                             artifacts[member.name] = f.read()
     except Exception as e:
-        print(f"Erro ao extrair: {e}")
+        print(f"[retrieve_folder_from_container] Error extracting: {e}")
     return artifacts
 
 def retrieve_content_from_container(path, container_id, is_binary=True):
@@ -52,8 +52,12 @@ def retrieve_content_from_container(path, container_id, is_binary=True):
 
 def retrieve_logs_from_container(container_id):
     try:
-        cmd = ["docker", "logs", "--tail", "100", container_id]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        return result.stdout if result.returncode == 0 else None
-    except Exception:
-        return None
+        cmd = ["docker", "logs", "--tail", "50", container_id]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+        if result.stdout:
+            return result.stdout
+            
+        return "Empty logs (waiting for process to initialize...)"
+    except Exception as e:
+        return f"[retrieve_logs_from_container] Error accessing Docker: {str(e)}"
