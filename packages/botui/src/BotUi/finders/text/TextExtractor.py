@@ -111,23 +111,14 @@ class TextExtractor:
         results = {}
 
         self._init_model()
-        with ThreadPoolExecutor(max_workers=None) as executor:
-            # Mapeamos a tarefa para cada parte
-            future_to_part = {
-                executor.submit(self._extract_single_image, info["image"], info["offset"], name): name 
-                for name, info in image_parts.items()
-            }
-            
-            for future in as_completed(future_to_part):
-                part_name = future_to_part[future]
-                try:
-                    results[part_name] = future.result()
-                except Exception as exc:
-                    print(f"Parte {part_name} gerou uma exceção: {exc}")
-                    results[part_name] = []
-
-
+        for name, info in image_parts.items():
+            try:
+                results[name] = self._extract_single_image(info["image"], info["offset"], name)
+            except Exception as exc:
+                print(f"Erro na parte {name}: {exc}")
+                results[name] = []
         return results
+
 
     def _extract_single_image(self, image, offset, part_name):
         """
