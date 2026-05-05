@@ -54,8 +54,3 @@ class RunBotResponse(BaseModel):
         ...,
         description="run status",
     )
-
-    pipeline_name: str = Field(
-        ...,
-        description="pipelone name",
-    )

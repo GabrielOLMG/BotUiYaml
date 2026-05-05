@@ -6,7 +6,8 @@ import subprocess
 from fastapi import APIRouter, HTTPException, Response, status
 
 from BotUiManager.api.models import RunBotRequest, RunBotResponse
-from BotUiManager.api.services.bot_docker_runner import run_bot_container, get_container_logs
+from BotUiManager.api.services.bot_docker_runner import run_bot_container
+from BotUiManager.api.services.general import retrieve_folder_from_container, retrieve_logs_from_container, container_exists
 
 router = APIRouter()
 
@@ -71,8 +72,7 @@ def kill_bot(job_id: str):
 
 @router.get("/jobs/{job_id}/collect", tags=["jobs"])
 def collect_container_outputs(job_id: str):
-    from BotUiManager.api.services.general import retrieve_folder_from_container, retrieve_logs_from_container, container_exists
-    outputs_path = f"{ROOT_API}/{job_id}/outputs"
+    outputs_path = f"{ROOT_API}/{job_id}/outputs_{job_id}"
     container_name = f"{BOTUI_WORKER_NAME}_{job_id}"
 
     screenshot_path = f"./screenshots/screenshot_page.png" 
@@ -111,10 +111,6 @@ def collect_container_outputs(job_id: str):
 @router.get("/jobs/all", tags=["jobs"])
 def get_active_jobs():
     try:
-        # Comando Docker:
-        # -a: Pega todos (inclusive os que pararam, já que não usamos mais --rm)
-        # --filter: Filtra apenas os que começam com o nosso prefixo de worker
-        # --format: Cospe o resultado como JSON para não termos que tratar texto puro
         cmd = [
             "docker", "ps", "-a", 
             "--filter", "name=botui_worker_", 
@@ -126,7 +122,6 @@ def get_active_jobs():
         if not result.stdout.strip():
             return []
 
-        # O Docker retorna um JSON por linha, então precisamos tratar isso:
         lines = result.stdout.strip().split('\n')
         containers = [json.loads(line) for line in lines]
         

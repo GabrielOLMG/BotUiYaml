@@ -12,6 +12,7 @@ def start_bot(
     pipeline: str = typer.Option(...),
     bot: str = typer.Option(...),
     bot_variables: str | None = typer.Option(None),
+    output_folder: str | None = typer.Option(None),
     debug: bool = typer.Option(False)
 ):
     pipeline_path = Path(pipeline).resolve()
@@ -24,7 +25,7 @@ def start_bot(
     if not yaml_path.is_file():
         raise typer.BadParameter(f"Bot file not found: {bot}")
 
-    output_folder = pipeline_path / "outputs"
+    output_folder = "outputs" if not output_folder else output_folder
 
     yaml_variables = None
     if bot_variables:
