@@ -7,29 +7,30 @@ from BotUiManager.api.models import RunBotRequest
 
 ROOT_API = os.getenv("BOT_PATH")
 NETWORK = os.getenv("DOCKER_NETWORK", "botui_network")
+BOTUI_WORKER_NAME = os.getenv("BOTUI_WORKER_NAME")
 
 def run_bot_container(
         job_id,
         payload: RunBotRequest,
     )-> dict:
-    container_name = f"botui_{'debug_' if payload.debug else ''}{job_id}"
+    container_name = f"{BOTUI_WORKER_NAME}_{job_id}"
     dir_name = Path(payload.pipeline_dir).name
     debug_flag = "--debug" if payload.debug else ""
 
     
 
     init_cmd = ["docker", "run", "-d", "--network", NETWORK]
-    if not payload.debug:
+    if False and not payload.debug:
         init_cmd.append("--rm")
     final_cmd = [
         "--name", container_name,
-        "-v", f"{payload.pipeline_dir}:{ROOT_API}/{dir_name}",
+        "-v", f"{payload.pipeline_dir}:{ROOT_API}/{job_id}",
         "botui",
         "sh", "-c",
         (   
-            f"mkdir -p {ROOT_API}/{dir_name}/outputs/logs && "
+            f"mkdir -p {ROOT_API}/{job_id}/outputs/logs && "
             f"run-bot start-bot "
-            f"--pipeline {ROOT_API}/{dir_name} "
+            f"--pipeline {ROOT_API}/{job_id} "
             f"--bot {payload.bot_relative_path} "
             f"--bot-variables {payload.globals_relative_path or ''} "
             f"{debug_flag} "

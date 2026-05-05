@@ -11,6 +11,8 @@ from BotUiManager.api.services.bot_docker_runner import run_bot_container, get_c
 router = APIRouter()
 
 ROOT_API = os.getenv("BOT_PATH")
+BOTUI_WORKER_NAME = os.getenv("BOTUI_WORKER_NAME")
+
 
 @router.post(
     path="/jobs/run",
@@ -32,11 +34,13 @@ def run_job(payload: RunBotRequest):
     )
 
 
-@router.get("/jobs/{container_id}/kill", tags=["jobs"])
-def kill_bot(container_id: str):
+@router.get("/jobs/{job_id}/kill", tags=["jobs"])
+def kill_bot(job_id: str):
     try:
+        container_name = f"{BOTUI_WORKER_NAME}_{job_id}"
+
         subprocess.run(
-            ["docker", "rm", "-f", container_id],
+            ["docker", "rm", "-f", container_name],
             check=True,
             capture_output=True,
             text=True
@@ -44,7 +48,7 @@ def kill_bot(container_id: str):
         
         return {
             "status": "success",
-            "message": f"Container {container_id} stopped and removed via CLI."
+            "message": f"Container {container_name} stopped and removed via CLI."
         }
 
     except subprocess.CalledProcessError as e:
@@ -52,7 +56,7 @@ def kill_bot(container_id: str):
         if "No such container" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Container {container_id} not found in Docker."
+                detail=f"Container {container_name} not found in Docker."
             )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -65,11 +69,11 @@ def kill_bot(container_id: str):
         )
  
 
-@router.get("/jobs/{container_id}/{pipeline_name}/collect", tags=["jobs"])
-def collect_container_outputs(container_id: str, pipeline_name: str):
+@router.get("/jobs/{job_id}/collect", tags=["jobs"])
+def collect_container_outputs(job_id: str):
     from BotUiManager.api.services.general import retrieve_folder_from_container, retrieve_logs_from_container, container_exists
-    outputs_path = f"{ROOT_API}/{pipeline_name}/outputs"
-
+    outputs_path = f"{ROOT_API}/{job_id}/outputs"
+    container_name = f"{BOTUI_WORKER_NAME}_{job_id}"
 
     screenshot_path = f"./screenshots/screenshot_page.png" 
     debug_screenshot_path = f"./debugs/debug.png" 
@@ -83,12 +87,12 @@ def collect_container_outputs(container_id: str, pipeline_name: str):
         "debug_json": None,
         "logs": None
     }
-    if not container_exists(container_id):
+    if not container_exists(container_name):
             return result
     
     result["exists"] = True
-    result["logs"] = retrieve_logs_from_container(container_id)
-    files = retrieve_folder_from_container(container_id, outputs_path)
+    result["logs"] = retrieve_logs_from_container(container_name)
+    files = retrieve_folder_from_container(container_name, outputs_path)
 
     if files:
         if screenshot_path in files:
@@ -104,3 +108,30 @@ def collect_container_outputs(container_id: str, pipeline_name: str):
 
     return result
     
+@router.get("/jobs/all", tags=["jobs"])
+def get_active_jobs():
+    try:
+        # Comando Docker:
+        # -a: Pega todos (inclusive os que pararam, já que não usamos mais --rm)
+        # --filter: Filtra apenas os que começam com o nosso prefixo de worker
+        # --format: Cospe o resultado como JSON para não termos que tratar texto puro
+        cmd = [
+            "docker", "ps", "-a", 
+            "--filter", "name=botui_worker_", 
+            "--format", '{"id": "{{.ID}}", "name": "{{.Names}}", "status": "{{.Status}}", "state": "{{.State}}"}'
+        ]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if not result.stdout.strip():
+            return []
+
+        # O Docker retorna um JSON por linha, então precisamos tratar isso:
+        lines = result.stdout.strip().split('\n')
+        containers = [json.loads(line) for line in lines]
+        
+        return containers
+
+    except Exception as e:
+        print(f"Erro ao listar containers: {e}")
+        return []

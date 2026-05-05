@@ -28,6 +28,22 @@ setup:
 	make build-bot && make build-api && make build-app && make run-api && make run-app
 	@echo "✅ System ready!"
 
+
+setup-app:
+	@echo ""
+	@echo "======================================"
+	@echo "🏗️  Setup App UI"
+	@echo "======================================"
+	make build-app && make run-app
+	@echo "✅ APP ready!"
+
+setup-api:
+	@echo ""
+	@echo "======================================"
+	@echo "🏗️  Setup API"
+	@echo "======================================"
+	make build-api && make run-api
+	@echo "✅ APP ready!"
 # ==========================================
 # BUILDs
 # ==========================================
@@ -45,23 +61,17 @@ build-bot:
 build-api:
 	@echo ""
 	@echo "======================================"
-	@echo "🏗️  Building API image: $(API_IMAGE)"
+	@echo "🏗️  Building API: "
 	@echo "======================================"
-	docker build \
-		-t $(API_IMAGE) \
-		-f $(API_DOCKERFILE) \
-		$(CONTEXT)
+	docker compose build --no-cache api
 	@echo "✅ API image built!"
 
 build-app:
 	@echo ""
 	@echo "======================================"
-	@echo "🏗️  Building APP image: $(APP_IMAGE)"
+	@echo "🏗️  Building APP: "
 	@echo "======================================"
-	docker build \
-		-t $(APP_IMAGE) \
-		-f $(APP_DOCKERFILE) \
-		$(CONTEXT)
+	docker compose build --no-cache dashboard
 	@echo "✅ API image built!"
 
 # ==========================================
