@@ -42,14 +42,11 @@ with st.sidebar:
                 "bot_relative_path": bot_path,
                 "globals_relative_path": vars_path,
                 "debug": debug_mode,
-                "n_instances": 1
             }
             try:
-                res = start_bot_api(payload)
+                res = start_bot_api(payload, batch=False)
                 if res.status_code == 200:
-                    st.session_state.last_container_id = res.json().get("container_id")
-                    st.session_state.pipeline_name = res.json().get("pipeline_name")
-
+                    st.session_state.job_id = res.json().get("job_id")
                     st.session_state.bot_running = True
                     st.rerun()
                 else:
@@ -58,8 +55,8 @@ with st.sidebar:
                 st.error(f"API Failure: {e}")
     else:
         if st.button("Stop Bot", use_container_width=True):
-            container_id = st.session_state.get("last_container_id")
-            res = kill_bot_api(container_id)
+            job_id = st.session_state.get("job_id")
+            res = kill_bot_api(job_id)
             
             if res.status_code == 200:
                 final_entry = "\n\n[SYSTEM] --- EXECUTION KILLED BY USER ---\n"
@@ -93,11 +90,10 @@ inject_auto_scroll_js()
 pipeline_status_placeholder = st.empty()
 
 if st.session_state.get("bot_running"):
-    container_id = st.session_state.get("last_container_id")
-    pipeline_name = st.session_state.get("pipeline_name")
+    job_id = st.session_state.get("job_id")
 
     while st.session_state.bot_running:
-        exists, screenshot, logs, screenshot_debug = get_outputs(container_id, pipeline_name)
+        exists, screenshot, logs, screenshot_debug = get_outputs(job_id)
 
         if not exists:
             st.session_state.bot_running = False
