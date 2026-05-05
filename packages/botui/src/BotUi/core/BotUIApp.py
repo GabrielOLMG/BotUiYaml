@@ -324,6 +324,7 @@ class BotUIApp:
         variables = config["variables"]
         has_reference = False
         for variable_name, variable_value in variables.items():
+            variable_value = self._resolve_special_keys(variable_value)
             if "$" in variable_value:
                 has_reference = True
             if variable_name in self.data_store:
