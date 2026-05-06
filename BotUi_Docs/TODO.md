@@ -13,10 +13,7 @@
 
 ## Documentaçao
 
-- falar do for each!
 - falar do target result na documentaçao
 - falar sobre a api na doccumentaçao
 - falar sobre a app na doccumentaçao
 - faalr que agora da para colcaor o campo opcional "name"
-- Documentar {{RANDOM_ID}}
-- Documentar {{RANDOM_CHOICE.LIST_NAME}}
