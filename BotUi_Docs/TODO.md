@@ -13,6 +13,7 @@
 
 ## Documentaçao
 
+- falar do for each!
 - falar do target result na documentaçao
 - falar sobre a api na doccumentaçao
 - falar sobre a app na doccumentaçao
