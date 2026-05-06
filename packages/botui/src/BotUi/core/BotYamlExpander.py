@@ -1,10 +1,11 @@
-
+import os
 import re
 import ast
 import yaml
 import json
 import uuid
 import random
+
 from copy import deepcopy
 from BotUi.utils.utils import resolve_variables
 
@@ -173,29 +174,7 @@ class BotYamlExpander:
     # -----------------------
     # Others functions
     # -----------------------
-    def _resolve_special_keys(self, value):
-        if not isinstance(value, str):
-            return value
 
-        # 1. RANDOM_ID (UUID)
-        if "{{RANDOM_ID}}" in value:
-            value = value.replace("{{RANDOM_ID}}", str(uuid.uuid4()))
-
-        # 2. RANDOM_CHOICE.KEY
-        pattern = r"\{\{RANDOM_CHOICE\.(.*?)\}\}"
-        matches = re.findall(pattern, value)
-
-        for list_key in matches:
-            choices_list = self.data_store.get(list_key)
-
-            if isinstance(choices_list, list) and len(choices_list) > 0:
-                choice = str(random.choice(choices_list))
-                tag_to_replace = "{{" + f"RANDOM_CHOICE.{list_key}" + "}}"
-                value = value.replace(tag_to_replace, choice)
-            else:
-                self.logger.warning(f"[_resolve_special_keys.RANDOM_CHOICE] List key '{list_key}' not found or empty in data_store.")
-
-        return value
     
     def _initialize_yaml_config(self, config):
         variables = config["variables"]
@@ -212,3 +191,58 @@ class BotYamlExpander:
             self._expand_reference()
 
         return True, None
+    
+    # -----------------------
+    # Special Keys functions
+    # -----------------------
+    def _resolve_special_keys(self, value):
+        if not isinstance(value, str):
+            return value
+        
+        value = self._load_file_sp(value)
+
+        if "{{RANDOM_ID}}" in value:
+            value = value.replace("{{RANDOM_ID}}", str(uuid.uuid4()))
+
+        value = self._random_choice_sp(value)
+        
+        return value
+    
+    def _load_file_sp(self, value):
+        if not isinstance(value, str):
+            return value
+        load_pattern = r"\{\{LOAD_FILE\.(.*?)\}\}"
+        load_matches = re.findall(load_pattern, value)
+
+        for file_path in load_matches:
+            full_path = os.path.join(self.bot_container_path, file_path)
+            try:
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+
+                if value == f"{{{{LOAD_FILE.{file_path}}}}}":
+                    return content
+                
+                value = value.replace(f"{{{{LOAD_FILE.{file_path}}}}}", str(content))
+            except Exception as e:
+                self.logger.error(f"Erro ao carregar arquivo em {full_path}: {e}")
+        return value
+
+
+    def _random_choice_sp(self, value):
+        if not isinstance(value, str):
+            return value
+        
+        pattern = r"\{\{RANDOM_CHOICE\.(.*?)\}\}"
+        matches = re.findall(pattern, value)
+
+        for list_key in matches:
+            choices_list = self.data_store.get(list_key)
+
+            if isinstance(choices_list, list) and len(choices_list) > 0:
+                choice = str(random.choice(choices_list))
+                tag_to_replace = "{{" + f"RANDOM_CHOICE.{list_key}" + "}}"
+                value = value.replace(tag_to_replace, choice)
+            else:
+                self.logger.warning(f"[BotYamlExpander._random_choice_sp] List key '{list_key}' not found or empty in data_store.")
+        return value
