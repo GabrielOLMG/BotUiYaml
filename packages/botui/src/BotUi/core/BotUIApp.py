@@ -265,7 +265,6 @@ class BotUIApp:
         if not inner_steps or not isinstance(inner_steps, list):
             raise ValueError("FOR_EACH requer 'steps' como lista de ações internas")
 
-        # 🔹 Resolve variáveis dinâmicas
         if isinstance(items, str) and "$" in items:
             items = resolve_variables(items, self.data_store)
         if isinstance(items, str):
@@ -274,32 +273,30 @@ class BotUIApp:
             except Exception:
                 raise ValueError(f"Não foi possível interpretar 'items': {items}")
 
-        # 🔹 Garante lista de dicts
         if isinstance(items, dict):
             items = [items]
         if not isinstance(items, list) or not all(isinstance(i, dict) for i in items):
             print(items)
             raise ValueError(f"'items' deve ser uma lista de dicionários, recebido: {type(items)}")
-
+        
+        resolved_inner_steps = self.expand_step(inner_steps)
         expanded_steps = []
         for item in items:
-            for inner_step in inner_steps:
+            for inner_step in resolved_inner_steps:
                 new_step = deepcopy(inner_step)
                 serialized = json.dumps(new_step)
                 for key, val in item.items():
                     pattern = rf"\{{\s*{loop_var}\.{key}\s*\}}"
                     serialized = re.sub(pattern, str(val), serialized)
                 step_obj = json.loads(serialized)
+                expanded_steps.append(step_obj)
 
-                # 🔁 Se o step expandido ainda tiver FOR_EACH dentro, processa recursivamente
-                if step_obj.get("action") == "FOR_EACH":
-                    expanded_steps.extend(self._expand_for_each_step(step_obj))
-                else:
-                    expanded_steps.append(step_obj)
-
-        return expanded_steps
+        return self.expand_step(expanded_steps)
 
     def _expand_imported_action(self, step):
+        if step.get("action") != "IMPORT_ACTIONS":
+            return step
+        
         import_path = f"{self.bot_container_path}/{step.get('path')}"
         if not import_path:
             raise ValueError("IMPORT_ACTIONS requer o campo 'path'")

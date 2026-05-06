@@ -52,7 +52,7 @@ def retrieve_content_from_container(path, container_id, is_binary=True):
 
 def retrieve_logs_from_container(container_id):
     try:
-        cmd = ["docker", "logs", "--tail", "50", container_id]
+        cmd = ["docker", "logs", "--tail", "150", container_id]
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         
         if result.stdout:
