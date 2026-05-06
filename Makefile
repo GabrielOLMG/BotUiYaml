@@ -142,6 +142,11 @@ kill-botui:
 	docker ps -q --filter "name=botui" | xargs -r docker kill
 	@echo "✅ Killed."
 
+clean-outputs:
+	@echo "Cleaning local outputs"
+	@find . -maxdepth 5 -type d -name "outputs_*" -exec rm -rf {} +
+	@echo "Pastas removidas."
+
 # ==========================================
 # JOBs
 # ==========================================
