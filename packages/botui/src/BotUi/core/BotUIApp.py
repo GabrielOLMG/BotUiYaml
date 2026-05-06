@@ -3,6 +3,8 @@ import re
 import ast
 import json
 import yaml
+import uuid
+import random
 import logging
 
 from copy import deepcopy
@@ -223,14 +225,30 @@ class BotUIApp:
     def _resolve_special_keys(self, value):
         if not isinstance(value, str):
             return value
-    
-        if "{{RANDOM_ID}}" in str(value):
-            import uuid
-            random_val = str(uuid.uuid4())
-            value = value.replace("{{RANDOM_ID}}", random_val)
+
+        # 1. Resolve o RANDOM_ID (UUID)
+        if "{{RANDOM_ID}}" in value:
+            value = value.replace("{{RANDOM_ID}}", str(uuid.uuid4()))
+
+        # 2. Resolve RANDOM_CHOICE.KEY
+        # O pattern busca algo como {{RANDOM_CHOICE.NOME_DA_LISTA}}
+        pattern = r"\{\{RANDOM_CHOICE\.(.*?)\}\}"
+        matches = re.findall(pattern, value)
+
+        for list_key in matches:
+            # Busca a lista dentro do self.data_store (variável de configuração da classe)
+            choices_list = self.data_store.get(list_key)
+
+            if isinstance(choices_list, list) and len(choices_list) > 0:
+                choice = str(random.choice(choices_list))
+                # Substitui a tag específica pelo valor sorteado
+                tag_to_replace = "{{" + f"RANDOM_CHOICE.{list_key}" + "}}"
+                value = value.replace(tag_to_replace, choice)
+            else:
+                print(f"Aviso: Chave de lista '{list_key}' não encontrada ou vazia em data_store.")
 
         return value
-        
+            
         
 
     # -----------------------
