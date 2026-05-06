@@ -145,7 +145,7 @@ kill-botui:
 clean-outputs:
 	@echo "Cleaning local outputs"
 	@find . -maxdepth 5 -type d -name "outputs_*" -exec rm -rf {} +
-	@echo "Pastas removidas."
+	@echo "Removed Folders"
 
 # ==========================================
 # JOBs
